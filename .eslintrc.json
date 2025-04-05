@@ -20,7 +20,7 @@
   },
   "ignorePatterns": ["node_modules/", "*.js", "components/ui/", "lib/utils.ts", "tailwind.config.ts"],
   "rules": {
-    // "react/react-in-jsx-scope": "off",
+    "react/react-in-jsx-scope": "off",
     // "react/jsx-props-no-spreading": "off",
     "import/order": [
       "warn",
