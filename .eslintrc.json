@@ -22,13 +22,15 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/require-default-props": "off",
+    "import/prefer-default-export": "off",
+    "no-nested-ternary": "off",
     "import/order": [
       "warn",
       {
         "newlines-between": "always",
         "groups": ["builtin", "external", "internal", "type", ["parent", "sibling", "index"], "unknown"],
         "pathGroups": [
-          { "pattern": "next{,/**}", "group": "internal", "position": "before" },
+          { "pattern": "next*{,/**}", "group": "internal", "position": "before" },
           { "pattern": "@/components/ui/**", "group": "internal", "position": "before" }
         ],
         "pathGroupsExcludedImportTypes": ["react"],
