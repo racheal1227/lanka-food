@@ -1,4 +1,4 @@
-import { Tables, TablesInsert, TablesUpdate } from '@/types/supabase.type'
+import { Tables, TablesInsert, TablesUpdate } from '@/types/database.types'
 
 export type Category = Tables<'categories'>
 export type CategoryInsert = TablesInsert<'categories'>
