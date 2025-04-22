@@ -1,7 +1,15 @@
 import supabase from '@/lib/supabaseClient'
-import { Product, ProductInsert } from '@/types/database.models'
+import { Category, Product, ProductInsert } from '@/types/database.models'
 
-// Create
+// Category
+export const getCategories = async (): Promise<Category[]> => {
+  const { data, error } = await supabase.from('categories').select('*')
+
+  if (error) throw error
+  return data
+}
+
+// Product
 export const createProduct = async (product: Omit<ProductInsert, 'id' | 'created_at'>) => {
   const { data, error } = await supabase.from('products').insert([product]).select()
 
@@ -9,13 +17,13 @@ export const createProduct = async (product: Omit<ProductInsert, 'id' | 'created
   return data[0]
 }
 
-// Read
 export const getProducts = async (): Promise<Product[]> => {
   const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false })
 
   if (error) throw error
   return data
 }
+
 export const getProduct = async (id: string): Promise<Product> => {
   const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
 
@@ -23,7 +31,6 @@ export const getProduct = async (id: string): Promise<Product> => {
   return data
 }
 
-// Update
 export const updateProduct = async (id: string, updates: Partial<Product>): Promise<Product> => {
   const { data, error } = await supabase.from('products').update(updates).eq('id', id).select().single()
 
@@ -31,7 +38,6 @@ export const updateProduct = async (id: string, updates: Partial<Product>): Prom
   return data
 }
 
-// Delete
 export const deleteProduct = async (id: string): Promise<boolean> => {
   const { error } = await supabase.from('products').delete().eq('id', id)
 
