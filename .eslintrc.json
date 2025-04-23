@@ -29,10 +29,7 @@
       {
         "newlines-between": "always",
         "groups": ["builtin", "external", "internal", "type", ["parent", "sibling", "index"], "unknown"],
-        "pathGroups": [
-          { "pattern": "next*{,/**}", "group": "internal", "position": "before" },
-          { "pattern": "@/components/ui/**", "group": "internal", "position": "before" }
-        ],
+        "pathGroups": [{ "pattern": "next*{,/**}", "group": "internal", "position": "before" }],
         "pathGroupsExcludedImportTypes": ["react"],
         "alphabetize": { "order": "asc", "caseInsensitive": true }
       }
