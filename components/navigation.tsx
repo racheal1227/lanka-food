@@ -1,20 +1,30 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useSuspenseQuery } from '@tanstack/react-query'
 
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+
+import { Category } from '@/types/database.models'
+import { ThemeSwitcher } from '@components/theme-switcher'
+import { getCategories } from '@services/product.service'
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu'
-
-import { ThemeSwitcher } from './theme-switcher'
+} from '@ui/navigation-menu'
 
 export default function MainNavigation() {
-  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const currentCategory = searchParams.get('category')
+
+  const { data: categories } = useSuspenseQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+    staleTime: Infinity,
+  })
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b shadow-sm">
@@ -30,28 +40,25 @@ export default function MainNavigation() {
             <NavigationMenu className="mx-auto">
               <NavigationMenuList className="flex justify-center">
                 <NavigationMenuItem>
-                  <Link href="/category1" legacyBehavior passHref>
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()} active={pathname === '/category1'}>
-                      카테고리1
+                  <Link href="/" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()} active={currentCategory === null}>
+                      전체
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                  <Link href="/category2" legacyBehavior passHref>
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()} active={pathname === '/category2'}>
-                      카테고리2
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <Link href="/category3" legacyBehavior passHref>
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()} active={pathname === '/category3'}>
-                      카테고리2
-                    </NavigationMenuLink>
-                  </Link>
-                </NavigationMenuItem>
+                {categories.map((category) => (
+                  <NavigationMenuItem key={category.id}>
+                    <Link href={`/?category=${encodeURIComponent(category.name)}`} legacyBehavior passHref>
+                      <NavigationMenuLink
+                        className={navigationMenuTriggerStyle()}
+                        active={currentCategory === category.name}
+                      >
+                        {category.name}
+                      </NavigationMenuLink>
+                    </Link>
+                  </NavigationMenuItem>
+                ))}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
