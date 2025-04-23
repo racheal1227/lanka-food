@@ -23,7 +23,6 @@
       "@/*": ["./*"],
       "@hooks/*": ["./hooks/*"],
       "@services/*": ["./services/*"],
-      "@types/*": ["./interfaces/*"],
       "@components/*": ["./components/*"],
       "@ui/*": ["./components/ui/*"]
     }
