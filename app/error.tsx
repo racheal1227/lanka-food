@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { toast } from '@/hooks/use-toast'
+import { toast } from '@hooks/use-toast'
 import { Button } from '@ui/button'
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

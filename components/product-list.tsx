@@ -5,8 +5,8 @@ import { ImageIcon } from 'lucide-react'
 
 import { CldImage } from 'next-cloudinary'
 
-import { getProducts } from '@/services/product.service'
 import { Product } from '@/types/database.models'
+import { getProducts } from '@services/product.service'
 
 export default function ProductList() {
   const { data: products } = useSuspenseQuery<Product[]>({ queryKey: ['products'], queryFn: getProducts })

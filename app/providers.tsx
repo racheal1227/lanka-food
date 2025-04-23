@@ -5,7 +5,7 @@ import * as React from 'react'
 
 import { ThemeProvider } from 'next-themes'
 
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from '@components/ui/toaster'
 
 export default function Providers({ children }: Readonly<{ children: React.ReactNode }>) {
   const [queryClient] = React.useState(

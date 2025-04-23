@@ -5,14 +5,14 @@ import { useEffect, useState } from 'react'
 
 import { useTheme } from 'next-themes'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@ui/dropdown-menu'
 
 function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false)
