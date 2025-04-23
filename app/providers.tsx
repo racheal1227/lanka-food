@@ -5,7 +5,8 @@ import * as React from 'react'
 
 import { ThemeProvider } from 'next-themes'
 
-import { Toaster } from '@components/ui/toaster'
+import Loader from '@ui/loader'
+import { Toaster } from '@ui/toaster'
 
 export default function Providers({ children }: Readonly<{ children: React.ReactNode }>) {
   const [queryClient] = React.useState(
@@ -18,8 +19,10 @@ export default function Providers({ children }: Readonly<{ children: React.React
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        {children}
-        <Toaster />
+        <React.Suspense fallback={<Loader />}>
+          {children}
+          <Toaster />
+        </React.Suspense>
       </ThemeProvider>
     </QueryClientProvider>
   )
