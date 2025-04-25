@@ -18,7 +18,7 @@ import {
 
 export default function MainNavigation() {
   const searchParams = useSearchParams()
-  const currentCategory = searchParams.get('category')
+  const selectedCategory = searchParams.get('category')
 
   const { data: categories } = useSuspenseQuery<Category[]>({
     queryKey: ['categories'],
@@ -41,7 +41,7 @@ export default function MainNavigation() {
               <NavigationMenuList className="flex justify-center">
                 <NavigationMenuItem>
                   <Link href="/" legacyBehavior passHref>
-                    <NavigationMenuLink className={navigationMenuTriggerStyle()} active={currentCategory === null}>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()} active={selectedCategory === null}>
                       전체
                     </NavigationMenuLink>
                   </Link>
@@ -52,7 +52,7 @@ export default function MainNavigation() {
                     <Link href={`/?category=${encodeURIComponent(category.name)}`} legacyBehavior passHref>
                       <NavigationMenuLink
                         className={navigationMenuTriggerStyle()}
-                        active={currentCategory === category.name}
+                        active={selectedCategory === category.name}
                       >
                         {category.name}
                       </NavigationMenuLink>

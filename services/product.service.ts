@@ -17,7 +17,27 @@ export const createProduct = async (product: Omit<ProductInsert, 'id' | 'created
   return data[0]
 }
 
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async (categoryName?: string): Promise<Product[]> => {
+  if (categoryName) {
+    const { data: category, error: categoryError } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('name', categoryName)
+      .single()
+
+    if (categoryError) throw categoryError
+
+    // 해당 category_id로 products 필터링
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('category_id', category.id)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data
+  }
+
   const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false })
 
   if (error) throw error
