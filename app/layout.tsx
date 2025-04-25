@@ -27,7 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </head>
-      <body className="bg-background text-foreground h-screen overflow-x-hidden">
+      <body className="bg-background text-foreground h-screen overflow-x-hidden" suppressHydrationWarning>
         <Providers>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
             <div className="flex flex-col h-screen">
