@@ -30,7 +30,7 @@ npm run dev
 ```bash
 npx supabase login
 npx supabase init
-npx supabase gen types typescript --project-id "$PROJECT_ID" > types/database.types
+npx supabase gen types typescript --project-id "$PROJECT_ID" > types/database.types.ts
 ```
 
 ### 환경 변수 설정
