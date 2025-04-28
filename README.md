@@ -6,6 +6,8 @@
 - React 19
 - Next.js v15
 - Tailwind CSS v3
+- shadcn/ui
+- Lucid
 - ESLint & Prettier
 - TanStack React Query
 - TanStack Table
