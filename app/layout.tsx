@@ -1,10 +1,9 @@
-import './globals.css'
+import '@/app/globals.css'
 
 import { Geist } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 
 import Providers from '@/app/providers'
-import MainNavigation from '@components/navigation'
 
 const defaultUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000'
 
@@ -30,13 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="bg-background text-foreground h-screen overflow-x-hidden" suppressHydrationWarning>
         <Providers>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <div className="flex flex-col h-screen">
-              <MainNavigation />
-              <main className="flex-grow flex flex-col items-center p-5 pt-20">{children}</main>
-              <footer className="w-full flex items-center justify-center border-t text-center text-xs gap-8 py-8">
-                <p>TODO: Footer</p>
-              </footer>
-            </div>
+            <div className="flex flex-col h-screen">{children}</div>
           </ThemeProvider>
         </Providers>
       </body>
