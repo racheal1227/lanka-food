@@ -1,6 +1,6 @@
 import MainNavigation from '@/components/navigation'
 
-export default function layout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
       <MainNavigation />
