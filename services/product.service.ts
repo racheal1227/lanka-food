@@ -1,5 +1,5 @@
-import supabase from '@/lib/supabaseClient'
 import { Category, Product, ProductInsert } from '@/types/database.models'
+import supabase from '@lib/supabase'
 
 // Category
 export const getCategories = async (): Promise<Category[]> => {
