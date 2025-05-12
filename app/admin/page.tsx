@@ -1,3 +1,10 @@
+import LogoutButton from '@components/auth/logout-button'
+
 export default function AdminPage() {
-  return <div>admin page</div>
+  return (
+    <>
+      <h3>admin page</h3>
+      <LogoutButton />
+    </>
+  )
 }
