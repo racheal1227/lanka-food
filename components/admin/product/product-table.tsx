@@ -14,7 +14,7 @@ import {
 import { ChevronDown, Edit, MoreHorizontal, Star, Trash } from 'lucide-react'
 import { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +22,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+} from '@ui/dropdown-menu'
+import { Input } from '@ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]

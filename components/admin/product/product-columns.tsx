@@ -4,12 +4,11 @@ import { ColumnDef } from '@tanstack/react-table'
 
 import Image from 'next/image'
 
-import { Badge } from '@/components/ui/badge'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Product } from '@/types/database.models'
-
-import { DataTableColumnHeader } from './data-table-column-header'
-import { DataTableRowActions } from './data-table-row-actions'
+import { DataTableColumnHeader } from '@components/table/data-table-column-header'
+import { DataTableRowActions } from '@components/table/data-table-row-actions'
+import { Badge } from '@ui/badge'
+import { Checkbox } from '@ui/checkbox'
 
 // 컬럼 생성 함수
 export const createProductColumns = ({

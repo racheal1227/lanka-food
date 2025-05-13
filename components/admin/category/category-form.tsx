@@ -4,11 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 import { Category } from '@/types/database.models'
+import { Button } from '@ui/button'
+import { Checkbox } from '@ui/checkbox'
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@ui/form'
+import { Input } from '@ui/input'
 
 const categorySchema = z.object({
   name: z.string().min(1, '카테고리 이름을 입력해주세요.'),

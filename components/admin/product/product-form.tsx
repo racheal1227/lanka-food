@@ -5,16 +5,15 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
 import { Product, Category } from '@/types/database.models'
-
-import { ImageUpload } from './image-upload'
-import { MultiImageUpload } from './multi-image-upload'
+import { ImageUpload } from '@components/admin/product/image-upload'
+import { MultiImageUpload } from '@components/admin/product/multi-image-upload'
+import { Button } from '@ui/button'
+import { Checkbox } from '@ui/checkbox'
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from '@ui/form'
+import { Input } from '@ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select'
+import { Textarea } from '@ui/textarea'
 
 const productSchema = z.object({
   name_ko: z.string({ required_error: '상품명을 입력해주세요.' }).min(1, { message: '상품명을 입력해주세요.' }),
