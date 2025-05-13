@@ -50,8 +50,8 @@ export function ProductForm({ product, categories, onSubmit, onCancel }: Product
       name_en: '',
       name_si: '',
       description: '',
-      price_krw: 0,
-      stock_quantity: 0,
+      price_krw: undefined,
+      stock_quantity: undefined,
       category_id: '',
       is_available: true,
       is_recommended: false,
@@ -174,10 +174,11 @@ export function ProductForm({ product, categories, onSubmit, onCancel }: Product
                   <FormLabel>가격 (KRW)</FormLabel>
                   <FormControl>
                     <Input
-                      type="number"
-                      min={0}
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="가격"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      onChange={(event) => field.onChange(parseFloat(event.target.value) || 0)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -192,12 +193,7 @@ export function ProductForm({ product, categories, onSubmit, onCancel }: Product
                 <FormItem>
                   <FormLabel>재고 수량</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
-                    />
+                    <Input type="number" placeholder="재고 수량" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
