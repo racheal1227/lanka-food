@@ -12,7 +12,7 @@ export default function ProductList() {
   const searchParams = useSearchParams()
   const selectedCategory = searchParams.get('category') || undefined
 
-  const { data: products = [] } = useSuspenseQuery<Product[]>({
+  const { data: products } = useSuspenseQuery<Product[]>({
     queryKey: ['products', 'category', selectedCategory],
     queryFn: () => getProductsByCategory(selectedCategory),
   })

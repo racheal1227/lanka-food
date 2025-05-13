@@ -17,7 +17,7 @@ export const createProduct = async (product: Omit<ProductInsert, 'id' | 'created
   return data[0]
 }
 
-// 관리자 페이지에서 사용하는 제품 조회 함수 (카테고리 ID 기반)
+// 관리자 페이지에서 사용하는 상품 조회 함수 (카테고리 ID 기반)
 export const getProducts = async (options?: {
   categoryId?: string
   sortBy?: 'created_at' | 'price_krw' | 'recommendation_order'
@@ -50,7 +50,7 @@ export const getProducts = async (options?: {
   return data
 }
 
-// 메인 페이지에서 사용하는 제품 조회 함수 (카테고리 이름 기반)
+// 메인 페이지에서 사용하는 상품 조회 함수 (카테고리 이름 기반)
 export const getProductsByCategory = async (
   categoryName?: string,
   options?: {
@@ -64,11 +64,15 @@ export const getProductsByCategory = async (
 
   if (categoryName) {
     // 카테고리 이름으로 카테고리 ID 찾기
-    const { data: categoryByName } = await supabase.from('categories').select('id').eq('name_ko', categoryName).limit(1)
+    const { data: category, error: categoryError } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('name', categoryName)
+      .single()
 
-    if (categoryByName && categoryByName.length > 0) {
-      query = query.eq('category_id', categoryByName[0].id)
-    }
+    if (categoryError) throw categoryError
+
+    query = query.eq('category_id', category.id)
   }
 
   // 정렬 적용

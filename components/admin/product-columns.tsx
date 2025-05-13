@@ -57,10 +57,10 @@ export const createProductColumns = ({
     },
     enableSorting: false,
   },
-  // 제품명 컬럼
+  // 상품명 컬럼
   {
     accessorKey: 'name_ko',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="제품명" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="상품명" />,
     cell: ({ row }) => <div className="font-medium">{row.getValue('name_ko')}</div>,
   },
   // 가격 컬럼

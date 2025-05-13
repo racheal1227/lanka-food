@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation'
 const navItems = [
   { label: '대시보드', href: '/admin', icon: LayoutDashboard },
   { label: '카테고리 관리', href: '/admin/categories', icon: Tag },
-  { label: '제품 관리', href: '/admin/products', icon: ShoppingBag },
+  { label: '상품 관리', href: '/admin/products', icon: ShoppingBag },
 ]
 
 export default function AdminSidebar() {
