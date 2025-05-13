@@ -7,11 +7,12 @@
 - Next.js v15
 - Tailwind CSS v3
 - shadcn/ui
-- Lucid
+- Lucide
 - ESLint & Prettier
 - TanStack React Query
 - TanStack Table
 - React Hook Form
+- dnd-kit
 
 - Supabase
 - Cloudinary
