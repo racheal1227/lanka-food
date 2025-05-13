@@ -4,20 +4,23 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 
 import { toast } from '@/hooks/use-toast'
 import * as categoryService from '@/services/category.service'
-import { Category } from '@/types/database.models'
+import { CategoryInsert, CategoryUpdate } from '@/types/database.models'
+import showErrorToast from '@/utils/show-error-toast'
 
+// Read
 export const useCategoriesQuery = () =>
   useSuspenseQuery({
     queryKey: ['categories'],
     queryFn: categoryService.getCategories,
+    staleTime: Infinity,
   })
 
+// Create
 export const useCreateCategory = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: Omit<Category, 'id' | 'created_at' | 'updated_at' | 'sort_order'>) =>
-      categoryService.createCategory(data),
+    mutationFn: (category: CategoryInsert) => categoryService.createCategory(category),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       toast({
@@ -26,27 +29,17 @@ export const useCreateCategory = () => {
       })
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: '오류',
-        description: '카테고리 추가 중 오류가 발생했습니다.',
-      })
-      console.error(error)
+      showErrorToast(error, '카테고리 추가 중 오류가 발생했습니다.')
     },
   })
 }
 
+// Update
 export const useUpdateCategory = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: ({
-      id,
-      data,
-    }: {
-      id: string
-      data: Omit<Category, 'id' | 'created_at' | 'updated_at' | 'sort_order'>
-    }) => categoryService.updateCategory(id, data),
+    mutationFn: (params: { id: string; category: CategoryUpdate }) => categoryService.updateCategory(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       toast({
@@ -55,16 +48,12 @@ export const useUpdateCategory = () => {
       })
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: '오류',
-        description: '카테고리 수정 중 오류가 발생했습니다.',
-      })
-      console.error(error)
+      showErrorToast(error, '카테고리 수정 중 오류가 발생했습니다.')
     },
   })
 }
 
+// Delete
 export const useDeleteCategory = () => {
   const queryClient = useQueryClient()
 
@@ -78,21 +67,17 @@ export const useDeleteCategory = () => {
       })
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: '오류',
-        description: '카테고리 삭제 중 오류가 발생했습니다.',
-      })
-      console.error(error)
+      showErrorToast(error, '카테고리 삭제 중 오류가 발생했습니다.')
     },
   })
 }
 
+// Update Order
 export const useUpdateCategoryOrder = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (categories: Pick<Category, 'id' | 'sort_order'>[]) => categoryService.updateCategoryOrder(categories),
+    mutationFn: (categories: { id: string; sort_order: number }[]) => categoryService.updateCategoryOrder(categories),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
       toast({
@@ -101,12 +86,7 @@ export const useUpdateCategoryOrder = () => {
       })
     },
     onError: (error) => {
-      toast({
-        variant: 'destructive',
-        title: '오류',
-        description: '카테고리 순서 변경 중 오류가 발생했습니다.',
-      })
-      console.error(error)
+      showErrorToast(error, '카테고리 순서 변경 중 오류가 발생했습니다.')
     },
   })
 }

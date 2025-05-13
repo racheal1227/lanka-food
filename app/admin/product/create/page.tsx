@@ -4,10 +4,9 @@ import { Suspense } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { ProductForm } from '@/components/admin/product-form'
-import { useCategoriesQuery } from '@/hooks/use-categories'
-import { useCreateProduct } from '@/hooks/use-products'
-import { Product } from '@/types/database.models'
+import { ProductForm } from '@components/admin/product/product-form'
+import { useCategoriesQuery } from '@hooks/use-category'
+import { useCreateProduct } from '@hooks/use-product'
 
 function CreateProductForm() {
   const router = useRouter()
@@ -18,13 +17,13 @@ function CreateProductForm() {
     // recommendation_order는 자동으로 계산되므로 제외
     createProduct.mutate(data, {
       onSuccess: () => {
-        router.push('/admin/products')
+        router.push('/admin/product')
       },
     })
   }
 
   const handleCancel = () => {
-    router.push('/admin/products')
+    router.push('/admin/product')
   }
 
   return <ProductForm categories={categories} onSubmit={handleSubmit} onCancel={handleCancel} />

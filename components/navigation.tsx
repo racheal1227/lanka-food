@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation'
 
 import { Category } from '@/types/database.models'
 import { ThemeSwitcher } from '@components/theme-switcher'
+import { useCategoriesQuery } from '@hooks/use-category'
 import { getCategories } from '@services/product.service'
 import {
   NavigationMenu,
@@ -20,11 +21,7 @@ export default function MainNavigation() {
   const searchParams = useSearchParams()
   const selectedCategory = searchParams.get('category')
 
-  const { data: categories } = useSuspenseQuery<Category[]>({
-    queryKey: ['categories'],
-    queryFn: getCategories,
-    staleTime: Infinity,
-  })
+  const { data: categories } = useCategoriesQuery()
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b shadow-sm">

@@ -3,18 +3,8 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
-import { CategoryForm } from '@/components/admin/category-form'
-import { SortableCategoryList } from '@/components/admin/sortable-category-list'
-import { Button } from '@/components/ui/button'
-import {
-  useCategoriesQuery,
-  useCreateCategory,
-  useUpdateCategory,
-  useDeleteCategory,
-  useUpdateCategoryOrder,
-} from '@/hooks/use-categories'
-import { Category } from '@/types/database.models'
-
+import { CategoryForm } from '@/components/admin/category/category-form'
+import { SortableCategoryList } from '@/components/admin/category/sortable-category-list'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -33,6 +24,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  useCategoriesQuery,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+  useUpdateCategoryOrder,
+} from '@/hooks/use-category'
+import { Category } from '@/types/database.models'
 
 export default function CategoriesPage() {
   const { data: categories, isLoading } = useCategoriesQuery()
@@ -51,11 +50,11 @@ export default function CategoriesPage() {
     setIsCreateDialogOpen(false)
   }
 
-  const handleUpdateCategory = (data: { name: string; is_active: boolean }) => {
+  const handleUpdateCategory = (category: { name: string; is_active: boolean }) => {
     if (selectedCategory) {
       updateCategory.mutate({
         id: selectedCategory.id,
-        data,
+        category,
       })
       setIsEditDialogOpen(false)
     }

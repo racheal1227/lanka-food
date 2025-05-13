@@ -5,9 +5,9 @@ import { z } from 'zod'
 
 import { notFound, useRouter } from 'next/navigation'
 
-import { ProductForm } from '@/components/admin/product-form'
-import { useCategoriesQuery } from '@/hooks/use-categories'
-import { useProductQuery, useUpdateProduct } from '@/hooks/use-products'
+import { ProductForm } from '@components/admin/product/product-form'
+import { useCategoriesQuery } from '@hooks/use-category'
+import { useProductQuery, useUpdateProduct } from '@hooks/use-product'
 
 // 상품 수정 폼에서 사용할 데이터 타입
 const productFormSchema = z.object({
@@ -38,17 +38,17 @@ function EditProductForm({ id }: { id: string }) {
 
   const handleSubmit = (data: ProductFormValues) => {
     updateProduct.mutate(
-      { id, data },
+      { id, product: data },
       {
         onSuccess: () => {
-          router.push('/admin/products')
+          router.push('/admin/product')
         },
       },
     )
   }
 
   const handleCancel = () => {
-    router.push('/admin/products')
+    router.push('/admin/product')
   }
 
   return <ProductForm product={product} categories={categories} onSubmit={handleSubmit} onCancel={handleCancel} />

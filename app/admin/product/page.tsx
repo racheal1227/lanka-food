@@ -5,8 +5,11 @@ import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { DataTable } from '@/components/admin/data-table'
-import { createProductColumns } from '@/components/admin/product-columns'
+import { Product } from '@/types/database.models'
+import { createProductColumns } from '@components/admin/product/product-columns'
+import { DataTable } from '@components/table/data-table'
+import { useDeleteProduct, useProductsQuery, useSetProductRecommendation } from '@hooks/use-product'
+import { useToast } from '@hooks/use-toast'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,18 +19,13 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { useProductsQuery, useDeleteProduct, useSetProductRecommendation } from '@/hooks/use-products'
-import { useToast } from '@/hooks/use-toast'
-import { getCategories } from '@/services/product.service'
-import { Product } from '@/types/database.models'
+} from '@ui/alert-dialog'
+import { Button } from '@ui/button'
 
 export default function ProductsPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { data: products, isLoading } = useProductsQuery()
+  const { data: products, isLoading } = useProductsQuery({ sorting: [{ id: 'created_at', desc: true }] })
 
   // 상품 삭제 관련 상태 및 mutation
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
@@ -51,7 +49,7 @@ export default function ProductsPage() {
 
   // 상품 편집 페이지로 이동
   const handleEditProduct = (product: Product) => {
-    router.push(`/admin/products/${product.id}`)
+    router.push(`/admin/product/${product.id}`)
   }
 
   // 상품 추천 설정/해제
@@ -64,7 +62,7 @@ export default function ProductsPage() {
 
   // 새 상품 추가 페이지로 이동
   const handleAddProduct = () => {
-    router.push('/admin/products/create')
+    router.push('/admin/product/create')
   }
 
   // 컬럼 정의

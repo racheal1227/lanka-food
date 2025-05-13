@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const sidebarItems = [
     { href: '/admin', label: '대시보드', icon: Home },
-    { href: '/admin/categories', label: '카테고리 관리', icon: Folder },
-    { href: '/admin/products', label: '상품 관리', icon: Package },
+    { href: '/admin/category', label: '카테고리 관리', icon: Folder },
+    { href: '/admin/product', label: '상품 관리', icon: Package },
   ]
 
   return (
