@@ -17,6 +17,7 @@ export const createProduct = async (product: Omit<ProductInsert, 'id' | 'created
   return data[0]
 }
 
+// 관리자 페이지에서 사용하는 제품 조회 함수 (카테고리 ID 기반)
 export const getProducts = async (options?: {
   categoryId?: string
   sortBy?: 'created_at' | 'price_krw' | 'recommendation_order'
@@ -28,6 +29,42 @@ export const getProducts = async (options?: {
 
   if (categoryId) {
     query = query.eq('category_id', categoryId)
+  }
+
+  // 정렬 적용
+  if (sortBy === 'recommendation_order') {
+    // 추천 순서만 적용할 때는 추천된 상품만 필터링
+    query = query.not('recommendation_order', 'is', null)
+    query = query.order('recommendation_order', { ascending: sortOrder === 'asc' })
+  } else {
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' })
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+  return data
+}
+
+// 메인 페이지에서 사용하는 제품 조회 함수 (카테고리 이름 기반)
+export const getProductsByCategory = async (
+  categoryName?: string,
+  options?: {
+    sortBy?: 'created_at' | 'price_krw' | 'recommendation_order'
+    sortOrder?: 'asc' | 'desc'
+  },
+) => {
+  const { sortBy = 'created_at', sortOrder = 'desc' } = options || {}
+
+  let query = supabase.from('products').select('*')
+
+  if (categoryName) {
+    // 카테고리 이름으로 카테고리 ID 찾기
+    const { data: categoryByName } = await supabase.from('categories').select('id').eq('name_ko', categoryName).limit(1)
+
+    if (categoryByName && categoryByName.length > 0) {
+      query = query.eq('category_id', categoryByName[0].id)
+    }
   }
 
   // 정렬 적용

@@ -4,17 +4,17 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 
 import { useSearchParams } from 'next/navigation'
 
+import { getProductsByCategory } from '@/services/product.service'
 import { Product } from '@/types/database.models'
 import ProductCard from '@components/product-card'
-import { getProducts } from '@services/product.service'
 
 export default function ProductList() {
   const searchParams = useSearchParams()
   const selectedCategory = searchParams.get('category') || undefined
 
-  const { data: products } = useSuspenseQuery<Product[]>({
-    queryKey: ['products', selectedCategory],
-    queryFn: () => getProducts(selectedCategory),
+  const { data: products = [] } = useSuspenseQuery<Product[]>({
+    queryKey: ['products', 'category', selectedCategory],
+    queryFn: () => getProductsByCategory(selectedCategory),
   })
 
   if (products.length === 0) {

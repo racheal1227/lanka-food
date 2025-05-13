@@ -1,13 +1,13 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import { toast } from '@/hooks/use-toast'
 import * as categoryService from '@/services/category.service'
 import { Category } from '@/types/database.models'
 
 export const useCategoriesQuery = () =>
-  useQuery({
+  useSuspenseQuery({
     queryKey: ['categories'],
     queryFn: categoryService.getCategories,
   })

@@ -1,35 +1,47 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { toast } from '@/hooks/use-toast'
 import * as productService from '@/services/product.service'
 import { Product } from '@/types/database.models'
 
-// 제품 목록 조회
+// 관리자 페이지용 제품 목록 조회 (카테고리 ID 기반)
 export const useProductsQuery = (options?: {
   categoryId?: string
   sortBy?: 'created_at' | 'price_krw' | 'recommendation_order'
   sortOrder?: 'asc' | 'desc'
 }) =>
-  useQuery({
+  useSuspenseQuery({
     queryKey: ['products', options],
     queryFn: () => productService.getProducts(options),
   })
 
+// 메인 페이지용 제품 목록 조회 (카테고리 이름 기반)
+export const useProductsByCategoryQuery = (
+  categoryName?: string,
+  options?: {
+    sortBy?: 'created_at' | 'price_krw' | 'recommendation_order'
+    sortOrder?: 'asc' | 'desc'
+  },
+) =>
+  useSuspenseQuery({
+    queryKey: ['products', 'category', categoryName, options],
+    queryFn: () => productService.getProductsByCategory(categoryName, options),
+  })
+
 // 추천 제품 목록 조회
 export const useRecommendedProductsQuery = () =>
-  useQuery({
+  useSuspenseQuery({
     queryKey: ['products', 'recommended'],
     queryFn: productService.getRecommendedProducts,
   })
 
 // 단일 제품 조회
 export const useProductQuery = (id: string) =>
-  useQuery({
+  useSuspenseQuery({
     queryKey: ['product', id],
     queryFn: () => productService.getProduct(id),
-    enabled: !!id,
   })
 
 // 제품 생성
