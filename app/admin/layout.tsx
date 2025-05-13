@@ -5,18 +5,18 @@ import { redirect } from 'next/navigation'
 
 import AdminHeader from '@/components/admin/admin-header'
 import AdminSidebar from '@/components/admin/admin-sidebar'
-import { getCurrentUser } from '@/services/auth.service'
+import { useAuthStore } from '@/stores/auth'
 
 export const metadata: Metadata = {
   title: '관리자 대시보드 | Lanka Food',
   description: 'Lanka Food 관리자 대시보드입니다.',
 }
 
-export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const user = await getCurrentUser()
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { user, role } = useAuthStore()
 
   // 로그인하지 않았거나 관리자가 아닌 경우 로그인 페이지로 리다이렉트
-  if (!user || user.role !== 'admin') {
+  if (!user || role !== 'admin') {
     redirect('/login')
   }
 

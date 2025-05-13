@@ -1,6 +1,5 @@
 'use server'
 
-import { User } from '@/types/database.models'
 import { createClient } from '@/utils/supabase/server'
 
 export const login = async ({ email, password }: { email: string; password: string }) => {
@@ -18,18 +17,4 @@ export const login = async ({ email, password }: { email: string; password: stri
 export const logout = async () => {
   const supabase = await createClient()
   await supabase.auth.signOut()
-}
-
-export const getCurrentUser = async (): Promise<User | null> => {
-  const supabase = await createClient()
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  if (!session) return null
-
-  const { data: userData, error } = await supabase.from('users').select('*').eq('id', session.user.id).single()
-  if (error) return null
-
-  return userData
 }

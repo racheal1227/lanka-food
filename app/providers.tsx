@@ -5,6 +5,7 @@ import * as React from 'react'
 
 import { ThemeProvider } from 'next-themes'
 
+import { AuthProvider } from '@components/auth/auth-provider'
 import Loader from '@ui/loader'
 import { Toaster } from '@ui/toaster'
 
@@ -19,10 +20,12 @@ export default function Providers({ children }: Readonly<{ children: React.React
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        <React.Suspense fallback={<Loader />}>
-          {children}
-          <Toaster />
-        </React.Suspense>
+        <AuthProvider>
+          <React.Suspense fallback={<Loader />}>
+            {children}
+            <Toaster />
+          </React.Suspense>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   )
