@@ -33,10 +33,14 @@ export const getProducts = async (options?: {
 
   // 정렬 적용
   if (sortBy === 'recommendation_order') {
-    // 추천 순서만 적용할 때는 추천된 상품만 필터링
-    query = query.not('recommendation_order', 'is', null)
-    query = query.order('recommendation_order', { ascending: sortOrder === 'asc' })
+    // Supabase 쿼리로 정렬 처리:
+    // 1. 추천 상품 내에서는 recommendation_order로 정렬
+    // 2. 일반 상품은 created_at으로 정렬
+    query = query
+      .order('recommendation_order', { ascending: sortOrder === 'asc', nullsFirst: false })
+      .order('created_at', { ascending: sortOrder === 'asc' })
   } else {
+    // 기존 정렬 방식
     query = query.order(sortBy, { ascending: sortOrder === 'asc' })
   }
 
@@ -69,10 +73,14 @@ export const getProductsByCategory = async (
 
   // 정렬 적용
   if (sortBy === 'recommendation_order') {
-    // 추천 순서만 적용할 때는 추천된 상품만 필터링
-    query = query.not('recommendation_order', 'is', null)
-    query = query.order('recommendation_order', { ascending: sortOrder === 'asc' })
+    // Supabase 쿼리로 정렬 처리:
+    // 1. 추천 상품 내에서는 recommendation_order로 정렬
+    // 2. 일반 상품은 created_at으로 정렬
+    query = query
+      .order('recommendation_order', { ascending: sortOrder === 'asc', nullsFirst: false })
+      .order('created_at', { ascending: sortOrder === 'asc' })
   } else {
+    // 기존 정렬 방식
     query = query.order(sortBy, { ascending: sortOrder === 'asc' })
   }
 
