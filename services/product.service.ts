@@ -17,28 +17,40 @@ export const createProduct = async (product: Omit<ProductInsert, 'id' | 'created
   return data[0]
 }
 
-export const getProducts = async (categoryName?: string): Promise<Product[]> => {
-  if (categoryName) {
-    const { data: category, error: categoryError } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('name', categoryName)
-      .single()
+export const getProducts = async (options?: {
+  categoryId?: string
+  sortBy?: 'created_at' | 'price_krw' | 'recommendation_order'
+  sortOrder?: 'asc' | 'desc'
+}) => {
+  const { categoryId, sortBy = 'created_at', sortOrder = 'desc' } = options || {}
 
-    if (categoryError) throw categoryError
+  let query = supabase.from('products').select('*')
 
-    // 해당 category_id로 products 필터링
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('category_id', category.id)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return data
+  if (categoryId) {
+    query = query.eq('category_id', categoryId)
   }
 
-  const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+  // 정렬 적용
+  if (sortBy === 'recommendation_order') {
+    // 추천 순서만 적용할 때는 추천된 상품만 필터링
+    query = query.not('recommendation_order', 'is', null)
+    query = query.order('recommendation_order', { ascending: sortOrder === 'asc' })
+  } else {
+    query = query.order(sortBy, { ascending: sortOrder === 'asc' })
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+  return data
+}
+
+export const getRecommendedProducts = async () => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .not('recommendation_order', 'is', null)
+    .order('recommendation_order', { ascending: true })
 
   if (error) throw error
   return data
@@ -63,4 +75,46 @@ export const deleteProduct = async (id: string): Promise<boolean> => {
 
   if (error) throw error
   return true
+}
+
+export const setProductRecommendation = async (id: string, isRecommended: boolean, recommendationOrder?: number) => {
+  let updates: Partial<Product> = {}
+
+  if (isRecommended) {
+    // 추천 설정
+    if (recommendationOrder) {
+      updates = { is_recommended: true, recommendation_order: recommendationOrder }
+    } else {
+      // 마지막 순서를 조회하여 새 항목 추가
+      const { data: maxOrderData } = await supabase
+        .from('products')
+        .select('recommendation_order')
+        .not('recommendation_order', 'is', null)
+        .order('recommendation_order', { ascending: false })
+        .limit(1)
+
+      // maxOrder가 null이 아닌지 확인
+      const maxOrder =
+        maxOrderData?.length && maxOrderData[0].recommendation_order !== null ? maxOrderData[0].recommendation_order : 0
+
+      updates = { is_recommended: true, recommendation_order: maxOrder + 1 }
+    }
+  } else {
+    // 추천 해제
+    updates = { is_recommended: false, recommendation_order: null }
+  }
+
+  const { data, error } = await supabase.from('products').update(updates).eq('id', id).select().single()
+
+  if (error) throw error
+  return data
+}
+
+export const updateProductRecommendationOrder = async (products: Pick<Product, 'id' | 'recommendation_order'>[]) => {
+  // Promise.all을 사용하여 병렬로 업데이트
+  await Promise.all(
+    products.map((product) =>
+      supabase.from('products').update({ recommendation_order: product.recommendation_order }).eq('id', product.id),
+    ),
+  )
 }

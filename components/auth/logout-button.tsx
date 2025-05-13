@@ -10,7 +10,11 @@ import { logout as logoutService } from '@services/auth.service'
 import { useAuthStore } from '@stores/auth'
 import { Button } from '@ui/button'
 
-export default function LogoutButton() {
+interface LogoutButtonProps {
+  children?: React.ReactNode
+}
+
+export default function LogoutButton({ children }: LogoutButtonProps) {
   const router = useRouter()
   const { logout: logoutStore } = useAuthStore()
 
@@ -30,8 +34,26 @@ export default function LogoutButton() {
     },
   })
 
+  const handleLogout = () => {
+    logout()
+  }
+
+  if (children) {
+    return (
+      <span
+        onClick={handleLogout}
+        onKeyDown={(e) => e.key === 'Enter' && handleLogout()}
+        role="button"
+        tabIndex={0}
+        style={{ cursor: 'pointer' }}
+      >
+        {children}
+      </span>
+    )
+  }
+
   return (
-    <Button variant="ghost" size="sm" onClick={() => logout()}>
+    <Button variant="ghost" size="sm" onClick={handleLogout}>
       <LogOut className="h-4 w-4 mr-2" />
       로그아웃
     </Button>
