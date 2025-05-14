@@ -5,30 +5,12 @@ import { z } from 'zod'
 
 import { notFound, useRouter } from 'next/navigation'
 
-import { ProductForm } from '@components/admin/product/product-form'
-import { useCategoriesQuery } from '@hooks/use-category'
+import ProductForm, { FormValues } from '@components/admin/product/product-form'
 import { useProductQuery, useUpdateProduct } from '@hooks/use-product'
 
-// 상품 수정 폼에서 사용할 데이터 타입
-const productFormSchema = z.object({
-  name_ko: z.string(),
-  name_en: z.string().optional(),
-  name_si: z.string().optional(),
-  description: z.string().optional(),
-  price_krw: z.number(),
-  stock_quantity: z.number(),
-  category_id: z.string(),
-  is_available: z.boolean(),
-  is_recommended: z.boolean(),
-  featured_image: z.string().nullable(),
-  detail_images: z.array(z.string()).nullable(),
-})
-
-type ProductFormValues = z.infer<typeof productFormSchema>
-
+// 상품 수정 폼에서 사용할 데이터 타입 - FormValues를 직접 사용
 function EditProductForm({ id }: { id: string }) {
   const router = useRouter()
-  const { data: categories = [] } = useCategoriesQuery()
   const { data: product } = useProductQuery(id)
   const updateProduct = useUpdateProduct()
 
@@ -36,9 +18,16 @@ function EditProductForm({ id }: { id: string }) {
     return notFound()
   }
 
-  const handleSubmit = (data: ProductFormValues) => {
+  const handleSubmit = (data: FormValues) => {
+    // Convert form data to the correct format before submitting
+    const formattedData = {
+      ...data,
+      // Make sure database gets the first image as featured_image for backwards compatibility
+      featured_image: data.featured_images?.length ? data.featured_images[0] : null,
+    }
+
     updateProduct.mutate(
-      { id, product: data },
+      { id, product: formattedData },
       {
         onSuccess: () => {
           router.push('/admin/product')
@@ -51,7 +40,7 @@ function EditProductForm({ id }: { id: string }) {
     router.push('/admin/product')
   }
 
-  return <ProductForm product={product} categories={categories} onSubmit={handleSubmit} onCancel={handleCancel} />
+  return <ProductForm product={product} onSubmit={handleSubmit} onCancel={handleCancel} />
 }
 
 export default function EditProductPage({ params }: { params: { id: string } }) {

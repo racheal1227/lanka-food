@@ -46,16 +46,19 @@ export default function ProductCard({ product }: { product: Product }) {
     }
   }, [])
 
+  // Check for featured images or fall back to featured_image (for backwards compatibility)
+  const mainImage = product.featured_images?.[0]
+
   return (
     <div ref={cardRef} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
       <div className="relative aspect-square w-full">
-        {product.featured_image ? (
+        {mainImage ? (
           isVisible ? (
             <CldImage
               width="400"
               height="400"
-              src={product.featured_image}
-              alt={product.name_ko}
+              src={mainImage}
+              alt={product.name_en}
               crop="fill"
               gravity="center"
               loading="lazy"

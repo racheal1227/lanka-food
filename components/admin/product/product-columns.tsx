@@ -42,13 +42,21 @@ export const createProductColumns = ({
   },
   // 이미지 컬럼
   {
-    accessorKey: 'featured_image',
+    accessorKey: 'featured_images',
     header: '이미지',
     cell: ({ row }) => {
-      const image = row.getValue('featured_image') as string | null
-      return image ? (
+      const images = row.getValue('featured_images') as string[] | null
+      const displayImage = images?.[0]
+
+      return displayImage ? (
         <div className="relative h-10 w-10 overflow-hidden rounded-md">
-          <Image src={image} alt={row.getValue('name_ko') as string} fill sizes="40px" className="object-cover" />
+          <Image
+            src={displayImage}
+            alt={row.getValue('name_ko') as string}
+            fill
+            sizes="40px"
+            className="object-cover"
+          />
         </div>
       ) : (
         <div className="h-10 w-10 rounded-md bg-muted" />

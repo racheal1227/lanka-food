@@ -73,12 +73,18 @@ function SortableImageItem({ id, url, onRemove }: SortableImageItemProps) {
 }
 
 interface MultiImageUploadProps {
-  value: string[] | null
+  value: string[]
   onChange: (value: string[]) => void
   maxFiles?: number
+  placeholder?: string
 }
 
-export function MultiImageUpload({ value = [], onChange, maxFiles = 10 }: MultiImageUploadProps) {
+export default function MultiImageUpload({
+  value,
+  onChange,
+  maxFiles = 10,
+  placeholder = '이미지 추가하기',
+}: MultiImageUploadProps) {
   // 내부 상태로 이미지 배열 관리
   const [images, setImages] = useState<string[]>(value || [])
   const [isMounted, setIsMounted] = useState(false)
@@ -175,7 +181,7 @@ export function MultiImageUpload({ value = [], onChange, maxFiles = 10 }: MultiI
             >
               <ImagePlus className="h-6 w-6" />
               <span className="text-sm text-muted-foreground">
-                상세 이미지 추가하기 ({images.length}/{maxFiles || 10})
+                {placeholder} ({images.length}/{maxFiles || 10})
               </span>
             </button>
           )}
