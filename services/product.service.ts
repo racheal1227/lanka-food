@@ -31,7 +31,7 @@ export const getProductsByCategory = async ({
   categoryName,
   sorting,
 }: SortingTableState & { categoryName?: string }): Promise<Product[]> => {
-  let query = supabase.from('products').select('*')
+  let query = supabase.from('products').select('*').eq('is_available', true)
 
   // 카테고리 이름으로 카테고리 ID 찾기
   if (categoryName) {

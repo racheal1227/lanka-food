@@ -9,12 +9,14 @@ import { toast } from '@hooks/use-toast'
 import * as productService from '@services/product.service'
 
 // Read
+// Admin Page
 export const useProductsQuery = (params: SortingTableState & { categoryId?: string }) =>
   useSuspenseQuery({
     queryKey: ['products', params],
     queryFn: () => productService.getProducts(params),
   })
 
+// Main Page
 export const useProductsByCategoryQuery = (params: SortingTableState & { categoryName?: string }) =>
   useSuspenseQuery({
     queryKey: ['products', 'category', params],
