@@ -373,9 +373,7 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
           name="featured_images"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>
-                대표 이미지 <span className="text-red-600">*</span>
-              </FormLabel>
+              <FormLabel>대표 이미지</FormLabel>
               <FormDescription>최대 5장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
               <FormControl>
                 <MultiImageUpload
@@ -397,12 +395,12 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>상세 이미지</FormLabel>
-              <FormDescription>최대 10장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
+              <FormDescription>최대 5장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
               <FormControl>
                 <MultiImageUpload
                   value={field.value ?? []}
                   onChange={field.onChange}
-                  maxFiles={10}
+                  maxFiles={5}
                   placeholder="상세 이미지 추가하기"
                   onImagesChange={setDetailClientImages}
                 />
@@ -411,10 +409,6 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
             </FormItem>
           )}
         />
-
-        <div className="text-sm text-muted-foreground mb-4">
-          <span className="text-red-600">*</span> 표시는 필수 입력 항목입니다.
-        </div>
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>

@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ImagePlus, X, GripVertical } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import * as React from 'react'
 
 import Image from 'next/image'
 import { CldImage } from 'next-cloudinary'
@@ -40,10 +40,10 @@ interface SortableImageItemProps {
 
 function SortableImageItem({ id, image, onRemove }: SortableImageItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
-  const [objectUrl, setObjectUrl] = useState<string | null>(null)
+  const [objectUrl, setObjectUrl] = React.useState<string | null>(null)
 
   // 로컬 파일이 있을 경우 객체 URL 생성 및 정리
-  useEffect(() => {
+  React.useEffect(() => {
     if (image.file && !image.uploaded) {
       const url = URL.createObjectURL(image.file)
       setObjectUrl(url)
@@ -115,25 +115,25 @@ function SortableImageItem({ id, image, onRemove }: SortableImageItemProps) {
 }
 
 interface MultiImageUploadProps {
-  value?: string[] // publicId 배열 (DB에 저장된 값)
+  value: string[]
   onChange: (value: string[]) => void
+  onImagesChange: (images: ClientImage[]) => void
   maxFiles?: number
   placeholder?: string
-  onImagesChange?: (images: ClientImage[]) => void
 }
 
 export default function MultiImageUpload({
-  value = [],
+  value,
   onChange,
-  maxFiles = 10,
+  maxFiles = 5,
   placeholder = '이미지 추가하기',
   onImagesChange,
 }: MultiImageUploadProps) {
   // 클라이언트 이미지 상태 관리
-  const [clientImages, setClientImages] = useState<ClientImage[]>([])
-  const [isMounted, setIsMounted] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const initialRenderRef = useRef(true)
+  const [clientImages, setClientImages] = React.useState<ClientImage[]>([])
+  const [isMounted, setIsMounted] = React.useState(false)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const initialRenderRef = React.useRef(true)
 
   // 센서 설정
   const sensors = useSensors(
@@ -148,17 +148,15 @@ export default function MultiImageUpload({
   )
 
   // hydration 이슈 방지
-  useEffect(() => {
+  React.useEffect(() => {
     setIsMounted(true)
   }, [])
 
   // 클라이언트 이미지가 변경될 때마다 부모 컴포넌트에 알림
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isMounted) return
 
-    if (onImagesChange) {
-      onImagesChange(clientImages)
-    }
+    onImagesChange(clientImages)
 
     // 값이 변경된 경우에만 onChange 호출
     // value와 현재 업로드된 publicIds가 다를 때만 호출
@@ -177,44 +175,28 @@ export default function MultiImageUpload({
 
   // value prop이 변경될 때 처리 (외부에서 값이 변경된 경우)
   // 최초 마운트 시에만 value에서 clientImages를 설정하도록 함
-  useEffect(() => {
+  React.useEffect(() => {
     if (!isMounted) return
-
-    console.log('MultiImageUpload value prop:', value)
 
     // 처음 마운트될 때만 value에서 clientImages 초기화
     if (initialRenderRef.current) {
       initialRenderRef.current = false
 
-      // value가 없거나 배열이 아니거나 빈 배열인 경우 빈 배열로 초기화
-      if (!value || !Array.isArray(value) || value.length === 0) {
-        console.log('Empty, non-array, or null value, clearing client images')
-        setClientImages([])
-        return
-      }
-
-      // null이나 빈 문자열 필터링
-      const filteredValue = value.filter((id) => id !== null && id !== undefined && id !== '')
-
-      if (filteredValue.length === 0) {
+      // value가 없거나 빈 배열인 경우 빈 배열로 초기화
+      if (!value || value.length === 0) {
         setClientImages([])
         return
       }
 
       // 이미 업로드된 이미지는 clientImages에 추가
       // 여기서 value는 publicId 배열입니다
-      const uploadedImages: ClientImage[] = filteredValue.map((publicId) => {
-        console.log('Processing publicId:', publicId)
+      const uploadedImages: ClientImage[] = value.map((publicId) => ({
+        id: `uploaded-${publicId || Date.now()}`,
+        uploaded: true,
+        publicId,
+        file: new File([], 'placeholder'), // 파일 객체는 의미 없음
+      }))
 
-        return {
-          id: `uploaded-${publicId || Date.now()}`,
-          uploaded: true,
-          publicId,
-          file: new File([], 'placeholder'), // 파일 객체는 의미 없음
-        }
-      })
-
-      console.log('Converted uploaded images:', uploadedImages)
       setClientImages(uploadedImages)
     }
   }, [value, isMounted])
@@ -237,7 +219,14 @@ export default function MultiImageUpload({
     const { files } = event.target
     if (!files || files.length === 0) return
 
-    const newImages: ClientImage[] = Array.from(files).map((file) => {
+    // 현재 이미지 수와 새로 추가할 이미지 수를 계산하여 maxFiles 제한 적용
+    const remainingSlots = maxFiles - clientImages.length
+    if (remainingSlots <= 0) return // 더 이상 추가할 수 없음
+
+    // maxFiles 제한을 초과하지 않는 범위 내에서만 이미지 추가
+    const filesToAdd = Array.from(files).slice(0, remainingSlots)
+
+    const newImages: ClientImage[] = filesToAdd.map((file) => {
       const id = `local-${Date.now()}-${file.name}`
       return {
         id,
@@ -291,6 +280,7 @@ export default function MultiImageUpload({
             onChange={handleFileSelect}
             accept="image/*"
             multiple
+            max={maxFiles}
             className="hidden"
             id="image-upload"
           />
