@@ -1,14 +1,12 @@
 'use client'
 
-import { Suspense } from 'react'
-import { z } from 'zod'
+import * as React from 'react'
 
 import { notFound, useRouter } from 'next/navigation'
 
 import ProductForm, { FormValues } from '@components/admin/product/product-form'
 import { useProductQuery, useUpdateProduct } from '@hooks/use-product'
 
-// 상품 수정 폼에서 사용할 데이터 타입 - FormValues를 직접 사용
 function EditProductForm({ id }: { id: string }) {
   const router = useRouter()
   const { data: product } = useProductQuery(id)
@@ -43,13 +41,15 @@ function EditProductForm({ id }: { id: string }) {
   return <ProductForm product={product} onSubmit={handleSubmit} onCancel={handleCancel} />
 }
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = React.use(params)
+
   return (
     <div className="container mx-auto py-6">
       <h1 className="mb-6 text-3xl font-bold">상품 수정</h1>
-      <Suspense fallback={<div>데이터 로딩 중...</div>}>
-        <EditProductForm id={params.id} />
-      </Suspense>
+      <React.Suspense fallback={<div>데이터 로딩 중...</div>}>
+        <EditProductForm id={resolvedParams.id} />
+      </React.Suspense>
     </div>
   )
 }
