@@ -46,7 +46,6 @@ export default function ProductCard({ product }: { product: Product }) {
     }
   }, [])
 
-  // Check for featured images or fall back to featured_image (for backwards compatibility)
   const mainImage = product.featured_images?.[0]
 
   return (
@@ -73,9 +72,15 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="p-4">
-        <h3 className="font-semibold">{product.name_ko}</h3>
-        <p className="text-gray-600 mt-1 text-sm line-clamp-2">{product.description}</p>
-        <div className="mt-2 text-right font-semibold">{product.price_krw.toLocaleString()} 원</div>
+        <h3 className="font-semibold">{product.name_en}</h3>
+        <p lang="ko" className="text-sm text-gray-500">
+          {product.name_ko}
+        </p>
+        <p lang="si" className="text-sm text-gray-500">
+          {product.name_si}
+        </p>
+        {/* <p className="text-gray-600 mt-1 text-sm line-clamp-2">{product.description}</p> */}
+        {/* <div className="mt-2 text-right font-semibold">{product.price_krw.toLocaleString()} 원</div> */}
       </div>
     </div>
   )
