@@ -4,20 +4,15 @@ import { Suspense } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import ProductForm from '@components/admin/product/product-form'
+import ProductForm, { FormValues } from '@components/admin/product/product-form'
 import { useCreateProduct } from '@hooks/use-product'
 
 function CreateProductForm() {
   const router = useRouter()
   const createProduct = useCreateProduct()
 
-  const handleSubmit = (data: any) => {
-    // recommendation_order는 자동으로 계산되므로 제외
-    createProduct.mutate(data, {
-      onSuccess: () => {
-        router.push('/admin/product')
-      },
-    })
+  const handleSubmit = (data: FormValues) => {
+    createProduct.mutate(data)
   }
 
   const handleCancel = () => {

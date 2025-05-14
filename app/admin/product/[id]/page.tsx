@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import { notFound, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 import ProductForm, { FormValues } from '@components/admin/product/product-form'
 import { useProductQuery, useUpdateProduct } from '@hooks/use-product'
@@ -12,26 +12,8 @@ function EditProductForm({ id }: { id: string }) {
   const { data: product } = useProductQuery(id)
   const updateProduct = useUpdateProduct()
 
-  if (!product) {
-    return notFound()
-  }
-
   const handleSubmit = (data: FormValues) => {
-    // Convert form data to the correct format before submitting
-    const formattedData = {
-      ...data,
-      // Make sure database gets the first image as featured_image for backwards compatibility
-      featured_image: data.featured_images?.length ? data.featured_images[0] : null,
-    }
-
-    updateProduct.mutate(
-      { id, product: formattedData },
-      {
-        onSuccess: () => {
-          router.push('/admin/product')
-        },
-      },
-    )
+    updateProduct.mutate({ id, product: data })
   }
 
   const handleCancel = () => {

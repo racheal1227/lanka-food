@@ -3,6 +3,8 @@
 import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { SortingTableState } from '@tanstack/react-table'
 
+import { useRouter } from 'next/navigation'
+
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import showErrorToast from '@/utils/show-error-toast'
 import { toast } from '@hooks/use-toast'
@@ -31,6 +33,7 @@ export const useProductQuery = (id: string) =>
 
 // Create
 export const useCreateProduct = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -41,6 +44,7 @@ export const useCreateProduct = () => {
         title: '성공',
         description: '상품이 추가되었습니다.',
       })
+      router.push('/admin/product')
     },
     onError: (error) => {
       showErrorToast(error, '상품 추가 중 오류가 발생했습니다.')
@@ -50,6 +54,7 @@ export const useCreateProduct = () => {
 
 // Update
 export const useUpdateProduct = () => {
+  const router = useRouter()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -61,6 +66,7 @@ export const useUpdateProduct = () => {
         title: '성공',
         description: '상품이 수정되었습니다.',
       })
+      router.push('/admin/product')
     },
     onError: (error) => {
       showErrorToast(error, '상품 수정 중 오류가 발생했습니다.')
