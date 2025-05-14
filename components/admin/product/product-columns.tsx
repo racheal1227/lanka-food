@@ -1,15 +1,14 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { ImageOff } from 'lucide-react'
+import { Edit, ImageOff, Star, Trash } from 'lucide-react'
 
 import { CldImage } from 'next-cloudinary'
 
 import { Product } from '@/types/database.models'
 import { DataTableColumnHeader } from '@components/table/data-table-column-header'
-import { DataTableRowActions } from '@components/table/data-table-row-actions'
 import { Badge } from '@ui/badge'
-import { Checkbox } from '@ui/checkbox'
+import { Button } from '@ui/button'
 
 // 컬럼 생성 함수
 export const createProductColumns = ({
@@ -21,30 +20,14 @@ export const createProductColumns = ({
   onDelete?: (product: Product) => void
   onRecommend?: (product: Product, isRecommended: boolean) => void
 }): ColumnDef<Product>[] => [
-  // 체크박스 컬럼
-  {
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="전체 선택"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="행 선택"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
   // 이미지 컬럼
   {
     accessorKey: 'featured_images',
     header: '이미지',
+    size: 80,
+    meta: {
+      title: '이미지',
+    },
     cell: ({ row: { original } }) => {
       const publicId = original.featured_images?.[0]
 
@@ -68,16 +51,42 @@ export const createProductColumns = ({
     },
     enableSorting: false,
   },
-  // 상품명 컬럼
+  // 상품명(한국어) 컬럼
   {
     accessorKey: 'name_ko',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="상품명" />,
-    cell: ({ row: { original } }) => <div className="font-medium">{original.name_ko}</div>,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="상품명(한국어)" />,
+    size: 180,
+    meta: {
+      title: '상품명(한국어)',
+    },
+    cell: ({ row: { original } }) => (
+      <div className="font-medium truncate" title={original.name_ko || '-'}>
+        {original.name_ko || '-'}
+      </div>
+    ),
+  },
+  // 상품명(영어) 컬럼
+  {
+    accessorKey: 'name_en',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="상품명(영어)" />,
+    size: 180,
+    meta: {
+      title: '상품명(영어)',
+    },
+    cell: ({ row: { original } }) => (
+      <div className="truncate" title={original.name_en}>
+        {original.name_en}
+      </div>
+    ),
   },
   // 가격 컬럼
   {
     accessorKey: 'price_krw',
     header: ({ column }) => <DataTableColumnHeader column={column} title="가격" />,
+    size: 60,
+    meta: {
+      title: '가격',
+    },
     cell: ({ row: { original } }) => {
       const formatted = new Intl.NumberFormat('ko-KR', {
         style: 'currency',
@@ -90,18 +99,34 @@ export const createProductColumns = ({
   {
     accessorKey: 'stock_quantity',
     header: ({ column }) => <DataTableColumnHeader column={column} title="재고" />,
+    size: 60,
+    meta: {
+      title: '재고',
+    },
     cell: ({ row: { original } }) => <div className="text-center">{original.stock_quantity}</div>,
   },
-  // 카테고리 컬럼 (나중에 category 정보를 가져오는 로직이 필요함)
+  // 카테고리명 컬럼
   {
-    accessorKey: 'category_id',
+    accessorKey: 'categories.name',
     header: ({ column }) => <DataTableColumnHeader column={column} title="카테고리" />,
-    cell: ({ row: { original } }) => <div>{original.category_id}</div>,
+    size: 120,
+    meta: {
+      title: '카테고리',
+    },
+    cell: ({ row: { original } }) => (
+      <div className="truncate" title={original.categories?.name || '-'}>
+        {original.categories?.name || '-'}
+      </div>
+    ),
   },
   // 상태 컬럼
   {
     accessorKey: 'is_available',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="상태" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="판매상태" />,
+    size: 100,
+    meta: {
+      title: '판매상태',
+    },
     cell: ({ row: { original } }) => (
       <Badge variant={original.is_available ? 'default' : 'outline'}>
         {original.is_available ? '판매중' : '판매중지'}
@@ -112,6 +137,10 @@ export const createProductColumns = ({
   {
     accessorKey: 'is_recommended',
     header: ({ column }) => <DataTableColumnHeader column={column} title="추천" />,
+    size: 80,
+    meta: {
+      title: '추천',
+    },
     cell: ({ row: { original } }) => (
       <Badge
         variant={original.is_recommended ? 'default' : 'outline'}
@@ -121,37 +150,40 @@ export const createProductColumns = ({
       </Badge>
     ),
   },
-  // 액션 컬럼
+  // 액션 컬럼 (관리 버튼)
   {
     id: 'actions',
     header: '관리',
+    size: 100,
+    meta: {
+      title: '관리',
+    },
+    enableSorting: false,
     cell: ({ row }) => {
       const product = row.original
       return (
-        <DataTableRowActions
-          row={row}
-          actions={{
-            edit: onEdit
-              ? {
-                  isVisible: true,
-                  onClick: (data) => onEdit(data as Product),
-                }
-              : undefined,
-            delete: onDelete
-              ? {
-                  isVisible: true,
-                  onClick: (data) => onDelete(data as Product),
-                }
-              : undefined,
-            recommend: onRecommend
-              ? {
-                  isVisible: true,
-                  isRecommended: product.is_recommended,
-                  onRecommend: (data, isRecommended) => onRecommend(data as Product, isRecommended),
-                }
-              : undefined,
-          }}
-        />
+        <div className="flex items-center justify-start gap-2">
+          {onRecommend && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onRecommend(product, !product.is_recommended)}
+              title={product.is_recommended ? '추천 해제' : '추천으로 설정'}
+            >
+              <Star className={`h-4 w-4 ${product.is_recommended ? 'fill-amber-500 text-amber-500' : ''}`} />
+            </Button>
+          )}
+          {onEdit && (
+            <Button variant="ghost" size="icon" onClick={() => onEdit(product)} title="수정">
+              <Edit className="h-4 w-4" />
+            </Button>
+          )}
+          {onDelete && (
+            <Button variant="ghost" size="icon" onClick={() => onDelete(product)} title="삭제" className="text-red-500">
+              <Trash className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       )
     },
   },

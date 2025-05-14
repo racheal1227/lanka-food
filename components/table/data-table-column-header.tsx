@@ -1,17 +1,10 @@
 'use client'
 
 import { Column } from '@tanstack/react-table'
-import { ArrowDown, ArrowUp, ChevronsUpDown, EyeOff } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '@lib/utils'
 import { Button } from '@ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@ui/dropdown-menu'
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
   column: Column<TData, TValue>
@@ -24,40 +17,32 @@ export function DataTableColumnHeader<TData, TValue>({
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
-    return <div className={cn(className)}>{title}</div>
+    return <div className={cn('text-[14px]', className)}>{title}</div>
   }
 
   return (
     <div className={cn('flex items-center space-x-2', className)}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="-ml-3 h-8 data-[state=open]:bg-accent">
-            <span>{title}</span>
-            {column.getIsSorted() === 'desc' ? (
-              <ArrowDown className="ml-2 h-4 w-4" />
-            ) : column.getIsSorted() === 'asc' ? (
-              <ArrowUp className="ml-2 h-4 w-4" />
-            ) : (
-              <ChevronsUpDown className="ml-2 h-4 w-4" />
-            )}
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowUp className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            <span>오름차순</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            <span>내림차순</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            <span>숨기기</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="-ml-3 h-8"
+        onClick={() => {
+          if (column.getIsSorted() === 'asc') {
+            column.toggleSorting(true) // 내림차순으로 변경
+          } else {
+            column.toggleSorting(false) // 오름차순으로 변경
+          }
+        }}
+      >
+        <span className="text-[14px]">{title}</span>
+        {column.getIsSorted() === 'desc' ? (
+          <ArrowDown className="h-4 w-4" />
+        ) : column.getIsSorted() === 'asc' ? (
+          <ArrowUp className="h-4 w-4" />
+        ) : (
+          <ChevronsUpDown className="h-4 w-4" />
+        )}
+      </Button>
     </div>
   )
 }

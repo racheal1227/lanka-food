@@ -8,7 +8,10 @@ export const getProducts = async ({
   categoryId,
   sorting,
 }: SortingTableState & { categoryId?: string }): Promise<Product[]> => {
-  let query = supabase.from('products').select('*')
+  let query = supabase.from('products').select(`
+      *,
+      categories:category_id (*)
+    `)
 
   if (categoryId) {
     query = query.eq('category_id', categoryId)
@@ -24,14 +27,22 @@ export const getProducts = async ({
   const { data, error } = await query
 
   if (error) throw error
-  return data
+  return data as Product[]
 }
 
 export const getProductsByCategory = async ({
   categoryName,
   sorting,
 }: SortingTableState & { categoryName?: string }): Promise<Product[]> => {
-  let query = supabase.from('products').select('*').eq('is_available', true)
+  let query = supabase
+    .from('products')
+    .select(
+      `
+      *,
+      categories:category_id (*)
+    `,
+    )
+    .eq('is_available', true)
 
   // 카테고리 이름으로 카테고리 ID 찾기
   if (categoryName) {
@@ -55,7 +66,7 @@ export const getProductsByCategory = async ({
   const { data, error } = await query
 
   if (error) throw error
-  return data
+  return data as Product[]
 }
 
 export const getProduct = async (id: string): Promise<Product> => {

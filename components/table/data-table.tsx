@@ -29,6 +29,13 @@ import { Input } from '@ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/table'
 
+// 컬럼 정의 확장 타입 - 타이틀 속성 추가
+declare module '@tanstack/react-table' {
+  interface ColumnMeta<TData, TValue> {
+    title?: string
+  }
+}
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -64,6 +71,7 @@ export function DataTable<TData, TValue>({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    columnResizeMode: 'onChange',
     state: {
       sorting,
       columnFilters,
@@ -71,6 +79,7 @@ export function DataTable<TData, TValue>({
       rowSelection: enableRowSelection ? rowSelection : {},
     },
     enableRowSelection,
+    enableColumnResizing: false, // 사용자가 컬럼 크기를 변경하지 못하도록 설정
   })
 
   // row selection이 변경될 때마다 콜백 호출
@@ -114,11 +123,11 @@ export function DataTable<TData, TValue>({
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize cursor-pointer"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
-                    {column.id}
+                    {column.columnDef.meta?.title || column.id}
                   </DropdownMenuCheckboxItem>
                 ))}
             </DropdownMenuContent>
@@ -126,13 +135,20 @@ export function DataTable<TData, TValue>({
         )}
       </div>
 
-      <div className="rounded-md border">
-        <Table>
+      <div className="rounded-md border overflow-x-auto">
+        <Table className="w-full table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    style={{
+                      width: header.getSize(),
+                      minWidth: header.getSize(),
+                      maxWidth: header.getSize(),
+                    }}
+                  >
                     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
@@ -148,7 +164,16 @@ export function DataTable<TData, TValue>({
                   className={row.getIsSelected() ? 'bg-muted' : ''}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell
+                      key={cell.id}
+                      style={{
+                        width: cell.column.getSize(),
+                        minWidth: cell.column.getSize(),
+                        maxWidth: cell.column.getSize(),
+                      }}
+                    >
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))
