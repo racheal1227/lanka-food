@@ -4,10 +4,6 @@ import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import { SetProductRecommendationParams } from '@/types/product.type'
 import supabase from '@lib/supabase'
 
-// 클라우드 이름 설정
-const CLOUD_NAME = 'docccqe8x'
-const UPLOAD_PRESET = 'lanka-food-error'
-
 export const getProducts = async ({
   categoryId,
   sorting,

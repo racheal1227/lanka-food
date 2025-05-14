@@ -1,8 +1,9 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
+import { ImageOff } from 'lucide-react'
 
-import Image from 'next/image'
+import { CldImage } from 'next-cloudinary'
 
 import { Product } from '@/types/database.models'
 import { DataTableColumnHeader } from '@components/table/data-table-column-header'
@@ -19,7 +20,7 @@ export const createProductColumns = ({
   onEdit?: (product: Product) => void
   onDelete?: (product: Product) => void
   onRecommend?: (product: Product, isRecommended: boolean) => void
-}): ColumnDef<Product, any>[] => [
+}): ColumnDef<Product>[] => [
   // 체크박스 컬럼
   {
     id: 'select',
@@ -44,22 +45,25 @@ export const createProductColumns = ({
   {
     accessorKey: 'featured_images',
     header: '이미지',
-    cell: ({ row }) => {
-      const images = row.getValue('featured_images') as string[] | null
-      const displayImage = images?.[0]
+    cell: ({ row: { original } }) => {
+      const publicId = original.featured_images?.[0]
 
-      return displayImage ? (
+      return publicId ? (
         <div className="relative h-10 w-10 overflow-hidden rounded-md">
-          <Image
-            src={displayImage}
-            alt={row.getValue('name_ko') as string}
-            fill
-            sizes="40px"
+          <CldImage
+            src={publicId}
+            width={40}
+            height={40}
+            crop="fill"
+            gravity="auto"
+            alt={original.name_ko || '상품 이미지'}
             className="object-cover"
           />
         </div>
       ) : (
-        <div className="h-10 w-10 rounded-md bg-muted" />
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-muted">
+          <ImageOff className="h-5 w-5 text-muted-foreground" />
+        </div>
       )
     },
     enableSorting: false,
@@ -68,18 +72,17 @@ export const createProductColumns = ({
   {
     accessorKey: 'name_ko',
     header: ({ column }) => <DataTableColumnHeader column={column} title="상품명" />,
-    cell: ({ row }) => <div className="font-medium">{row.getValue('name_ko')}</div>,
+    cell: ({ row: { original } }) => <div className="font-medium">{original.name_ko}</div>,
   },
   // 가격 컬럼
   {
     accessorKey: 'price_krw',
     header: ({ column }) => <DataTableColumnHeader column={column} title="가격" />,
-    cell: ({ row }) => {
-      const price = row.getValue('price_krw') as number
+    cell: ({ row: { original } }) => {
       const formatted = new Intl.NumberFormat('ko-KR', {
         style: 'currency',
         currency: 'KRW',
-      }).format(price)
+      }).format(original.price_krw)
       return <div className="text-right font-medium">{formatted}</div>
     },
   },
@@ -87,38 +90,36 @@ export const createProductColumns = ({
   {
     accessorKey: 'stock_quantity',
     header: ({ column }) => <DataTableColumnHeader column={column} title="재고" />,
-    cell: ({ row }) => {
-      const quantity = row.getValue('stock_quantity') as number
-      return <div className="text-center">{quantity}</div>
-    },
+    cell: ({ row: { original } }) => <div className="text-center">{original.stock_quantity}</div>,
   },
   // 카테고리 컬럼 (나중에 category 정보를 가져오는 로직이 필요함)
   {
     accessorKey: 'category_id',
     header: ({ column }) => <DataTableColumnHeader column={column} title="카테고리" />,
-    cell: ({ row }) => <div>{row.getValue('category_id')}</div>,
+    cell: ({ row: { original } }) => <div>{original.category_id}</div>,
   },
   // 상태 컬럼
   {
     accessorKey: 'is_available',
     header: ({ column }) => <DataTableColumnHeader column={column} title="상태" />,
-    cell: ({ row }) => {
-      const isAvailable = row.getValue('is_available') as boolean
-      return <Badge variant={isAvailable ? 'default' : 'outline'}>{isAvailable ? '판매중' : '판매중지'}</Badge>
-    },
+    cell: ({ row: { original } }) => (
+      <Badge variant={original.is_available ? 'default' : 'outline'}>
+        {original.is_available ? '판매중' : '판매중지'}
+      </Badge>
+    ),
   },
   // 추천 상품 컬럼
   {
     accessorKey: 'is_recommended',
     header: ({ column }) => <DataTableColumnHeader column={column} title="추천" />,
-    cell: ({ row }) => {
-      const isRecommended = row.getValue('is_recommended') as boolean
-      return (
-        <Badge variant={isRecommended ? 'default' : 'outline'} className={isRecommended ? 'bg-amber-500' : ''}>
-          {isRecommended ? '추천' : '-'}
-        </Badge>
-      )
-    },
+    cell: ({ row: { original } }) => (
+      <Badge
+        variant={original.is_recommended ? 'default' : 'outline'}
+        className={original.is_recommended ? 'bg-amber-500' : ''}
+      >
+        {original.is_recommended ? '추천' : '-'}
+      </Badge>
+    ),
   },
   // 액션 컬럼
   {
