@@ -20,6 +20,34 @@ export const createProductColumns = ({
   onDelete?: (product: Product) => void
   onRecommend?: (product: Product, isRecommended: boolean) => void
 }): ColumnDef<Product>[] => [
+  // 생성일자 컬럼
+  {
+    accessorKey: 'created_at',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="생성일자" />,
+    size: 140,
+    meta: {
+      title: '생성일자',
+    },
+    cell: ({ row: { original } }) => {
+      const date = new Date(original.created_at)
+
+      const formatted = date
+        ? new Intl.DateTimeFormat('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+          }).format(date)
+        : '-'
+
+      return (
+        <div className="truncate" title={formatted}>
+          {formatted}
+        </div>
+      )
+    },
+  },
   // 이미지 컬럼
   {
     accessorKey: 'featured_images',
