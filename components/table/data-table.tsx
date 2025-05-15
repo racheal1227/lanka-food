@@ -44,6 +44,7 @@ interface DataTableProps<TData, TValue> {
   showColumnToggle?: boolean
   enableRowSelection?: boolean
   onRowsSelectionChange?: (rows: TData[]) => void
+  actionButton?: React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -54,6 +55,7 @@ export function DataTable<TData, TValue>({
   showColumnToggle = true,
   enableRowSelection = false,
   onRowsSelectionChange,
+  actionButton,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -92,47 +94,61 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
+      {/* 상단 액션 행: 검색, 액션 버튼, 열 관리 */}
       <div className="flex items-center justify-between py-4">
-        {/* 검색 필드 */}
+        {/* 검색 필드 - 유동적 너비 */}
         {searchKey && (
-          <div className="flex items-center">
+          <div className="flex-1 mr-4">
             <Input
               placeholder={searchPlaceholder}
               value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ''}
               onChange={(event) => table.getColumn(searchKey)?.setFilterValue(event.target.value)}
-              className="max-w-sm"
+              className="w-full h-10"
             />
           </div>
         )}
 
-        {/* 열 토글 메뉴 */}
-        {showColumnToggle && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-auto h-8">
-                <Settings2 className="mr-2 h-4 w-4" />
-                <span>열 관리</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>표시할 열 선택</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {table
-                .getAllColumns()
-                .filter((column) => column.getCanHide())
-                .map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize cursor-pointer"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.columnDef.meta?.title || column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        {/* 오른쪽 버튼 그룹: 액션 버튼 + 열 관리 */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {/* 액션 버튼 */}
+          {actionButton && <div>{actionButton}</div>}
+
+          {/* 열 토글 메뉴 */}
+          {showColumnToggle && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <Settings2 className="mr-2 h-4 w-4" />
+                  <span>열 관리</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>표시할 열 선택</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {table
+                  .getAllColumns()
+                  .filter((column) => column.getCanHide())
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      className="capitalize cursor-pointer"
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                    >
+                      {column.columnDef.meta?.title || column.id}
+                    </DropdownMenuCheckboxItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
+      </div>
+
+      {/* 총 데이터 수 표시 - 작은 글씨로 아래에 배치 */}
+      <div className="mb-2">
+        <p className="text-xs text-muted-foreground">
+          총 <b>{table.getFilteredRowModel().rows.length}</b>개 항목
+        </p>
       </div>
 
       <div className="rounded-md border overflow-x-auto">
@@ -197,30 +213,8 @@ export function DataTable<TData, TValue>({
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-6 lg:space-x-8">
-          <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">페이지 당 행 수</p>
-            <Select
-              value={`${table.getState().pagination.pageSize}`}
-              onValueChange={(value) => {
-                table.setPageSize(Number(value))
-              }}
-            >
-              <SelectTrigger className="h-8 w-[70px]">
-                <SelectValue placeholder={table.getState().pagination.pageSize} />
-              </SelectTrigger>
-              <SelectContent side="top">
-                {[5, 10, 20, 30, 40, 50].map((pageSize) => (
-                  <SelectItem key={pageSize} value={`${pageSize}`}>
-                    {pageSize}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            {table.getState().pagination.pageIndex + 1} / {table.getPageCount()} 페이지
-          </div>
+
+        <div className="flex flex-col items-center justify-center flex-1">
           <div className="flex items-center space-x-2">
             <Button
               variant="outline"
@@ -242,6 +236,11 @@ export function DataTable<TData, TValue>({
               <span className="sr-only">이전 페이지</span>
               <ChevronLeft className="h-4 w-4" />
             </Button>
+
+            <div className="flex items-center justify-center text-sm font-medium mx-2">
+              {table.getState().pagination.pageIndex + 1} / {table.getPageCount()} 페이지
+            </div>
+
             <Button
               variant="outline"
               size="sm"
@@ -263,6 +262,27 @@ export function DataTable<TData, TValue>({
               <ChevronsRight className="h-4 w-4" />
             </Button>
           </div>
+        </div>
+
+        <div className="flex items-center space-x-2 flex-1 justify-end">
+          <p className="text-sm font-medium">페이지 당 행 수</p>
+          <Select
+            value={`${table.getState().pagination.pageSize}`}
+            onValueChange={(value) => {
+              table.setPageSize(Number(value))
+            }}
+          >
+            <SelectTrigger className="h-8 w-[70px]">
+              <SelectValue placeholder={table.getState().pagination.pageSize} />
+            </SelectTrigger>
+            <SelectContent side="top">
+              {[10, 20, 50, 100].map((pageSize) => (
+                <SelectItem key={pageSize} value={`${pageSize}`}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
     </div>

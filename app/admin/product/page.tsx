@@ -80,9 +80,6 @@ export default function ProductsPage() {
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mb-6">상품 관리</h1>
-        <Button onClick={handleAddProduct}>
-          <Plus className="mr-2 h-4 w-4" />새 상품 추가
-        </Button>
       </div>
 
       <DataTable
@@ -91,7 +88,12 @@ export default function ProductsPage() {
         searchKey="name_ko"
         searchPlaceholder="상품명 검색..."
         showColumnToggle
-        enableRowSelection
+        enableRowSelection={false}
+        actionButton={
+          <Button onClick={handleAddProduct}>
+            <Plus className="mr-2 h-4 w-4" />새 상품 추가
+          </Button>
+        }
       />
 
       {/* 상품 삭제 확인 대화상자 */}
