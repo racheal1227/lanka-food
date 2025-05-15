@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, Menu, Search, Send } from 'lucide-react'
+import { Home, Menu, MessageCircle, Search, Send } from 'lucide-react'
 import { useState } from 'react'
 
 import Link from 'next/link'
@@ -59,7 +59,6 @@ export default function MobileNavigation() {
           </Tooltip>
         </TooltipProvider>
 
-        {/* 카테고리 Drawer로 변경 */}
         <Drawer open={categorySheetOpen} onOpenChange={setCategorySheetOpen}>
           <DrawerTrigger asChild>
             <TooltipProvider>
@@ -116,7 +115,6 @@ export default function MobileNavigation() {
           </DrawerContent>
         </Drawer>
 
-        {/* 검색 Drawer로 변경 */}
         <Drawer open={searchSheetOpen} onOpenChange={setSearchSheetOpen}>
           <DrawerTrigger asChild>
             <TooltipProvider>
@@ -136,7 +134,7 @@ export default function MobileNavigation() {
               </Tooltip>
             </TooltipProvider>
           </DrawerTrigger>
-          <DrawerContent className="max-h-[85vh]">
+          <DrawerContent className="h-[100vh]">
             <DrawerHeader>
               <DrawerTitle>검색</DrawerTitle>
             </DrawerHeader>
@@ -198,7 +196,7 @@ export default function MobileNavigation() {
                 className="p-0 flex items-center justify-center w-12 h-12 text-muted-foreground hover:text-foreground bg-transparent"
                 onClick={handleContact}
               >
-                <Send className="!h-6 !w-6" />
+                <MessageCircle className="!h-6 !w-6" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
