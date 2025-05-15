@@ -156,12 +156,14 @@ export const createProductColumns = ({
       title: '판매상태',
     },
     cell: ({ row: { original } }) => (
-      <Badge
-        variant={original.is_available ? 'default' : 'outline'}
-        className={original.is_available ? 'hover:bg-primary' : ''}
-      >
-        {original.is_available ? '판매중' : '판매중지'}
-      </Badge>
+      <div className="flex items-center justify-center h-full">
+        <Badge
+          variant={original.is_available ? 'default' : 'outline'}
+          className={original.is_available ? 'hover:bg-primary' : ''}
+        >
+          {original.is_available ? '판매중' : '판매중지'}
+        </Badge>
+      </div>
     ),
   },
   // 추천 상품 컬럼
@@ -173,12 +175,14 @@ export const createProductColumns = ({
       title: '추천',
     },
     cell: ({ row: { original } }) => (
-      <Badge
-        variant={original.is_recommended ? 'default' : 'outline'}
-        className={original.is_recommended ? 'bg-amber-500 hover:bg-amber-500' : ''}
-      >
-        {original.is_recommended ? '추천' : '-'}
-      </Badge>
+      <div className="flex items-center justify-center h-full">
+        <Badge
+          variant={original.is_recommended ? 'default' : 'outline'}
+          className={original.is_recommended ? 'bg-amber-500 hover:bg-amber-500' : ''}
+        >
+          {original.is_recommended ? '추천' : '-'}
+        </Badge>
+      </div>
     ),
   },
   // 액션 컬럼 (관리 버튼)
