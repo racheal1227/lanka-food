@@ -42,7 +42,11 @@ export default function ProductsPage() {
   // 상품 삭제 확인 핸들러
   const confirmDeleteProduct = () => {
     if (productToDelete) {
-      deleteProductMutation.mutate(productToDelete.id)
+      deleteProductMutation.mutate({
+        id: productToDelete.id,
+        featuredImages: productToDelete.featured_images,
+        detailImages: productToDelete.detail_images,
+      })
       setProductToDelete(null)
     }
   }

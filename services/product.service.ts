@@ -34,15 +34,7 @@ export const getProductsByCategory = async ({
   categoryName,
   sorting,
 }: SortingTableState & { categoryName?: string }): Promise<Product[]> => {
-  let query = supabase
-    .from('products')
-    .select(
-      `
-      *,
-      categories:category_id (*)
-    `,
-    )
-    .eq('is_available', true)
+  let query = supabase.from('products').select('*, categories:category_id (*)').eq('is_available', true)
 
   // 카테고리 이름으로 카테고리 ID 찾기
   if (categoryName) {
@@ -90,7 +82,61 @@ export const updateProduct = async ({ id, product }: { id: string; product: Prod
   return data
 }
 
-export const deleteProduct = async (id: string): Promise<boolean> => {
+export const deleteImageFromCloudinary = async (publicId: string): Promise<boolean> => {
+  try {
+    // API 엔드포인트 사용 (Next.js 서버 API 라우트에서 구현 필요)
+    const response = await fetch('/api/cloudinary/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ publicId }),
+    })
+
+    if (!response.ok) {
+      console.error(`이미지 삭제 응답 오류: ${response.statusText}`)
+      return false
+    }
+
+    const data = await response.json()
+    return data.success === true
+  } catch (error) {
+    console.error(`이미지 삭제 실패 (${publicId}):`, error)
+    return false
+  }
+}
+
+export const deleteProduct = async (
+  id: string,
+  featuredImages?: string[] | null,
+  detailImages?: string[] | null,
+): Promise<boolean> => {
+  // 이미지가 있으면 Cloudinary에서 삭제합니다.
+  const allImageIds: string[] = []
+
+  if (featuredImages && Array.isArray(featuredImages)) {
+    allImageIds.push(...featuredImages.filter(Boolean))
+  }
+
+  if (detailImages && Array.isArray(detailImages)) {
+    allImageIds.push(...detailImages.filter(Boolean))
+  }
+
+  // 모든 이미지에 대해 병렬로 삭제 요청을 수행합니다.
+  if (allImageIds.length > 0) {
+    await Promise.all(
+      allImageIds.map(async (publicId) => {
+        try {
+          await deleteImageFromCloudinary(publicId)
+        } catch (error) {
+          console.error(`이미지 삭제 실패 (${publicId}):`, error)
+          // 이미지 삭제 실패는 상품 삭제를 중단하지 않습니다.
+        }
+      }),
+    )
+  }
+
+  // 상품을 삭제합니다.
   const { error } = await supabase.from('products').delete().eq('id', id)
 
   if (error) throw error
@@ -116,7 +162,9 @@ export const setProductRecommendation = async ({
   return data
 }
 
-export const updateProductRecommendationOrder = async (products: { id: string; recommendation_order: number }[]) => {
+export const updateProductRecommendationOrder = async (
+  products: { id: string; recommendation_order: number | null }[],
+) => {
   const results = await Promise.all(
     products.map(async (product) => {
       const { data, error } = await supabase
@@ -132,15 +180,6 @@ export const updateProductRecommendationOrder = async (products: { id: string; r
 
   return results
 }
-
-// 파일을 Base64로 변환하는 헬퍼 함수
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = (error) => reject(error)
-  })
 
 // Cloudinary 업로드 함수
 export const uploadImageToCloudinary = async (file: File): Promise<{ publicId: string; url: string }> => {
@@ -171,31 +210,6 @@ export const uploadImageToCloudinary = async (file: File): Promise<{ publicId: s
   } catch (error) {
     console.error('Cloudinary 업로드 오류:', error)
     throw new Error(`Cloudinary 업로드 실패: ${error instanceof Error ? error.message : '알 수 없는 오류'}`)
-  }
-}
-
-// Cloudinary에서 이미지 삭제 함수
-export const deleteImageFromCloudinary = async (publicId: string): Promise<boolean> => {
-  try {
-    // API 엔드포인트 사용 (Next.js 서버 API 라우트에서 구현 필요)
-    const response = await fetch('/api/cloudinary/delete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ publicId }),
-    })
-
-    if (!response.ok) {
-      console.error(`이미지 삭제 응답 오류: ${response.statusText}`)
-      return false
-    }
-
-    const data = await response.json()
-    return data.success === true
-  } catch (error) {
-    console.error(`이미지 삭제 실패 (${publicId}):`, error)
-    return false
   }
 }
 

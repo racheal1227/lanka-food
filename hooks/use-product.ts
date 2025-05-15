@@ -79,7 +79,15 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => productService.deleteProduct(id),
+    mutationFn: ({
+      id,
+      featuredImages,
+      detailImages,
+    }: {
+      id: string
+      featuredImages?: string[] | null
+      detailImages?: string[] | null
+    }) => productService.deleteProduct(id, featuredImages, detailImages),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       toast({
