@@ -12,7 +12,7 @@ export const useCategoriesQuery = () =>
   useSuspenseQuery({
     queryKey: ['categories'],
     queryFn: categoryService.getCategories,
-    staleTime: Infinity,
+    // staleTime: Infinity,
   })
 
 // Create
@@ -23,6 +23,8 @@ export const useCreateCategory = () => {
     mutationFn: (category: CategoryInsert) => categoryService.createCategory(category),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리가 추가되었습니다.',
@@ -42,6 +44,8 @@ export const useUpdateCategory = () => {
     mutationFn: (params: { id: string; category: CategoryUpdate }) => categoryService.updateCategory(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리가 수정되었습니다.',
@@ -61,6 +65,8 @@ export const useDeleteCategory = () => {
     mutationFn: (id: string) => categoryService.deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리가 삭제되었습니다.',
@@ -80,6 +86,8 @@ export const useUpdateCategoryOrder = () => {
     mutationFn: (categories: { id: string; sort_order: number }[]) => categoryService.updateCategoryOrder(categories),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리 순서가 변경되었습니다.',

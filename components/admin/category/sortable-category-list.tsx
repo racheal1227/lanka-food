@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Edit, Trash2 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -77,6 +77,11 @@ interface SortableCategoryListProps {
 export function SortableCategoryList({ categories, onEdit, onDelete, onReorder }: SortableCategoryListProps) {
   const [items, setItems] = useState(categories)
 
+  // categories prop이 변경될 때마다 내부 상태 업데이트
+  useEffect(() => {
+    setItems(categories)
+  }, [categories])
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -84,28 +89,31 @@ export function SortableCategoryList({ categories, onEdit, onDelete, onReorder }
     }),
   )
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
 
-    if (over && active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
+      if (over && active.id !== over.id) {
+        setItems((items) => {
+          const oldIndex = items.findIndex((item) => item.id === active.id)
+          const newIndex = items.findIndex((item) => item.id === over.id)
 
-        const newItems = arrayMove(items, oldIndex, newIndex)
+          const newItems = arrayMove(items, oldIndex, newIndex)
 
-        // 변경된 순서 정보를 부모 컴포넌트로 전달
-        onReorder(
-          newItems.map((item, index) => ({
-            ...item,
-            sort_order: index + 1,
-          })),
-        )
+          // 변경된 순서 정보를 부모 컴포넌트로 전달
+          onReorder(
+            newItems.map((item, index) => ({
+              ...item,
+              sort_order: index + 1,
+            })),
+          )
 
-        return newItems
-      })
-    }
-  }
+          return newItems
+        })
+      }
+    },
+    [onReorder],
+  )
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
