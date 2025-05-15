@@ -156,7 +156,10 @@ export const createProductColumns = ({
       title: '판매상태',
     },
     cell: ({ row: { original } }) => (
-      <Badge variant={original.is_available ? 'default' : 'outline'}>
+      <Badge
+        variant={original.is_available ? 'default' : 'outline'}
+        className={original.is_available ? 'hover:bg-primary' : ''}
+      >
         {original.is_available ? '판매중' : '판매중지'}
       </Badge>
     ),
@@ -172,7 +175,7 @@ export const createProductColumns = ({
     cell: ({ row: { original } }) => (
       <Badge
         variant={original.is_recommended ? 'default' : 'outline'}
-        className={original.is_recommended ? 'bg-amber-500' : ''}
+        className={original.is_recommended ? 'bg-amber-500 hover:bg-amber-500' : ''}
       >
         {original.is_recommended ? '추천' : '-'}
       </Badge>
@@ -197,9 +200,12 @@ export const createProductColumns = ({
               size="icon"
               onClick={() => onRecommend(product, !product.is_recommended)}
               title={product.is_recommended ? '추천 해제' : '추천으로 설정'}
+              className="hover:bg-transparent group"
             >
               <Star
-                className={`h-4 w-4 text-amber-500 ${product.is_recommended ? 'fill-amber-500 text-amber-500' : ''}`}
+                className={`h-4 w-4 text-amber-500 ${
+                  product.is_recommended ? 'fill-amber-500' : 'group-hover:fill-amber-500'
+                }`}
               />
             </Button>
           )}
@@ -209,7 +215,13 @@ export const createProductColumns = ({
             </Button>
           )}
           {onDelete && (
-            <Button variant="ghost" size="icon" onClick={() => onDelete(product)} title="삭제" className="text-red-600">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(product)}
+              title="삭제"
+              className="text-red-600 hover:text-red-600 hover:bg-transparent"
+            >
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
