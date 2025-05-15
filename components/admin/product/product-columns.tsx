@@ -1,7 +1,7 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Edit, ImageOff, Star, Trash } from 'lucide-react'
+import { Edit, ImageOff, Star, Trash, Trash2 } from 'lucide-react'
 
 import { CldImage } from 'next-cloudinary'
 
@@ -198,7 +198,9 @@ export const createProductColumns = ({
               onClick={() => onRecommend(product, !product.is_recommended)}
               title={product.is_recommended ? '추천 해제' : '추천으로 설정'}
             >
-              <Star className={`h-4 w-4 ${product.is_recommended ? 'fill-amber-500 text-amber-500' : ''}`} />
+              <Star
+                className={`h-4 w-4 text-amber-500 ${product.is_recommended ? 'fill-amber-500 text-amber-500' : ''}`}
+              />
             </Button>
           )}
           {onEdit && (
@@ -207,8 +209,8 @@ export const createProductColumns = ({
             </Button>
           )}
           {onDelete && (
-            <Button variant="ghost" size="icon" onClick={() => onDelete(product)} title="삭제" className="text-red-500">
-              <Trash className="h-4 w-4" />
+            <Button variant="ghost" size="icon" onClick={() => onDelete(product)} title="삭제" className="text-red-600">
+              <Trash2 className="h-4 w-4" />
             </Button>
           )}
         </div>

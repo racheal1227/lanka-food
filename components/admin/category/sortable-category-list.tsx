@@ -54,11 +54,11 @@ function SortableCategoryItem({ category, onEdit, onDelete }: SortableCategoryIt
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => onEdit(category)}>
+        <Button variant="ghost" size="icon" onClick={() => onEdit(category)} title="수정">
           <Edit className="h-4 w-4" />
           <span className="sr-only">수정</span>
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => onDelete(category.id)}>
+        <Button variant="ghost" size="icon" onClick={() => onDelete(category.id)} title="삭제" className="text-red-600">
           <Trash2 className="h-4 w-4" />
           <span className="sr-only">삭제</span>
         </Button>
