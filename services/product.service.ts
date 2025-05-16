@@ -17,7 +17,18 @@ export const getProducts = async ({
     query = query.eq('category_id', categoryId)
   }
   if (searchTerm) {
-    query = query.ilike('name_kr', `%${searchTerm}%`)
+    // 검색어를 띄어쓰기로 분리
+    const searchTerms = searchTerm.split(/\s+/).filter(Boolean)
+
+    // 각 검색어에 대해 OR 조건으로 검색
+    query = query.or(
+      searchTerms
+        .map(
+          (term) =>
+            `name_ko.ilike.%${term}%,name_en.ilike.%${term}%,name_si.ilike.%${term}%,description.ilike.%${term}%`,
+        )
+        .join(','),
+    )
   }
   sorting.forEach((sort) => {
     const [column, option] = formatToSupabaseSort(sort)
@@ -54,7 +65,18 @@ export const getProductsByCategoryName = async ({
     query = query.eq('category_id', category.id)
   }
   if (searchTerm) {
-    query = query.ilike('name_kr', `%${searchTerm}%`)
+    // 검색어를 띄어쓰기로 분리
+    const searchTerms = searchTerm.split(/\s+/).filter(Boolean)
+
+    // 각 검색어에 대해 OR 조건으로 검색
+    query = query.or(
+      searchTerms
+        .map(
+          (term) =>
+            `name_ko.ilike.%${term}%,name_en.ilike.%${term}%,name_si.ilike.%${term}%,description.ilike.%${term}%`,
+        )
+        .join(','),
+    )
   }
   sorting.forEach((sort) => {
     const [column, option] = formatToSupabaseSort(sort)

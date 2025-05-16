@@ -111,7 +111,7 @@ export default function ProductsPage() {
       <div>
         <TableToolbar
           table={table}
-          searchValue={searchTerm}
+          searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           searchPlaceholder="상품명 검색..."
           showColumnToggle

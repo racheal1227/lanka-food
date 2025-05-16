@@ -2,13 +2,14 @@
 
 import { Table } from '@tanstack/react-table'
 
+import { Button } from '@ui/button'
 import { Input } from '@ui/input'
 
 import ColumnToggle from './column-toggle'
 
 interface TableToolbarProps<T> {
   table: Table<T>
-  searchValue?: string
+  searchTerm?: string
   onSearchChange?: (value: string) => void
   searchPlaceholder?: string
   showColumnToggle?: boolean
@@ -18,7 +19,7 @@ interface TableToolbarProps<T> {
 
 export default function TableToolbar<T>({
   table,
-  searchValue = '',
+  searchTerm,
   onSearchChange,
   searchPlaceholder = '검색...',
   showColumnToggle = true,
@@ -30,12 +31,20 @@ export default function TableToolbar<T>({
       {/* 왼쪽: 검색 필드 */}
       <div className="flex-1 mr-4">
         {showSearch && onSearchChange && (
-          <Input
-            placeholder={searchPlaceholder}
-            value={searchValue}
-            onChange={(event) => onSearchChange(event.target.value)}
-            className="w-full h-10"
-          />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              const formData = new FormData(e.currentTarget)
+              const searchInput = formData.get('search') as string
+              onSearchChange(searchInput)
+            }}
+            className="flex items-center gap-2"
+          >
+            <Input name="search" placeholder={searchPlaceholder} defaultValue={searchTerm} className="h-9" />
+            <Button type="submit" size="default" className="h-9">
+              검색
+            </Button>
+          </form>
         )}
       </div>
 
