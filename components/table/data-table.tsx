@@ -21,7 +21,6 @@ interface DataTableProps<T> {
 }
 
 export function DataTable<T>({ table, data }: DataTableProps<T>) {
-  // 테이블 객체에서 필요한 속성과 메서드 구조분해
   const {
     getHeaderGroups,
     getRowModel,
@@ -34,7 +33,6 @@ export function DataTable<T>({ table, data }: DataTableProps<T>) {
     setPageSize,
   } = table
 
-  // 페이지네이션 UI를 위한 페이지 계산
   const renderPageNumbers = () => {
     const totalPages = getPageCount()
     const currentPageIndex = getState().pagination.pageIndex

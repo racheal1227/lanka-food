@@ -1,16 +1,16 @@
 'use client'
 
-import { SortingState } from '@tanstack/react-table'
+import { PaginationState, SortingState, Updater, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import * as React from 'react'
 
 import { useRouter } from 'next/navigation'
 
 import { Product } from '@/types/database.models'
 import { createProductColumns } from '@components/admin/product/product-columns'
-import { ProductTable } from '@components/admin/product/product-table'
+import { DataTable } from '@components/table/data-table'
+import TableToolbar from '@components/table/table-toolbar'
 import { useDeleteProduct, useProducts, useSetProductRecommendation } from '@hooks/use-product'
-import { useToast } from '@hooks/use-toast'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,35 +25,72 @@ import { Button } from '@ui/button'
 
 export default function ProductsPage() {
   const router = useRouter()
-  const { toast } = useToast()
 
-  // 페이지네이션과 정렬 상태 관리
-  const [pageIndex, setPageIndex] = useState(0)
-  const [pageSize, setPageSize] = useState(10)
-  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }])
-  const [searchTerm, setSearchTerm] = useState('')
+  const [pageIndex, setPageIndex] = React.useState<number>(0)
+  const [pageSize, setPageSize] = React.useState<number>(10)
+  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'created_at', desc: true }])
+  const [searchTerm, setSearchTerm] = React.useState<string>('')
+  const [productToDelete, setProductToDelete] = React.useState<Product | null>(null)
 
-  // 제품 데이터 조회
-  const { data: productsData, isLoading } = useProducts({
-    pageIndex,
-    pageSize,
-    sorting,
-    searchTerm,
-  })
-
-  // 상품 삭제 관련 상태 및 mutation
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  const { data: productsData } = useProducts({ pageIndex, pageSize, sorting, searchTerm })
   const deleteProductMutation = useDeleteProduct()
-
-  // 상품 추천 설정 관련 mutation
   const setProductRecommendation = useSetProductRecommendation()
 
-  // 상품 삭제 핸들러
-  const handleDeleteProduct = (product: Product) => {
-    setProductToDelete(product)
+  const handlePaginationChange = (updater: Updater<PaginationState>) => {
+    const newPagination = typeof updater === 'function' ? updater({ pageIndex, pageSize }) : updater
+
+    if (newPagination.pageIndex !== pageIndex) {
+      setPageIndex(newPagination.pageIndex)
+    }
+
+    if (newPagination.pageSize !== pageSize) {
+      setPageSize(newPagination.pageSize)
+      setPageIndex(0)
+    }
   }
 
-  // 상품 삭제 확인 핸들러
+  const handleSortingChange = (updater: Updater<SortingState>) => {
+    let newSorting: SortingState
+    if (typeof updater === 'function') {
+      newSorting = updater(sorting)
+    } else {
+      newSorting = updater
+    }
+    setSorting(newSorting)
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setPageIndex(0)
+  }
+
+  const actionButton = (
+    <Button onClick={() => router.push('/admin/product/create')}>
+      <Plus className="mr-2 h-4 w-4" />새 상품 추가
+    </Button>
+  )
+
+  const columns = createProductColumns({
+    onEdit: (product) => router.push(`/admin/product/${product.id}`),
+    onDelete: (product) => setProductToDelete(product),
+    onRecommend: (product: Product, isRecommended: boolean) => {
+      setProductRecommendation.mutate({ id: product.id, isRecommended })
+    },
+  })
+
+  const table = useReactTable({
+    data: productsData?.content || [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    onSortingChange: handleSortingChange,
+    manualPagination: true,
+    manualSorting: true,
+    pageCount: productsData?.pagination.totalPages || 0,
+    state: { sorting, pagination: { pageIndex, pageSize } },
+    onPaginationChange: handlePaginationChange,
+    enableColumnResizing: false,
+  })
+
   const confirmDeleteProduct = () => {
     if (productToDelete) {
       deleteProductMutation.mutate({
@@ -65,84 +102,24 @@ export default function ProductsPage() {
     }
   }
 
-  // 상품 편집 페이지로 이동
-  const handleEditProduct = (product: Product) => {
-    router.push(`/admin/product/${product.id}`)
-  }
-
-  // 상품 추천 설정/해제
-  const handleSetRecommendation = (product: Product, isRecommended: boolean) => {
-    setProductRecommendation.mutate({
-      id: product.id,
-      isRecommended,
-    })
-  }
-
-  // 새 상품 추가 페이지로 이동
-  const handleAddProduct = () => {
-    router.push('/admin/product/create')
-  }
-
-  // 페이지 변경 핸들러
-  const handlePageChange = (page: number) => {
-    setPageIndex(page)
-  }
-
-  // 페이지 크기 변경 핸들러
-  const handlePageSizeChange = (size: number) => {
-    setPageSize(size)
-    setPageIndex(0) // 페이지 크기가 변경되면 첫 페이지로 돌아감
-  }
-
-  // 정렬 변경 핸들러
-  const handleSortingChange = (newSorting: SortingState) => {
-    setSorting(newSorting)
-  }
-
-  // 검색어 변경 핸들러
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value)
-    setPageIndex(0) // 검색어가 변경되면 첫 페이지로 돌아감
-  }
-
-  // 컬럼 정의
-  const columns = createProductColumns({
-    onEdit: handleEditProduct,
-    onDelete: handleDeleteProduct,
-    onRecommend: handleSetRecommendation,
-  })
-
-  // 액션 버튼 정의
-  const actionButton = (
-    <Button onClick={handleAddProduct}>
-      <Plus className="mr-2 h-4 w-4" />새 상품 추가
-    </Button>
-  )
-
-  if (isLoading || !productsData) {
-    return <div className="flex items-center justify-center h-40">로딩 중...</div>
-  }
-
   return (
-    <div>
+    <>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mb-6">상품 관리</h1>
       </div>
 
-      <ProductTable
-        columns={columns}
-        data={productsData}
-        currentPage={pageIndex}
-        pageCount={productsData.pagination.totalPages}
-        pageSize={pageSize}
-        sorting={sorting}
-        searchValue={searchTerm}
-        onPageChange={handlePageChange}
-        onPageSizeChange={handlePageSizeChange}
-        onSortingChange={handleSortingChange}
-        onSearchChange={handleSearchChange}
-        actionButton={actionButton}
-      />
+      <div>
+        <TableToolbar
+          table={table}
+          searchValue={searchTerm}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="상품명 검색..."
+          showColumnToggle
+          showSearch
+          actionButtons={actionButton}
+        />
+        <DataTable table={table} data={productsData} />
+      </div>
 
       {/* 상품 삭제 확인 대화상자 */}
       <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
@@ -161,6 +138,6 @@ export default function ProductsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   )
 }
