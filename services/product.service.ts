@@ -61,6 +61,9 @@ export const getProductsByCategoryName = async ({
     query = query.order(column, option)
   })
 
+  const offset = pageIndex * pageSize
+  query = query.range(offset, offset + pageSize - 1)
+
   const { data, count, error } = await query
   if (error) throw error
 

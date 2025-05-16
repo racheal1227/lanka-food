@@ -14,7 +14,7 @@ export const createPageResponse = <T>(
     content: data,
     pagination: {
       isEmpty: data.length === 0,
-      isFirst: pageIndex === 1,
+      isFirst: pageIndex === 0,
       isLast: pageIndex >= totalPages - 1,
       currentPageIndex: pageIndex,
       totalPages,

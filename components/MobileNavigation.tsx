@@ -1,17 +1,16 @@
 'use client'
 
-import { Home, Menu, MessageCircle, Search, Send } from 'lucide-react'
+import { Home, Menu, MessageCircle, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { CldImage } from 'next-cloudinary'
 
+import ProductCard from '@components/product-card'
 import { useCategoriesQuery } from '@hooks/use-category'
-import { useProductsByCategory } from '@hooks/use-product'
+import { useRecommendedProducts } from '@hooks/use-product'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
-import { Card, CardContent } from '@ui/card'
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@ui/drawer'
 import { Input } from '@ui/input'
 import { Separator } from '@ui/separator'
@@ -26,9 +25,7 @@ export default function MobileNavigation() {
   const [searchSheetOpen, setSearchSheetOpen] = useState(false)
 
   // 추천 상품 가져오기
-  const { data: products } = useProductsByCategory({
-    sorting: [{ id: 'recommendation_order', desc: false }],
-  })
+  const { data: products } = useRecommendedProducts()
 
   // 추천 상품 필터링
   const recommendedProducts = products?.filter((product) => product.is_recommended).slice(0, 4) || []
@@ -147,35 +144,11 @@ export default function MobileNavigation() {
               <Separator className="my-4" />
               <div>
                 <div className="flex items-center mb-2">
-                  <h3 className="font-medium text-md">추천 상품</h3>
-                  <Badge variant="outline" className="ml-2">
-                    추천
-                  </Badge>
+                  <Badge variant="default">추천 상품</Badge>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   {recommendedProducts.map((product) => (
-                    <Link key={product.id} href={`/product/${product.id}`} onClick={() => setSearchSheetOpen(false)}>
-                      <Card className="overflow-hidden">
-                        <div className="h-32 w-full overflow-hidden">
-                          {product.featured_images && product.featured_images[0] && (
-                            <CldImage
-                              width={300}
-                              height={300}
-                              src={product.featured_images[0]}
-                              alt={product.name_ko || ''}
-                              crop="fill"
-                              gravity="center"
-                              loading="lazy"
-                              className="h-full w-full object-cover"
-                            />
-                          )}
-                        </div>
-                        <CardContent className="p-2">
-                          <p className="text-sm font-medium truncate">{product.name_ko || ''}</p>
-                          <p className="text-xs text-muted-foreground">{product.price_krw?.toLocaleString()}원</p>
-                        </CardContent>
-                      </Card>
-                    </Link>
+                    <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               </div>

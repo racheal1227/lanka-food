@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useSuspenseQuery, useInfiniteQuery } from '@tanstack/react-query'
 
 import { useRouter } from 'next/navigation'
 
@@ -20,9 +20,25 @@ export const useProducts = (params: QueryParams & { categoryId?: string }) =>
 
 // Main Page
 export const useProductsByCategory = (params: QueryParams & { categoryName?: string }) =>
-  useSuspenseQuery({
+  useInfiniteQuery({
     queryKey: ['products-category', params],
-    queryFn: () => productService.getProductsByCategoryName(params),
+    queryFn: ({ pageParam = 0 }) =>
+      productService.getProductsByCategoryName({
+        ...params,
+        pageIndex: pageParam,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.isLast) return undefined
+      return lastPage.pagination.currentPageIndex + 1
+    },
+  })
+
+// Search Page
+export const useRecommendedProducts = () =>
+  useSuspenseQuery({
+    queryKey: ['products-recommended'],
+    queryFn: () => productService.getRecommendedProducts(),
   })
 
 export const useProductQuery = (id: string) =>
