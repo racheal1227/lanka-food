@@ -1,0 +1,34 @@
+import { ColumnSort } from '@tanstack/react-table'
+
+import { PageResponse } from '@/types/query.type'
+
+export const createPageResponse = <T>(
+  data: T[],
+  count: number,
+  pageIndex: number,
+  pageSize: number,
+): PageResponse<T> => {
+  const totalPages = Math.ceil(count / pageSize)
+
+  return {
+    content: data,
+    pagination: {
+      isEmpty: data.length === 0,
+      isFirst: pageIndex === 1,
+      isLast: pageIndex >= totalPages - 1,
+      currentPageIndex: pageIndex,
+      totalPages,
+      count,
+      pageSize,
+    },
+  }
+}
+
+export const formatToSupabaseSort = (sort: ColumnSort): [string, { ascending?: boolean }] => {
+  if (sort.id.includes('.')) {
+    const [table, column] = sort.id.split('.')
+    return [`${table}(${column})`, { ascending: !sort.desc }]
+  }
+
+  return [sort.id, { ascending: !sort.desc }]
+}

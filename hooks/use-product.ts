@@ -1,28 +1,28 @@
 'use client'
 
-import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { SortingTableState } from '@tanstack/react-table'
+import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
 import { useRouter } from 'next/navigation'
 
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
-import showErrorToast from '@/utils/show-error-toast'
+import { QueryParams } from '@/types/query.type'
+import { showErrorToast } from '@/utils/show-error-toast'
 import { toast } from '@hooks/use-toast'
 import * as productService from '@services/product.service'
 
 // Read
 // Admin Page
-export const useProductsQuery = (params: SortingTableState & { categoryId?: string }) =>
+export const useProducts = (params: QueryParams & { categoryId?: string }) =>
   useSuspenseQuery({
     queryKey: ['products', params],
     queryFn: () => productService.getProducts(params),
   })
 
 // Main Page
-export const useProductsByCategoryQuery = (params: SortingTableState & { categoryName?: string }) =>
+export const useProductsByCategory = (params: QueryParams & { categoryName?: string }) =>
   useSuspenseQuery({
-    queryKey: ['products', 'category', params],
-    queryFn: () => productService.getProductsByCategory(params),
+    queryKey: ['products-category', params],
+    queryFn: () => productService.getProductsByCategoryName(params),
   })
 
 export const useProductQuery = (id: string) =>

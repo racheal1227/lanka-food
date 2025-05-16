@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation'
 import { CldImage } from 'next-cloudinary'
 
 import { useCategoriesQuery } from '@hooks/use-category'
-import { useProductsByCategoryQuery } from '@hooks/use-product'
+import { useProductsByCategory } from '@hooks/use-product'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 import { Card, CardContent } from '@ui/card'
@@ -26,7 +26,7 @@ export default function MobileNavigation() {
   const [searchSheetOpen, setSearchSheetOpen] = useState(false)
 
   // 추천 상품 가져오기
-  const { data: products } = useProductsByCategoryQuery({
+  const { data: products } = useProductsByCategory({
     sorting: [{ id: 'recommendation_order', desc: false }],
   })
 

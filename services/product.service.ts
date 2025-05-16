@@ -1,40 +1,46 @@
-import { SortingTableState } from '@tanstack/react-table'
-
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import { SetProductRecommendationParams } from '@/types/product.type'
+import { PageResponse, QueryParams } from '@/types/query.type'
+import { createPageResponse, formatToSupabaseSort } from '@/utils/query.utils'
 import supabase from '@lib/supabase'
 
 export const getProducts = async ({
-  categoryId,
+  pageIndex,
+  pageSize,
   sorting,
-}: SortingTableState & { categoryId?: string }): Promise<Product[]> => {
-  let query = supabase.from('products').select(`
-      *,
-      categories:category_id (*)
-    `)
+  searchTerm,
+  categoryId,
+}: QueryParams & { categoryId?: string }): Promise<PageResponse<Product>> => {
+  let query = supabase.from('products').select('*', { count: 'exact' })
 
   if (categoryId) {
     query = query.eq('category_id', categoryId)
   }
-
-  sorting.forEach(({ id, desc }) => {
-    query = query.order(id, { ascending: !desc })
-    if (id === 'recommendation_order') {
-      query = query.order('created_at', { ascending: !desc })
-    }
+  if (searchTerm) {
+    query = query.ilike('name_kr', `%${searchTerm}%`)
+  }
+  sorting.forEach((sort) => {
+    const [column, option] = formatToSupabaseSort(sort)
+    query = query.order(column, option)
   })
 
-  const { data, error } = await query
+  const offset = pageIndex * pageSize
+  query = query.range(offset, offset + pageSize - 1)
 
+  const { data, count, error } = await query
   if (error) throw error
-  return data as Product[]
+
+  return createPageResponse<Product>(data, count || 0, pageIndex, pageSize)
 }
 
-export const getProductsByCategory = async ({
-  categoryName,
+export const getProductsByCategoryName = async ({
+  pageIndex,
+  pageSize,
   sorting,
-}: SortingTableState & { categoryName?: string }): Promise<Product[]> => {
-  let query = supabase.from('products').select('*, categories:category_id (*)').eq('is_available', true)
+  searchTerm,
+  categoryName,
+}: QueryParams & { categoryName?: string }): Promise<PageResponse<Product>> => {
+  let query = supabase.from('products').select('*', { count: 'exact' }).eq('is_available', true)
 
   // 카테고리 이름으로 카테고리 ID 찾기
   if (categoryName) {
@@ -47,22 +53,35 @@ export const getProductsByCategory = async ({
     if (categoryError) throw categoryError
     query = query.eq('category_id', category.id)
   }
-
-  sorting.forEach(({ id, desc }) => {
-    query = query.order(id, { ascending: !desc })
-    if (id === 'recommendation_order') {
-      query = query.order('created_at', { ascending: !desc })
-    }
+  if (searchTerm) {
+    query = query.ilike('name_kr', `%${searchTerm}%`)
+  }
+  sorting.forEach((sort) => {
+    const [column, option] = formatToSupabaseSort(sort)
+    query = query.order(column, option)
   })
 
-  const { data, error } = await query
-
+  const { data, count, error } = await query
   if (error) throw error
-  return data as Product[]
+
+  return createPageResponse<Product>(data, count || 0, pageIndex, pageSize)
 }
 
 export const getProduct = async (id: string): Promise<Product> => {
   const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
+
+  if (error) throw error
+  return data
+}
+
+export const getRecommendedProducts = async (): Promise<Product[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_available', true)
+    .eq('is_recommended', true)
+    .order('created_at', { ascending: false })
+    .limit(4)
 
   if (error) throw error
   return data

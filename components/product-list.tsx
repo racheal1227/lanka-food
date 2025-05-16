@@ -3,13 +3,13 @@
 import { useSearchParams } from 'next/navigation'
 
 import ProductCard from '@components/product-card'
-import { useProductsByCategoryQuery } from '@hooks/use-product'
+import { useProductsByCategory } from '@hooks/use-product'
 
 export default function ProductList() {
   const searchParams = useSearchParams()
   const selectedCategory = searchParams.get('category') || undefined
 
-  const { data: products } = useProductsByCategoryQuery({
+  const { data: products } = useProductsByCategory({
     categoryName: selectedCategory,
     sorting: [{ id: 'created_at', desc: true }],
   })
