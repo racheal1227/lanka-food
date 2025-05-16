@@ -1,12 +1,12 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Edit, ImageOff, Star, Trash, Trash2 } from 'lucide-react'
+import { Edit, ImageOff, Star, Trash2 } from 'lucide-react'
 
 import { CldImage } from 'next-cloudinary'
 
 import { Product } from '@/types/database.models'
-import { DataTableColumnHeader } from '@components/table/data-table-column-header'
+import DataTableColumnHeader from '@components/table/data-table-column-header'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 

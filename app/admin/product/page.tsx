@@ -1,5 +1,6 @@
 'use client'
 
+import { SortingState } from '@tanstack/react-table'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
@@ -7,8 +8,8 @@ import { useRouter } from 'next/navigation'
 
 import { Product } from '@/types/database.models'
 import { createProductColumns } from '@components/admin/product/product-columns'
-import { DataTable } from '@components/table/data-table'
-import { useDeleteProduct, useProductsQuery, useSetProductRecommendation } from '@hooks/use-product'
+import { ProductTable } from '@components/admin/product/product-table'
+import { useDeleteProduct, useProducts, useSetProductRecommendation } from '@hooks/use-product'
 import { useToast } from '@hooks/use-toast'
 import {
   AlertDialog,
@@ -25,7 +26,20 @@ import { Button } from '@ui/button'
 export default function ProductsPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const { data: products, isLoading } = useProductsQuery({ sorting: [{ id: 'created_at', desc: true }] })
+
+  // 페이지네이션과 정렬 상태 관리
+  const [pageIndex, setPageIndex] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_at', desc: true }])
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // 제품 데이터 조회
+  const { data: productsData, isLoading } = useProducts({
+    pageIndex,
+    pageSize,
+    sorting,
+    searchTerm,
+  })
 
   // 상품 삭제 관련 상태 및 mutation
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
@@ -69,6 +83,28 @@ export default function ProductsPage() {
     router.push('/admin/product/create')
   }
 
+  // 페이지 변경 핸들러
+  const handlePageChange = (page: number) => {
+    setPageIndex(page)
+  }
+
+  // 페이지 크기 변경 핸들러
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setPageIndex(0) // 페이지 크기가 변경되면 첫 페이지로 돌아감
+  }
+
+  // 정렬 변경 핸들러
+  const handleSortingChange = (newSorting: SortingState) => {
+    setSorting(newSorting)
+  }
+
+  // 검색어 변경 핸들러
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setPageIndex(0) // 검색어가 변경되면 첫 페이지로 돌아감
+  }
+
   // 컬럼 정의
   const columns = createProductColumns({
     onEdit: handleEditProduct,
@@ -76,24 +112,36 @@ export default function ProductsPage() {
     onRecommend: handleSetRecommendation,
   })
 
+  // 액션 버튼 정의
+  const actionButton = (
+    <Button onClick={handleAddProduct}>
+      <Plus className="mr-2 h-4 w-4" />새 상품 추가
+    </Button>
+  )
+
+  if (isLoading || !productsData) {
+    return <div className="flex items-center justify-center h-40">로딩 중...</div>
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mb-6">상품 관리</h1>
       </div>
 
-      <DataTable
+      <ProductTable
         columns={columns}
-        data={products}
-        searchKey="name_ko"
-        searchPlaceholder="상품명 검색..."
-        showColumnToggle
-        enableRowSelection={false}
-        actionButton={
-          <Button onClick={handleAddProduct}>
-            <Plus className="mr-2 h-4 w-4" />새 상품 추가
-          </Button>
-        }
+        data={productsData}
+        currentPage={pageIndex}
+        pageCount={productsData.pagination.totalPages}
+        pageSize={pageSize}
+        sorting={sorting}
+        searchValue={searchTerm}
+        onPageChange={handlePageChange}
+        onPageSizeChange={handlePageSizeChange}
+        onSortingChange={handleSortingChange}
+        onSearchChange={handleSearchChange}
+        actionButton={actionButton}
       />
 
       {/* 상품 삭제 확인 대화상자 */}
