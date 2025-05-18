@@ -17,7 +17,7 @@ export const getProducts = async ({
   searchTerm,
   categoryId,
 }: QueryParams & { categoryId?: string }): Promise<PageResponse<Product>> => {
-  let query = supabase.from('products').select('*', { count: 'exact' })
+  let query = supabase.from('products').select('*, categories(*)', { count: 'exact' })
 
   if (categoryId) {
     query = query.eq('category_id', categoryId)

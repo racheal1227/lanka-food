@@ -79,6 +79,7 @@ export const createProductColumns = ({
     meta: {
       title: '상품명(한국어)',
     },
+    enableHiding: false,
     cell: ({ row: { original } }) => (
       <div className="font-medium truncate" title={original.name_ko || '-'}>
         {original.name_ko || '-'}
@@ -138,6 +139,7 @@ export const createProductColumns = ({
         {original.categories?.name || '-'}
       </div>
     ),
+    enableSorting: false,
   },
   // 상태 컬럼
   {
@@ -186,6 +188,7 @@ export const createProductColumns = ({
       title: '관리',
     },
     enableSorting: false,
+    enableHiding: false,
     cell: ({ row }) => {
       const product = row.original
       return (
