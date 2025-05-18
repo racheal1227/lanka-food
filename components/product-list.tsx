@@ -1,6 +1,6 @@
 'use client'
 
-import { Loader2, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Loader2, X } from 'lucide-react'
 import * as React from 'react'
 import { useInView } from 'react-intersection-observer'
 
@@ -13,6 +13,7 @@ import ProductCard from '@components/product-card'
 import useIsMobile from '@hooks/use-mobile'
 import { useProductsByCategory } from '@hooks/use-product'
 import { Badge } from '@ui/badge'
+import { Button } from '@ui/button'
 
 export default function ProductList() {
   const searchParams = useSearchParams()
@@ -22,6 +23,8 @@ export default function ProductList() {
 
   const selectedCategory = searchParams.get('category') || undefined
   const searchTerm = searchParams.get('searchTerm') || undefined
+  const sortBy = searchParams.get('sortBy') || 'created_at'
+  const sortDir = searchParams.get('sortDir') || 'desc'
 
   // PC에서는 검색어 파라미터 제거
   React.useEffect(() => {
@@ -39,10 +42,13 @@ export default function ProductList() {
     rootMargin: '0px 0px 300px 0px', // 하단에서 300px 전에 로드 시작
   })
 
+  // 정렬 옵션 설정
+  const getSortingOptions = () => [{ id: sortBy, desc: sortDir === 'desc' }]
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useProductsByCategory({
     categoryName: selectedCategory,
     searchTerm,
-    sorting: [{ id: 'created_at', desc: true }],
+    sorting: getSortingOptions(),
     pageIndex: 0,
     pageSize: 8,
   })
@@ -58,6 +64,23 @@ export default function ProductList() {
       params.set('searchTerm', filteredTerms)
     } else {
       params.delete('searchTerm')
+    }
+
+    router.replace(`${pathname}?${params.toString()}`)
+  }
+
+  // 정렬 변경 처리
+  const handleSortChange = (field: string) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    // 같은 필드를 클릭한 경우 정렬 방향 토글
+    if (sortBy === field) {
+      const newDirection = sortDir === 'asc' ? 'desc' : 'asc'
+      params.set('sortDir', newDirection)
+    } else {
+      // 다른 필드를 클릭한 경우 기본 내림차순으로 설정
+      params.set('sortBy', field)
+      params.set('sortDir', 'desc')
     }
 
     router.replace(`${pathname}?${params.toString()}`)
@@ -85,25 +108,70 @@ export default function ProductList() {
     return <div>상품이 없습니다.</div>
   }
 
+  // 정렬 옵션 UI에 사용할 도우미 함수
+  const getSortIcon = (field: string) => {
+    if (sortBy !== field) return null
+    return sortDir === 'asc' ? <ArrowUp className="h-3 w-3 ml-1" /> : <ArrowDown className="h-3 w-3 ml-1" />
+  }
+
   return (
     <div>
-      {/* 검색어 뱃지 */}
-      {searchTerm && isMobile && (
-        <div className="mb-4 flex flex-wrap items-center gap-1.5">
-          {parseSearchTerms(searchTerm).map((term) => (
-            <Badge key={term} variant="outline" className="flex items-center py-1 px-2 text-xs">
-              <span>{term}</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveSearchTerm(term)}
-                className="ml-1 inline-flex h-3 w-3 items-center justify-center rounded-full p-0 hover:bg-gray-200"
-              >
-                <X className="h-2 w-2" />
-              </button>
-            </Badge>
-          ))}
+      {/* 상단 영역: 검색어 뱃지와 정렬 버튼 */}
+      <div className="mb-4">
+        {/* 검색어 뱃지 */}
+        {searchTerm && isMobile && (
+          <div className="flex flex-wrap items-center gap-1.5 mb-4">
+            {parseSearchTerms(searchTerm).map((term) => (
+              <Badge key={term} variant="outline" className="flex items-center py-1 px-2 text-xs">
+                <span>{term}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSearchTerm(term)}
+                  className="ml-1 inline-flex h-3 w-3 items-center justify-center rounded-full p-0 hover:bg-gray-200"
+                >
+                  <X className="h-2 w-2" />
+                </button>
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* 정렬 버튼 */}
+        <div className="flex justify-end gap-2 mb-2">
+          <Button
+            variant={sortBy === 'created_at' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleSortChange('created_at')}
+            className="text-xs gap-1"
+          >
+            최신순{getSortIcon('created_at')}
+          </Button>
+          <Button
+            variant={sortBy === 'name_en' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleSortChange('name_en')}
+            className="text-xs gap-1"
+          >
+            이름순(영어){getSortIcon('name_en')}
+          </Button>
+          <Button
+            variant={sortBy === 'name_ko' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleSortChange('name_ko')}
+            className="text-xs gap-1"
+          >
+            이름순(한국어){getSortIcon('name_ko')}
+          </Button>
+          <Button
+            variant={sortBy === 'name_si' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => handleSortChange('name_si')}
+            className="text-xs gap-1"
+          >
+            이름순(싱할라어){getSortIcon('name_si')}
+          </Button>
         </div>
-      )}
+      </div>
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4">
         {data.pages.map((page) => (
