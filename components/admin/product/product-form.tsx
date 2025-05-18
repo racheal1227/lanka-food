@@ -1,20 +1,25 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Suspense, useState } from 'react'
+import { format } from 'date-fns'
+import { CalendarIcon, Clock } from 'lucide-react'
+import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { useCategoriesQuery } from '@/hooks/use-category'
 import { toast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
 import { uploadImageArray } from '@/services/product.service'
 import { Product } from '@/types/database.models'
-import showErrorToast from '@/utils/show-error-toast'
+import { showErrorToast } from '@/utils/show-error-toast'
 import MultiImageUpload, { ClientImage } from '@components/admin/product/multi-image-upload'
 import { Button } from '@ui/button'
+import { Calendar } from '@ui/calendar'
 import { Checkbox } from '@ui/checkbox'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@ui/form'
 import { Input } from '@ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select'
 import { Textarea } from '@ui/textarea'
 
@@ -34,6 +39,7 @@ const productSchema = z.object({
   is_recommended: z.boolean(),
   featured_images: z.array(z.string()).nullable().optional(),
   detail_images: z.array(z.string()).nullable().optional(),
+  published_at: z.date({ required_error: '상품 등록 일자를 선택해주세요.' }),
 })
 
 export type FormValues = z.infer<typeof productSchema>
@@ -67,9 +73,15 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
         publicId,
       })) || []
 
-  const [featuredClientImages, setFeaturedClientImages] = useState<ClientImage[]>(initialFeaturedImages)
-  const [detailClientImages, setDetailClientImages] = useState<ClientImage[]>(initialDetailImages)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [featuredClientImages, setFeaturedClientImages] = React.useState<ClientImage[]>(initialFeaturedImages)
+  const [detailClientImages, setDetailClientImages] = React.useState<ClientImage[]>(initialDetailImages)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [selectedHour, setSelectedHour] = React.useState<number>(new Date().getHours())
+  const [selectedMinute, setSelectedMinute] = React.useState<number>(new Date().getMinutes())
+  const [tempDate, setTempDate] = React.useState<Date | undefined>(undefined)
+  const [tempHour, setTempHour] = React.useState<number>(0)
+  const [tempMinute, setTempMinute] = React.useState<number>(0)
+  const [datePickerOpen, setDatePickerOpen] = React.useState(false)
 
   const defaultValues: FormValues = product
     ? {
@@ -88,6 +100,7 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
         detail_images: Array.isArray(product.detail_images)
           ? product.detail_images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
           : [],
+        published_at: product.published_at ? new Date(product.published_at) : new Date(),
       }
     : {
         name_ko: '',
@@ -101,6 +114,7 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
         is_recommended: false,
         featured_images: [],
         detail_images: [],
+        published_at: new Date(),
       }
 
   const form = useForm<FormValues>({
@@ -151,9 +165,17 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
         setDetailClientImages(updatedImages)
       }
 
+      // published_at 데이터 처리
+      const publishedAt = new Date(data.published_at)
+      // 시간과 분 설정
+      publishedAt.setHours(selectedHour)
+      publishedAt.setMinutes(selectedMinute)
+      publishedAt.setSeconds(0)
+
       // 폼 데이터 업데이트 및 제출
       const formData = {
         ...data,
+        published_at: publishedAt,
         featured_images: featuredImages.length > 0 ? featuredImages : null,
         detail_images: detailImages.length > 0 ? detailImages : null,
         is_available: data.stock_quantity === 0 ? false : data.is_available,
@@ -188,6 +210,45 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
   }
 
   const isStockZero = form.watch('stock_quantity') === 0
+
+  // 시간 선택 옵션 생성
+  const hours = Array.from({ length: 24 }, (_, i) => i)
+  const minutes = Array.from({ length: 60 }, (_, i) => i)
+
+  // 날짜 시간 선택 시 폼 업데이트 함수
+  const updateDateTime = (date: Date | undefined, hour?: number, minute?: number) => {
+    if (!date) return
+
+    setTempDate(date)
+    setTempHour(hour !== undefined ? hour : tempHour)
+    setTempMinute(minute !== undefined ? minute : tempMinute)
+  }
+
+  const applyDateTime = () => {
+    if (!tempDate) return
+
+    const newDate = new Date(tempDate)
+    newDate.setHours(tempHour)
+    newDate.setMinutes(tempMinute)
+    newDate.setSeconds(0)
+
+    form.setValue('published_at', newDate)
+    setSelectedHour(tempHour)
+    setSelectedMinute(tempMinute)
+    setDatePickerOpen(false)
+  }
+
+  const cancelDateTime = () => {
+    setDatePickerOpen(false)
+  }
+
+  const openDatePicker = () => {
+    const currentDate = form.getValues('published_at')
+    setTempDate(currentDate)
+    setTempHour(currentDate.getHours())
+    setTempMinute(currentDate.getMinutes())
+    setDatePickerOpen(true)
+  }
 
   return (
     <Form {...form}>
@@ -281,6 +342,99 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
           </div>
 
           <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="published_at"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    상품 등록 일자 <span className="text-red-600">*</span>
+                  </FormLabel>
+                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen} modal>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
+                          onClick={openDatePicker}
+                        >
+                          {field.value ? (
+                            format(field.value, 'yyyy-MM-dd HH:mm')
+                          ) : (
+                            <span>날짜와 시간을 선택하세요</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <div className="p-3">
+                        <Calendar
+                          mode="single"
+                          selected={tempDate}
+                          onSelect={(date) => updateDateTime(date)}
+                          initialFocus
+                        />
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                          <div>
+                            <div className="flex items-center">
+                              <Clock className="mr-2 h-4 w-4" />
+                              <span className="text-sm font-medium">시간</span>
+                            </div>
+                            <Select
+                              value={tempHour.toString()}
+                              onValueChange={(value) => updateDateTime(tempDate, parseInt(value, 10))}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="시간 선택" />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-[200px]">
+                                {hours.map((hour) => (
+                                  <SelectItem key={`hour-${hour}`} value={hour.toString()}>
+                                    {hour.toString().padStart(2, '0')}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div>
+                            <div className="flex items-center">
+                              <span className="text-sm font-medium">분</span>
+                            </div>
+                            <Select
+                              value={tempMinute.toString()}
+                              onValueChange={(value) => updateDateTime(tempDate, undefined, parseInt(value, 10))}
+                            >
+                              <SelectTrigger className="mt-1">
+                                <SelectValue placeholder="분 선택" />
+                              </SelectTrigger>
+                              <SelectContent className="max-h-[200px]">
+                                {minutes.map((minute) => (
+                                  <SelectItem key={`minute-${minute}`} value={minute.toString()}>
+                                    {minute.toString().padStart(2, '0')}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                        <div className="mt-4 flex justify-end space-x-2">
+                          <Button type="button" variant="outline" size="sm" onClick={cancelDateTime}>
+                            취소
+                          </Button>
+                          <Button type="button" size="sm" onClick={applyDateTime}>
+                            확인
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="price_krw"
@@ -425,8 +579,8 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
 
 export default function ProductForm(props: ProductFormProps) {
   return (
-    <Suspense fallback={<div>카테고리 로딩 중...</div>}>
+    <React.Suspense fallback={<div>카테고리 로딩 중...</div>}>
       <ProductFormContent {...props} />
-    </Suspense>
+    </React.Suspense>
   )
 }
