@@ -4,7 +4,7 @@ import { Home, Menu, MessageCircle, Search } from 'lucide-react'
 import { useState } from 'react'
 
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import ProductCard from '@components/product-card'
 import { useCategoriesQuery } from '@hooks/use-category'
@@ -17,6 +17,7 @@ import { Separator } from '@ui/separator'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@ui/tooltip'
 
 export default function MobileNavigation() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const selectedCategory = searchParams.get('category')
 
@@ -33,6 +34,15 @@ export default function MobileNavigation() {
   // 연락하기 핸들러
   const handleContact = () => {
     window.open('https://example.com/contact', '_blank')
+  }
+
+  // 검색 핸들러
+  const handleSearch = (searchQuery: string) => {
+    if (searchQuery.trim()) {
+      // 검색어를 URL에 추가하고 Next.js 라우터로 이동
+      router.push(`/?searchTerm=${encodeURIComponent(searchQuery.trim())}`)
+      setSearchSheetOpen(false) // 검색 창 닫기
+    }
   }
 
   return (
@@ -137,10 +147,20 @@ export default function MobileNavigation() {
             </DrawerHeader>
             <Separator className="mb-4" />
             <div className="px-4 pb-4">
-              <div className="flex mb-4">
-                <Input placeholder="상품 검색..." className="w-full" />
-                <Button className="ml-2">검색</Button>
-              </div>
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  const formData = new FormData(event.currentTarget)
+                  const searchQuery = formData.get('searchQuery') as string
+                  handleSearch(searchQuery)
+                }}
+                className="flex mb-4"
+              >
+                <Input name="searchQuery" placeholder="상품 검색..." className="w-full" />
+                <Button type="submit" className="ml-2">
+                  검색
+                </Button>
+              </form>
               <Separator className="my-4" />
               <div>
                 <div className="flex items-center mb-2">

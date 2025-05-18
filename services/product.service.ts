@@ -1,7 +1,7 @@
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import { SetProductRecommendationParams } from '@/types/product.type'
 import { PageResponse, QueryParams } from '@/types/query.type'
-import { createPageResponse, formatToSupabaseSort } from '@/utils/query.utils'
+import { applySearchTermsFilter, createPageResponse, formatToSupabaseSort, parseSearchTerms } from '@/utils/query.utils'
 import supabase from '@lib/supabase'
 
 export const getProducts = async ({
@@ -17,18 +17,8 @@ export const getProducts = async ({
     query = query.eq('category_id', categoryId)
   }
   if (searchTerm) {
-    // 검색어를 띄어쓰기로 분리
-    const searchTerms = searchTerm.split(/\s+/).filter(Boolean)
-
-    // 각 검색어에 대해 OR 조건으로 검색
-    query = query.or(
-      searchTerms
-        .map(
-          (term) =>
-            `name_ko.ilike.%${term}%,name_en.ilike.%${term}%,name_si.ilike.%${term}%,description.ilike.%${term}%`,
-        )
-        .join(','),
-    )
+    const searchTerms = parseSearchTerms(searchTerm)
+    query = applySearchTermsFilter(query, searchTerms)
   }
   sorting.forEach((sort) => {
     const [column, option] = formatToSupabaseSort(sort)
@@ -65,18 +55,8 @@ export const getProductsByCategoryName = async ({
     query = query.eq('category_id', category.id)
   }
   if (searchTerm) {
-    // 검색어를 띄어쓰기로 분리
-    const searchTerms = searchTerm.split(/\s+/).filter(Boolean)
-
-    // 각 검색어에 대해 OR 조건으로 검색
-    query = query.or(
-      searchTerms
-        .map(
-          (term) =>
-            `name_ko.ilike.%${term}%,name_en.ilike.%${term}%,name_si.ilike.%${term}%,description.ilike.%${term}%`,
-        )
-        .join(','),
-    )
+    const searchTerms = parseSearchTerms(searchTerm)
+    query = applySearchTermsFilter(query, searchTerms)
   }
   sorting.forEach((sort) => {
     const [column, option] = formatToSupabaseSort(sort)

@@ -83,3 +83,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .navigation-container {
+    min-height: 56px; /* 모바일 헤더 높이 */
+  }
+
+  @media (min-width: 768px) {
+    .navigation-container {
+      min-height: 60px; /* 데스크톱 네비게이션 높이 */
+    }
+  }
+}
