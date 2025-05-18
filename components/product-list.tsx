@@ -6,6 +6,7 @@ import { useInView } from 'react-intersection-observer'
 
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
+import Loading from '@/app/loading'
 import { Product } from '@/types/database.models'
 import { parseSearchTerms } from '@/utils/query.utils'
 import ProductCard from '@components/product-card'
@@ -71,7 +72,7 @@ export default function ProductList() {
 
   // 로딩 상태 처리
   if (status === 'pending') {
-    return '데이터 로딩 중...'
+    return <Loading />
   }
 
   // 에러 상태 처리

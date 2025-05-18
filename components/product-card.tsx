@@ -1,6 +1,6 @@
 'use client'
 
-import { ImageIcon } from 'lucide-react'
+import { ImageOff } from 'lucide-react'
 import * as React from 'react'
 
 import { CldImage } from 'next-cloudinary'
@@ -14,7 +14,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const placeholder = (
     <div className="bg-gray-200 h-full w-full flex items-center justify-center">
-      <ImageIcon className="w-12 h-12 text-gray-300" />
+      <ImageOff className="w-12 h-12 text-gray-300" />
     </div>
   )
 
