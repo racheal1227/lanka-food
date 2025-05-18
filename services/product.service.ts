@@ -262,12 +262,7 @@ export const uploadImageArray = async (
     await Promise.all(
       publicIdsToDelete.map(async (publicId) => {
         try {
-          const deleteResult = await deleteImageFromCloudinary(publicId)
-          if (deleteResult) {
-            console.log(`이미지 삭제 성공: ${publicId}`)
-          } else {
-            console.warn(`이미지 삭제 결과 불확실: ${publicId}`)
-          }
+          await deleteImageFromCloudinary(publicId)
         } catch (error) {
           console.error(`이미지 삭제 실패 (${publicId}):`, error)
           // 삭제 실패는 치명적이지 않으므로 프로세스를 계속 진행
