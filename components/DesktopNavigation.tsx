@@ -63,7 +63,7 @@ export default function DesktopNavigation() {
             </NavigationMenu>
           </div>
 
-          <div className="w-2 flex justify-end flex-shrink-0">
+          {/* <div className="w-2 flex justify-end flex-shrink-0">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -81,7 +81,7 @@ export default function DesktopNavigation() {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
