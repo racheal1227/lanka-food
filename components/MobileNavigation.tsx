@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, Menu, MessageCircle, Search } from 'lucide-react'
+import { Home, Menu, MessageCircle, Search, X } from 'lucide-react'
 import { useState } from 'react'
 
 import Link from 'next/link'
@@ -24,6 +24,7 @@ export default function MobileNavigation() {
   const { data: categories } = useCategoriesQuery()
   const [categorySheetOpen, setCategorySheetOpen] = useState(false)
   const [searchSheetOpen, setSearchSheetOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // 추천 상품 가져오기
   const { data: recommendedProducts } = useRecommendedProducts()
@@ -34,12 +35,18 @@ export default function MobileNavigation() {
   }
 
   // 검색 핸들러
-  const handleSearch = (searchQuery: string) => {
-    if (searchQuery.trim()) {
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
       // 검색어를 URL에 추가하고 Next.js 라우터로 이동
-      router.push(`/?searchTerm=${encodeURIComponent(searchQuery.trim())}`)
+      router.push(`/?searchTerm=${encodeURIComponent(query.trim())}`)
       setSearchSheetOpen(false) // 검색 창 닫기
+      setSearchQuery('') // 검색어 초기화
     }
+  }
+
+  // 검색어 초기화 핸들러
+  const clearSearchQuery = () => {
+    setSearchQuery('')
   }
 
   return (
@@ -147,13 +154,27 @@ export default function MobileNavigation() {
               <form
                 onSubmit={(event) => {
                   event.preventDefault()
-                  const formData = new FormData(event.currentTarget)
-                  const searchQuery = formData.get('searchQuery') as string
                   handleSearch(searchQuery)
                 }}
                 className="flex mb-4"
               >
-                <Input name="searchQuery" placeholder="상품 검색..." className="w-full" />
+                <div className="relative flex-1">
+                  <Input
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="상품 검색..."
+                    className="w-full pr-8"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={clearSearchQuery}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
                 <Button type="submit" className="ml-2">
                   검색
                 </Button>
