@@ -67,6 +67,10 @@ export const getProductsByCategoryName = async ({
   sorting.forEach((sort) => {
     const [column, option] = formatToSupabaseSort(sort)
     query = query.order(column, option)
+    // FIXME: 등록일자 변경 후 이름 정렬 삭제
+    if (column === 'published_at') {
+      query = query.order('created_at', { ascending: false }).order('name_en', { ascending: true })
+    }
   })
 
   const offset = pageIndex * pageSize
