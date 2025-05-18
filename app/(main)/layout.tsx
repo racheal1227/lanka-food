@@ -1,11 +1,22 @@
 'use client'
 
+import * as React from 'react'
+
 import MainNavigation from '@/components/navigation'
 import { Separator } from '@/components/ui/separator'
 import useIsMobile from '@/hooks/use-mobile'
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
+  // 초기 렌더링은 모바일 레이아웃으로 고정 (서버와 클라이언트 일치)
+  const [isClient, setIsClient] = React.useState(false)
   const isMobile = useIsMobile()
+
+  React.useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  // 초기 서버 렌더링 또는 클라이언트가 아직 초기화되지 않은 경우 모바일 레이아웃
+  const showMobileLayout = !isClient || isMobile
 
   return (
     <>
@@ -18,7 +29,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
         <main className="flex-grow flex flex-col items-center w-full p-5 pt-5 md:pt-20 pb-5">{children}</main>
         {/* <FloatingContact contactUrl="https://example.com/contact" /> */}
         <footer className="w-full flex items-center justify-center border-t text-center text-xs gap-8 py-8">
-          {isMobile ? (
+          {showMobileLayout ? (
             // 모바일 버전 - 세로 레이아웃
             <div className="flex flex-col items-center gap-1 max-w-md">
               <p className="text-sm font-medium mt-1">📞 상담전화 / Contact</p>
