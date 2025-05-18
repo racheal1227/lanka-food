@@ -78,9 +78,14 @@ export default function ProductList() {
       const newDirection = sortDir === 'asc' ? 'desc' : 'asc'
       params.set('sortDir', newDirection)
     } else {
-      // 다른 필드를 클릭한 경우 기본 내림차순으로 설정
+      // 다른 필드를 클릭한 경우, 필드에 따라 기본 정렬 방향 설정
       params.set('sortBy', field)
-      params.set('sortDir', 'desc')
+      // 최신순은 기본적으로 내림차순, 이름순은 기본적으로 오름차순
+      if (field === 'created_at') {
+        params.set('sortDir', 'desc')
+      } else {
+        params.set('sortDir', 'asc')
+      }
     }
 
     router.replace(`${pathname}?${params.toString()}`)

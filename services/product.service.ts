@@ -1,7 +1,13 @@
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import { SetProductRecommendationParams } from '@/types/product.type'
 import { PageResponse, QueryParams } from '@/types/query.type'
-import { applySearchTermsFilter, createPageResponse, formatToSupabaseSort, parseSearchTerms } from '@/utils/query.utils'
+import {
+  applySearchTermsFilter,
+  convertEmptyToNull,
+  createPageResponse,
+  formatToSupabaseSort,
+  parseSearchTerms,
+} from '@/utils/query.utils'
 import supabase from '@lib/supabase'
 
 export const getProducts = async ({
@@ -93,14 +99,27 @@ export const getRecommendedProducts = async (): Promise<Product[]> => {
 }
 
 export const createProduct = async (product: ProductInsert): Promise<Product> => {
-  const { data, error } = await supabase.from('products').insert([product]).select()
+  // 이름 필드의 빈 문자열을 null로 변환
+  const processedProduct = {
+    ...product,
+    name_ko: convertEmptyToNull(product.name_ko),
+    name_si: convertEmptyToNull(product.name_si),
+  }
+
+  const { data, error } = await supabase.from('products').insert([processedProduct]).select()
 
   if (error) throw error
   return data[0]
 }
 
 export const updateProduct = async ({ id, product }: { id: string; product: ProductUpdate }): Promise<Product> => {
-  const { data, error } = await supabase.from('products').update(product).eq('id', id).select().single()
+  // 이름 필드의 빈 문자열을 null로 변환
+  const processedProduct = {
+    ...product,
+    name_ko: convertEmptyToNull(product.name_ko),
+    name_si: convertEmptyToNull(product.name_si),
+  }
+  const { data, error } = await supabase.from('products').update(processedProduct).eq('id', id).select().single()
 
   if (error) throw error
   return data

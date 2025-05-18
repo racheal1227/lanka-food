@@ -24,10 +24,16 @@ export const createPageResponse = <T>(
   }
 }
 
-export const formatToSupabaseSort = (sort: ColumnSort): [string, { ascending?: boolean }] => {
+export const formatToSupabaseSort = (sort: ColumnSort): [string, { ascending?: boolean; nullsLast?: boolean }] => {
   if (sort.id.includes('.')) {
     const [table, column] = sort.id.split('.')
     return [`${table}(${column})`, { ascending: !sort.desc }]
+  }
+
+  // 이름 필드에 대해서 NULL 값을 마지막에 오도록 설정
+  const nameFields = ['name_ko', 'name_en', 'name_si']
+  if (nameFields.includes(sort.id)) {
+    return [sort.id, { ascending: !sort.desc, nullsLast: true }]
   }
 
   return [sort.id, { ascending: !sort.desc }]
@@ -47,3 +53,6 @@ export const applySearchTermsFilter = (
 
   return query.or(searchTerms.map((term) => columns.map((column) => `${column}.ilike.%${term}%`).join(',')).join(','))
 }
+
+export const convertEmptyToNull = (value: string | null | undefined): string | null | undefined =>
+  value === '' ? null : value
