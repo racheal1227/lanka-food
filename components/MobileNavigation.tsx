@@ -181,7 +181,7 @@ export default function MobileNavigation() {
           </DrawerContent>
         </Drawer>
 
-        <TooltipProvider>
+        {/* <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -196,7 +196,7 @@ export default function MobileNavigation() {
               <p>판매사 연락하기</p>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
+        </TooltipProvider> */}
       </div>
     </div>
   )
