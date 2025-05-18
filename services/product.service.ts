@@ -91,7 +91,7 @@ export const getRecommendedProducts = async (): Promise<Product[]> => {
     .select('*')
     .eq('is_available', true)
     .eq('is_recommended', true)
-    .order('created_at', { ascending: false })
+    .order('published_at', { ascending: false })
     .limit(4)
 
   if (error) throw error

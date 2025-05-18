@@ -1,6 +1,7 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
+import { format } from 'date-fns'
 import { Edit, ImageOff, Star, Trash2 } from 'lucide-react'
 
 import { CldImage } from 'next-cloudinary'
@@ -22,24 +23,15 @@ export const createProductColumns = ({
 }): ColumnDef<Product>[] => [
   // 생성일자 컬럼
   {
-    accessorKey: 'created_at',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="생성일자" />,
+    accessorKey: 'published_at',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="등록일자" />,
     size: 140,
     meta: {
-      title: '생성일자',
+      title: '등록일자',
     },
     cell: ({ row: { original } }) => {
-      const date = new Date(original.created_at)
-
-      const formatted = date
-        ? new Intl.DateTimeFormat('ko-KR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-          }).format(date)
-        : '-'
+      const date = new Date(original.published_at)
+      const formatted = date ? format(new Date(date), 'yyyy-MM-dd HH:mm') : '-'
 
       return (
         <div className="truncate" title={formatted}>

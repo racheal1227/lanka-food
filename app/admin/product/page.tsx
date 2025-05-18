@@ -28,7 +28,7 @@ export default function ProductsPage() {
 
   const [pageIndex, setPageIndex] = React.useState<number>(0)
   const [pageSize, setPageSize] = React.useState<number>(10)
-  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'created_at', desc: true }])
+  const [sorting, setSorting] = React.useState<SortingState>([{ id: 'published_at', desc: true }])
   const [searchTerm, setSearchTerm] = React.useState<string>('')
   const [productToDelete, setProductToDelete] = React.useState<Product | null>(null)
 

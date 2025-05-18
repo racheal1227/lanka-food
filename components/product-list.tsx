@@ -23,7 +23,7 @@ export default function ProductList() {
 
   const selectedCategory = searchParams.get('category') || undefined
   const searchTerm = searchParams.get('searchTerm') || undefined
-  const sortBy = searchParams.get('sortBy') || 'created_at'
+  const sortBy = searchParams.get('sortBy') || 'published_at'
   const sortDir = searchParams.get('sortDir') || 'desc'
 
   // PC에서는 검색어 파라미터 제거
@@ -81,7 +81,7 @@ export default function ProductList() {
       // 다른 필드를 클릭한 경우, 필드에 따라 기본 정렬 방향 설정
       params.set('sortBy', field)
       // 최신순은 기본적으로 내림차순, 이름순은 기본적으로 오름차순
-      if (field === 'created_at') {
+      if (field === 'published_at') {
         params.set('sortDir', 'desc')
       } else {
         params.set('sortDir', 'asc')
@@ -144,12 +144,12 @@ export default function ProductList() {
         {/* 정렬 버튼 */}
         <div className="flex justify-end gap-2 mb-2">
           <Button
-            variant={sortBy === 'created_at' ? 'default' : 'outline'}
+            variant={sortBy === 'published_at' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => handleSortChange('created_at')}
+            onClick={() => handleSortChange('published_at')}
             className="text-xs gap-1"
           >
-            최신순{getSortIcon('created_at')}
+            최신순{getSortIcon('published_at')}
           </Button>
           <Button
             variant={sortBy === 'name_en' ? 'default' : 'outline'}
