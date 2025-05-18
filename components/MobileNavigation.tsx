@@ -26,10 +26,7 @@ export default function MobileNavigation() {
   const [searchSheetOpen, setSearchSheetOpen] = useState(false)
 
   // 추천 상품 가져오기
-  const { data: products } = useRecommendedProducts()
-
-  // 추천 상품 필터링
-  const recommendedProducts = products?.filter((product) => product.is_recommended).slice(0, 4) || []
+  const { data: recommendedProducts } = useRecommendedProducts()
 
   // 연락하기 핸들러
   const handleContact = () => {
@@ -166,9 +163,9 @@ export default function MobileNavigation() {
                 <div className="flex items-center mb-2">
                   <Badge variant="default">추천 상품</Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-1">
                   {recommendedProducts.map((product) => (
-                    <ProductCard key={product.id} product={product} />
+                    <ProductCard key={product.id} product={product} size="small" />
                   ))}
                 </div>
               </div>
