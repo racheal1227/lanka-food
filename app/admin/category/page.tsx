@@ -34,7 +34,7 @@ import {
 import { Category } from '@/types/database.models'
 
 export default function CategoriesPage() {
-  const { data: categories, isLoading } = useCategoriesQuery()
+  const { data: categories } = useCategoriesQuery(true)
   const createCategory = useCreateCategory()
   const updateCategory = useUpdateCategory()
   const deleteCategory = useDeleteCategory()
@@ -88,10 +88,6 @@ export default function CategoriesPage() {
     }))
 
     updateCategoryOrder.mutate(categoriesWithOrder)
-  }
-
-  if (isLoading) {
-    return <div>로딩 중...</div>
   }
 
   return (
