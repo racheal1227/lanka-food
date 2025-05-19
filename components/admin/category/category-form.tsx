@@ -26,10 +26,15 @@ interface CategoryFormProps {
 export function CategoryForm({ category, onSubmit, onCancel }: CategoryFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: category?.name || '',
-      is_active: category?.is_active || true,
-    },
+    defaultValues: category
+      ? {
+          name: category.name,
+          is_active: category.is_active,
+        }
+      : {
+          name: '',
+          is_active: true,
+        },
   })
 
   return (
