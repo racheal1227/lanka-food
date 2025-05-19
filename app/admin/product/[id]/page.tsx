@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import ProductForm, { FormValues } from '@components/admin/product/product-form'
+import ProductForm, { SubmitValues } from '@components/admin/product/product-form'
 import { useProductQuery, useUpdateProduct } from '@hooks/use-product'
 
 function EditProductForm({ id }: { id: string }) {
@@ -12,7 +12,7 @@ function EditProductForm({ id }: { id: string }) {
   const { data: product } = useProductQuery(id)
   const updateProduct = useUpdateProduct()
 
-  const handleSubmit = (data: FormValues) => {
+  const handleSubmit = (data: SubmitValues) => {
     updateProduct.mutate({ id, product: data })
   }
 

@@ -42,11 +42,14 @@ const productSchema = z.object({
   published_at: z.date({ required_error: '상품 등록 일자를 선택해주세요.' }),
 })
 
-export type FormValues = z.infer<typeof productSchema>
+type FormValues = z.infer<typeof productSchema>
+export interface SubmitValues extends Omit<FormValues, 'published_at'> {
+  published_at: string
+}
 
 export interface ProductFormProps {
   product?: Product
-  onSubmit: (data: FormValues) => void
+  onSubmit: (data: SubmitValues) => void
   onCancel: () => void
 }
 
@@ -94,12 +97,8 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
         category_id: product.category_id,
         is_available: product.is_available,
         is_recommended: product.is_recommended,
-        featured_images: Array.isArray(product.featured_images)
-          ? product.featured_images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
-          : [],
-        detail_images: Array.isArray(product.detail_images)
-          ? product.detail_images.filter((url) => url && typeof url === 'string' && url.trim() !== '')
-          : [],
+        featured_images: product.featured_images || [],
+        detail_images: product.detail_images || [],
         published_at: product.published_at ? new Date(product.published_at) : new Date(),
       }
     : {
@@ -173,9 +172,9 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
       publishedAt.setSeconds(0)
 
       // 폼 데이터 업데이트 및 제출
-      const formData = {
+      const formData: SubmitValues = {
         ...data,
-        published_at: publishedAt,
+        published_at: publishedAt.toISOString(),
         featured_images: featuredImages.length > 0 ? featuredImages : null,
         detail_images: detailImages.length > 0 ? detailImages : null,
         is_available: data.stock_quantity === 0 ? false : data.is_available,
@@ -360,7 +359,7 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
                           onClick={openDatePicker}
                         >
                           {field.value ? (
-                            format(field.value, 'yyyy-MM-dd HH:mm')
+                            format(new Date(field.value), 'yyyy-MM-dd HH:mm')
                           ) : (
                             <span>날짜와 시간을 선택하세요</span>
                           )}
