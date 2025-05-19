@@ -44,13 +44,9 @@ function SortableCategoryItem({ category, onEdit, onDelete }: SortableCategoryIt
         <div {...attributes} {...listeners} className="cursor-grab">
           <GripVertical className="h-5 w-5 text-muted-foreground" />
         </div>
-        <div className="flex flex-col">
+        <div className="flex items-center gap-2">
+          {!category.is_active && <Badge>비활성화</Badge>}
           <span className="font-medium">{category.name}</span>
-          {!category.is_active && (
-            <Badge variant="outline" className="mt-1">
-              비활성화
-            </Badge>
-          )}
         </div>
       </div>
       <div className="flex items-center gap-2">
