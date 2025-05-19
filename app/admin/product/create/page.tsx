@@ -4,14 +4,14 @@ import { Suspense } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import ProductForm, { FormValues } from '@components/admin/product/product-form'
+import ProductForm, { SubmitValues } from '@components/admin/product/product-form'
 import { useCreateProduct } from '@hooks/use-product'
 
 function CreateProductForm() {
   const router = useRouter()
   const createProduct = useCreateProduct()
 
-  const handleSubmit = (data: FormValues) => {
+  const handleSubmit = (data: SubmitValues) => {
     createProduct.mutate(data)
   }
 

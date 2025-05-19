@@ -1,8 +1,14 @@
 import { Category, CategoryInsert, CategoryUpdate } from '@/types/database.models'
 import supabase from '@lib/supabase'
 
-export const getCategories = async (): Promise<Category[]> => {
-  const { data, error } = await supabase.from('categories').select('*').order('sort_order', { ascending: true })
+export const getCategories = async (isAdmin?: boolean): Promise<Category[]> => {
+  let query = supabase.from('categories').select('*').order('sort_order', { ascending: true })
+
+  if (!isAdmin) {
+    query = query.filter('is_active', 'eq', true)
+  }
+
+  const { data, error } = await query
 
   if (error) throw error
   return data

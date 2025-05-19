@@ -1,48 +1,53 @@
-import { SortingTableState } from '@tanstack/react-table'
-
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import { SetProductRecommendationParams } from '@/types/product.type'
+import { PageResponse, QueryParams } from '@/types/query.type'
+import {
+  applySearchTermsFilter,
+  convertEmptyToNull,
+  createPageResponse,
+  formatToSupabaseSort,
+  parseSearchTerms,
+} from '@/utils/query.utils'
 import supabase from '@lib/supabase'
 
 export const getProducts = async ({
-  categoryId,
+  pageIndex,
+  pageSize,
   sorting,
-}: SortingTableState & { categoryId?: string }): Promise<Product[]> => {
-  let query = supabase.from('products').select(`
-      *,
-      categories:category_id (*)
-    `)
+  searchTerm,
+  categoryId,
+}: QueryParams & { categoryId?: string }): Promise<PageResponse<Product>> => {
+  let query = supabase.from('products').select('*, categories(*)', { count: 'exact' })
 
   if (categoryId) {
     query = query.eq('category_id', categoryId)
   }
-
-  sorting.forEach(({ id, desc }) => {
-    query = query.order(id, { ascending: !desc })
-    if (id === 'recommendation_order') {
-      query = query.order('created_at', { ascending: !desc })
-    }
+  if (searchTerm) {
+    const searchTerms = parseSearchTerms(searchTerm)
+    query = applySearchTermsFilter(query, searchTerms)
+  }
+  sorting.forEach((sort) => {
+    const [column, option] = formatToSupabaseSort(sort)
+    query = query.order(column, option)
   })
 
-  const { data, error } = await query
+  const offset = pageIndex * pageSize
+  query = query.range(offset, offset + pageSize - 1)
 
+  const { data, count, error } = await query
   if (error) throw error
-  return data as Product[]
+
+  return createPageResponse<Product>(data, count || 0, pageIndex, pageSize)
 }
 
-export const getProductsByCategory = async ({
-  categoryName,
+export const getProductsByCategoryName = async ({
+  pageIndex,
+  pageSize,
   sorting,
-}: SortingTableState & { categoryName?: string }): Promise<Product[]> => {
-  let query = supabase
-    .from('products')
-    .select(
-      `
-      *,
-      categories:category_id (*)
-    `,
-    )
-    .eq('is_available', true)
+  searchTerm,
+  categoryName,
+}: QueryParams & { categoryName?: string }): Promise<PageResponse<Product>> => {
+  let query = supabase.from('products').select('*', { count: 'exact' }).eq('is_available', true)
 
   // 카테고리 이름으로 카테고리 ID 찾기
   if (categoryName) {
@@ -55,18 +60,25 @@ export const getProductsByCategory = async ({
     if (categoryError) throw categoryError
     query = query.eq('category_id', category.id)
   }
-
-  sorting.forEach(({ id, desc }) => {
-    query = query.order(id, { ascending: !desc })
-    if (id === 'recommendation_order') {
-      query = query.order('created_at', { ascending: !desc })
+  if (searchTerm) {
+    const searchTerms = parseSearchTerms(searchTerm)
+    query = applySearchTermsFilter(query, searchTerms)
+  }
+  sorting.forEach((sort) => {
+    const [column, option] = formatToSupabaseSort(sort)
+    query = query.order(column, option)
+    if (column === 'published_at') {
+      query = query.order('created_at', { ascending: false })
     }
   })
 
-  const { data, error } = await query
+  const offset = pageIndex * pageSize
+  query = query.range(offset, offset + pageSize - 1)
 
+  const { data, count, error } = await query
   if (error) throw error
-  return data as Product[]
+
+  return createPageResponse<Product>(data, count || 0, pageIndex, pageSize)
 }
 
 export const getProduct = async (id: string): Promise<Product> => {
@@ -76,21 +88,101 @@ export const getProduct = async (id: string): Promise<Product> => {
   return data
 }
 
+export const getRecommendedProducts = async (): Promise<Product[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('is_available', true)
+    .eq('is_recommended', true)
+    .order('published_at', { ascending: false })
+    .limit(6)
+
+  if (error) throw error
+  return data
+}
+
 export const createProduct = async (product: ProductInsert): Promise<Product> => {
-  const { data, error } = await supabase.from('products').insert([product]).select()
+  // 이름 필드의 빈 문자열을 null로 변환
+  const processedProduct = {
+    ...product,
+    name_ko: convertEmptyToNull(product.name_ko),
+    name_si: convertEmptyToNull(product.name_si),
+  }
+
+  const { data, error } = await supabase.from('products').insert([processedProduct]).select()
 
   if (error) throw error
   return data[0]
 }
 
 export const updateProduct = async ({ id, product }: { id: string; product: ProductUpdate }): Promise<Product> => {
-  const { data, error } = await supabase.from('products').update(product).eq('id', id).select().single()
+  // 이름 필드의 빈 문자열을 null로 변환
+  const processedProduct = {
+    ...product,
+    name_ko: convertEmptyToNull(product.name_ko),
+    name_si: convertEmptyToNull(product.name_si),
+  }
+  const { data, error } = await supabase.from('products').update(processedProduct).eq('id', id).select().single()
 
   if (error) throw error
   return data
 }
 
-export const deleteProduct = async (id: string): Promise<boolean> => {
+export const deleteImageFromCloudinary = async (publicId: string): Promise<boolean> => {
+  try {
+    // API 엔드포인트 사용 (Next.js 서버 API 라우트에서 구현 필요)
+    const response = await fetch('/api/cloudinary/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ publicId }),
+    })
+
+    if (!response.ok) {
+      console.error(`이미지 삭제 응답 오류: ${response.statusText}`)
+      return false
+    }
+
+    const data = await response.json()
+    return data.success === true
+  } catch (error) {
+    console.error(`이미지 삭제 실패 (${publicId}):`, error)
+    return false
+  }
+}
+
+export const deleteProduct = async (
+  id: string,
+  featuredImages?: string[] | null,
+  detailImages?: string[] | null,
+): Promise<boolean> => {
+  // 이미지가 있으면 Cloudinary에서 삭제합니다.
+  const allImageIds: string[] = []
+
+  if (featuredImages && Array.isArray(featuredImages)) {
+    allImageIds.push(...featuredImages.filter(Boolean))
+  }
+
+  if (detailImages && Array.isArray(detailImages)) {
+    allImageIds.push(...detailImages.filter(Boolean))
+  }
+
+  // 모든 이미지에 대해 병렬로 삭제 요청을 수행합니다.
+  if (allImageIds.length > 0) {
+    await Promise.all(
+      allImageIds.map(async (publicId) => {
+        try {
+          await deleteImageFromCloudinary(publicId)
+        } catch (error) {
+          console.error(`이미지 삭제 실패 (${publicId}):`, error)
+          // 이미지 삭제 실패는 상품 삭제를 중단하지 않습니다.
+        }
+      }),
+    )
+  }
+
+  // 상품을 삭제합니다.
   const { error } = await supabase.from('products').delete().eq('id', id)
 
   if (error) throw error
@@ -116,7 +208,9 @@ export const setProductRecommendation = async ({
   return data
 }
 
-export const updateProductRecommendationOrder = async (products: { id: string; recommendation_order: number }[]) => {
+export const updateProductRecommendationOrder = async (
+  products: { id: string; recommendation_order: number | null }[],
+) => {
   const results = await Promise.all(
     products.map(async (product) => {
       const { data, error } = await supabase
@@ -132,15 +226,6 @@ export const updateProductRecommendationOrder = async (products: { id: string; r
 
   return results
 }
-
-// 파일을 Base64로 변환하는 헬퍼 함수
-const fileToBase64 = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.readAsDataURL(file)
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = (error) => reject(error)
-  })
 
 // Cloudinary 업로드 함수
 export const uploadImageToCloudinary = async (file: File): Promise<{ publicId: string; url: string }> => {
@@ -174,31 +259,6 @@ export const uploadImageToCloudinary = async (file: File): Promise<{ publicId: s
   }
 }
 
-// Cloudinary에서 이미지 삭제 함수
-export const deleteImageFromCloudinary = async (publicId: string): Promise<boolean> => {
-  try {
-    // API 엔드포인트 사용 (Next.js 서버 API 라우트에서 구현 필요)
-    const response = await fetch('/api/cloudinary/delete', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ publicId }),
-    })
-
-    if (!response.ok) {
-      console.error(`이미지 삭제 응답 오류: ${response.statusText}`)
-      return false
-    }
-
-    const data = await response.json()
-    return data.success === true
-  } catch (error) {
-    console.error(`이미지 삭제 실패 (${publicId}):`, error)
-    return false
-  }
-}
-
 // 이미지 배열 업로드 함수
 interface ClientImage {
   id: string
@@ -224,12 +284,7 @@ export const uploadImageArray = async (
     await Promise.all(
       publicIdsToDelete.map(async (publicId) => {
         try {
-          const deleteResult = await deleteImageFromCloudinary(publicId)
-          if (deleteResult) {
-            console.log(`이미지 삭제 성공: ${publicId}`)
-          } else {
-            console.warn(`이미지 삭제 결과 불확실: ${publicId}`)
-          }
+          await deleteImageFromCloudinary(publicId)
         } catch (error) {
           console.error(`이미지 삭제 실패 (${publicId}):`, error)
           // 삭제 실패는 치명적이지 않으므로 프로세스를 계속 진행

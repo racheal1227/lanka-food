@@ -5,13 +5,13 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { toast } from '@/hooks/use-toast'
 import * as categoryService from '@/services/category.service'
 import { CategoryInsert, CategoryUpdate } from '@/types/database.models'
-import showErrorToast from '@/utils/show-error-toast'
+import { showErrorToast } from '@/utils/show-error-toast'
 
 // Read
-export const useCategoriesQuery = () =>
+export const useCategoriesQuery = (isAdmin?: boolean) =>
   useSuspenseQuery({
-    queryKey: ['categories'],
-    queryFn: categoryService.getCategories,
+    queryKey: ['categories', { isAdmin }],
+    queryFn: () => categoryService.getCategories(isAdmin),
     staleTime: Infinity,
   })
 
@@ -23,6 +23,8 @@ export const useCreateCategory = () => {
     mutationFn: (category: CategoryInsert) => categoryService.createCategory(category),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리가 추가되었습니다.',
@@ -42,6 +44,8 @@ export const useUpdateCategory = () => {
     mutationFn: (params: { id: string; category: CategoryUpdate }) => categoryService.updateCategory(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리가 수정되었습니다.',
@@ -61,6 +65,8 @@ export const useDeleteCategory = () => {
     mutationFn: (id: string) => categoryService.deleteCategory(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리가 삭제되었습니다.',
@@ -80,6 +86,8 @@ export const useUpdateCategoryOrder = () => {
     mutationFn: (categories: { id: string; sort_order: number }[]) => categoryService.updateCategoryOrder(categories),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] })
+      queryClient.refetchQueries({ queryKey: ['categories'] })
+
       toast({
         title: '성공',
         description: '카테고리 순서가 변경되었습니다.',

@@ -1,5 +1,3 @@
-import { Folder, Home, Package } from 'lucide-react'
-
 import { Metadata } from 'next'
 
 import AdminHeader from '@/components/admin/admin-header'
@@ -11,12 +9,6 @@ export const metadata: Metadata = {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const sidebarItems = [
-    { href: '/admin', label: '대시보드', icon: Home },
-    { href: '/admin/category', label: '카테고리 관리', icon: Folder },
-    { href: '/admin/product', label: '상품 관리', icon: Package },
-  ]
-
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <AdminSidebar />

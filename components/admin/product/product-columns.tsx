@@ -1,12 +1,13 @@
 'use client'
 
 import { ColumnDef } from '@tanstack/react-table'
-import { Edit, ImageOff, Star, Trash } from 'lucide-react'
+import { format } from 'date-fns'
+import { Edit, ImageOff, Star, Trash2 } from 'lucide-react'
 
 import { CldImage } from 'next-cloudinary'
 
 import { Product } from '@/types/database.models'
-import { DataTableColumnHeader } from '@components/table/data-table-column-header'
+import DataTableColumnHeader from '@components/table/data-table-column-header'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 
@@ -20,6 +21,25 @@ export const createProductColumns = ({
   onDelete?: (product: Product) => void
   onRecommend?: (product: Product, isRecommended: boolean) => void
 }): ColumnDef<Product>[] => [
+  // 생성일자 컬럼
+  {
+    accessorKey: 'published_at',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="등록일자" />,
+    size: 140,
+    meta: {
+      title: '등록일자',
+    },
+    cell: ({ row: { original } }) => {
+      const date = new Date(original.published_at)
+      const formatted = date ? format(new Date(date), 'yyyy-MM-dd HH:mm') : '-'
+
+      return (
+        <div className="truncate" title={formatted}>
+          {formatted}
+        </div>
+      )
+    },
+  },
   // 이미지 컬럼
   {
     accessorKey: 'featured_images',
@@ -59,6 +79,7 @@ export const createProductColumns = ({
     meta: {
       title: '상품명(한국어)',
     },
+    enableHiding: false,
     cell: ({ row: { original } }) => (
       <div className="font-medium truncate" title={original.name_ko || '-'}>
         {original.name_ko || '-'}
@@ -118,6 +139,7 @@ export const createProductColumns = ({
         {original.categories?.name || '-'}
       </div>
     ),
+    enableSorting: false,
   },
   // 상태 컬럼
   {
@@ -128,9 +150,14 @@ export const createProductColumns = ({
       title: '판매상태',
     },
     cell: ({ row: { original } }) => (
-      <Badge variant={original.is_available ? 'default' : 'outline'}>
-        {original.is_available ? '판매중' : '판매중지'}
-      </Badge>
+      <div className="flex items-center justify-center h-full">
+        <Badge
+          variant={original.is_available ? 'default' : 'outline'}
+          className={original.is_available ? 'hover:bg-primary' : ''}
+        >
+          {original.is_available ? '판매중' : '판매중지'}
+        </Badge>
+      </div>
     ),
   },
   // 추천 상품 컬럼
@@ -142,12 +169,14 @@ export const createProductColumns = ({
       title: '추천',
     },
     cell: ({ row: { original } }) => (
-      <Badge
-        variant={original.is_recommended ? 'default' : 'outline'}
-        className={original.is_recommended ? 'bg-amber-500' : ''}
-      >
-        {original.is_recommended ? '추천' : '-'}
-      </Badge>
+      <div className="flex items-center justify-center h-full">
+        <Badge
+          variant={original.is_recommended ? 'default' : 'outline'}
+          className={original.is_recommended ? 'bg-amber-500 hover:bg-amber-500' : ''}
+        >
+          {original.is_recommended ? '추천' : '-'}
+        </Badge>
+      </div>
     ),
   },
   // 액션 컬럼 (관리 버튼)
@@ -159,6 +188,7 @@ export const createProductColumns = ({
       title: '관리',
     },
     enableSorting: false,
+    enableHiding: false,
     cell: ({ row }) => {
       const product = row.original
       return (
@@ -169,8 +199,13 @@ export const createProductColumns = ({
               size="icon"
               onClick={() => onRecommend(product, !product.is_recommended)}
               title={product.is_recommended ? '추천 해제' : '추천으로 설정'}
+              className="hover:bg-transparent group"
             >
-              <Star className={`h-4 w-4 ${product.is_recommended ? 'fill-amber-500 text-amber-500' : ''}`} />
+              <Star
+                className={`h-4 w-4 text-amber-500 ${
+                  product.is_recommended ? 'fill-amber-500' : 'group-hover:fill-amber-500'
+                }`}
+              />
             </Button>
           )}
           {onEdit && (
@@ -179,8 +214,14 @@ export const createProductColumns = ({
             </Button>
           )}
           {onDelete && (
-            <Button variant="ghost" size="icon" onClick={() => onDelete(product)} title="삭제" className="text-red-500">
-              <Trash className="h-4 w-4" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(product)}
+              title="삭제"
+              className="text-red-600 hover:text-red-600 hover:bg-transparent"
+            >
+              <Trash2 className="h-4 w-4" />
             </Button>
           )}
         </div>

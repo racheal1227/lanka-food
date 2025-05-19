@@ -89,7 +89,7 @@ export function LoginForm() {
         <Button type="submit" className="w-full" disabled={isPending}>
           로그인
         </Button>
-        {errors.root && <p className="text-sm text-red-500">{errors.root.message}</p>}
+        {errors.root && <p className="text-sm text-red-600">{errors.root.message}</p>}
       </form>
     </Form>
   )

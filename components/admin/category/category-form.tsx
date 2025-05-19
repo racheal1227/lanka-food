@@ -12,7 +12,7 @@ import { Input } from '@ui/input'
 
 const categorySchema = z.object({
   name: z.string().min(1, '카테고리 이름을 입력해주세요.'),
-  is_active: z.boolean().default(true),
+  is_active: z.boolean(),
 })
 
 type FormValues = z.infer<typeof categorySchema>
@@ -26,10 +26,15 @@ interface CategoryFormProps {
 export function CategoryForm({ category, onSubmit, onCancel }: CategoryFormProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: category?.name || '',
-      is_active: category?.is_active ?? true,
-    },
+    defaultValues: category
+      ? {
+          name: category.name,
+          is_active: category.is_active,
+        }
+      : {
+          name: '',
+          is_active: true,
+        },
   })
 
   return (

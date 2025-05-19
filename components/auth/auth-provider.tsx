@@ -49,8 +49,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event)
-
       if (event === 'SIGNED_OUT' || !session) {
         // 로그아웃 처리
         logout()

@@ -1,36 +1,40 @@
 'use client'
 
-import { ImageIcon } from 'lucide-react'
+import { ImageOff } from 'lucide-react'
 import * as React from 'react'
 
 import { CldImage } from 'next-cloudinary'
 
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import { Product } from '@/types/database.models'
 
-export default function ProductCard({ product }: { product: Product }) {
-  const cardRef = React.useRef<HTMLDivElement>(null)
+interface ProductCardProps {
+  product: Product
+  size?: 'small' | 'large'
+}
 
+export default function ProductCard({ product, size = 'large' }: ProductCardProps) {
+  const cardRef = React.useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = React.useState(false)
 
   const placeholder = (
     <div className="bg-gray-200 h-full w-full flex items-center justify-center">
-      <ImageIcon className="w-12 h-12 text-gray-300" />
+      <ImageOff className={cn('text-gray-300', size === 'small' ? 'w-6 h-6' : 'w-12 h-12')} />
     </div>
   )
 
   React.useEffect(() => {
-    // IntersectionObserver를 사용하여 요소가 화면에 보이는지 감지
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          // 한 번 보이면 관찰 중단
           if (cardRef.current) observer.unobserve(cardRef.current)
         }
       },
       {
         root: null,
-        rootMargin: '100px', // 화면에 보이기 전 미리 로드 시작
+        rootMargin: '100px',
         threshold: 0.1,
       },
     )
@@ -49,13 +53,16 @@ export default function ProductCard({ product }: { product: Product }) {
   const mainImage = product.featured_images?.[0]
 
   return (
-    <div ref={cardRef} className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="relative aspect-square w-full">
+    <Card
+      ref={cardRef}
+      className={cn('overflow-hidden hover:shadow-md transition-shadow', size === 'small' ? 'max-w-[150px]' : '')}
+    >
+      <div className={cn('relative w-full', size === 'small' ? 'aspect-[4/3]' : 'aspect-square')}>
         {mainImage ? (
           isVisible ? (
             <CldImage
-              width="400"
-              height="400"
+              width={size === 'small' ? '150' : '400'}
+              height={size === 'small' ? '120' : '400'}
               src={mainImage}
               alt={product.name_en}
               crop="fill"
@@ -71,17 +78,23 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="p-4">
-        <h3 className="font-semibold">{product.name_en}</h3>
-        <p lang="ko" className="text-sm text-gray-500">
-          {product.name_ko}
-        </p>
-        <p lang="si" className="text-sm text-gray-500">
-          {product.name_si}
-        </p>
-        {/* <p className="text-gray-600 mt-1 text-sm line-clamp-2">{product.description}</p> */}
-        {/* <div className="mt-2 text-right font-semibold">{product.price_krw.toLocaleString()} 원</div> */}
-      </div>
-    </div>
+      <CardContent className={cn(size === 'small' ? 'p-2' : 'p-4')}>
+        <h3 className={cn('font-semibold truncate', size === 'small' ? 'text-xs' : '')}>{product.name_en}</h3>
+        {size === 'small' ? (
+          <p lang="ko" className="text-xs text-gray-500 truncate">
+            {product.name_ko}
+          </p>
+        ) : (
+          <>
+            <p lang="ko" className="text-sm text-gray-500">
+              {product.name_ko}
+            </p>
+            <p lang="si" className="text-sm text-gray-500">
+              {product.name_si}
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
   )
 }

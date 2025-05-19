@@ -34,7 +34,7 @@ import {
 import { Category } from '@/types/database.models'
 
 export default function CategoriesPage() {
-  const { data: categories, isLoading } = useCategoriesQuery()
+  const { data: categories } = useCategoriesQuery(true)
   const createCategory = useCreateCategory()
   const updateCategory = useUpdateCategory()
   const deleteCategory = useDeleteCategory()
@@ -88,10 +88,6 @@ export default function CategoriesPage() {
     }))
 
     updateCategoryOrder.mutate(categoriesWithOrder)
-  }
-
-  if (isLoading) {
-    return <div>로딩 중...</div>
   }
 
   return (
@@ -151,8 +147,8 @@ export default function CategoriesPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>카테고리 삭제</AlertDialogTitle>
             <AlertDialogDescription>
-              '{selectedCategory?.name}' 카테고리를 삭제하시겠습니까? 이 작업은 되돌릴 수 없으며, 해당 카테고리에 포함된
-              상품들은 카테고리가 없는 상태가 됩니다.
+              <strong>{selectedCategory?.name}</strong> 카테고리를 삭제하시겠습니까?
+              <br />이 작업은 되돌릴 수 없으며, 해당 카테고리에 포함된 상품들은 카테고리가 없는 상태가 됩니다.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

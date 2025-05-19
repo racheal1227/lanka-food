@@ -1,28 +1,44 @@
 'use client'
 
-import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { SortingTableState } from '@tanstack/react-table'
+import { useMutation, useQueryClient, useSuspenseQuery, useInfiniteQuery } from '@tanstack/react-query'
 
 import { useRouter } from 'next/navigation'
 
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
-import showErrorToast from '@/utils/show-error-toast'
+import { QueryParams } from '@/types/query.type'
+import { showErrorToast } from '@/utils/show-error-toast'
 import { toast } from '@hooks/use-toast'
 import * as productService from '@services/product.service'
 
 // Read
 // Admin Page
-export const useProductsQuery = (params: SortingTableState & { categoryId?: string }) =>
+export const useProducts = (params: QueryParams & { categoryId?: string }) =>
   useSuspenseQuery({
     queryKey: ['products', params],
     queryFn: () => productService.getProducts(params),
   })
 
 // Main Page
-export const useProductsByCategoryQuery = (params: SortingTableState & { categoryName?: string }) =>
+export const useProductsByCategory = (params: QueryParams & { categoryName?: string }) =>
+  useInfiniteQuery({
+    queryKey: ['products-category', params],
+    queryFn: ({ pageParam = 0 }) =>
+      productService.getProductsByCategoryName({
+        ...params,
+        pageIndex: pageParam,
+      }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.pagination.isLast) return undefined
+      return lastPage.pagination.currentPageIndex + 1
+    },
+  })
+
+// Search Page
+export const useRecommendedProducts = () =>
   useSuspenseQuery({
-    queryKey: ['products', 'category', params],
-    queryFn: () => productService.getProductsByCategory(params),
+    queryKey: ['products-recommended'],
+    queryFn: () => productService.getRecommendedProducts(),
   })
 
 export const useProductQuery = (id: string) =>
@@ -79,7 +95,15 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: string) => productService.deleteProduct(id),
+    mutationFn: ({
+      id,
+      featuredImages,
+      detailImages,
+    }: {
+      id: string
+      featuredImages?: string[] | null
+      detailImages?: string[] | null
+    }) => productService.deleteProduct(id, featuredImages, detailImages),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] })
       toast({
