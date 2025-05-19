@@ -13,6 +13,7 @@
 - TanStack Table
 - React Hook Form
 - dnd-kit
+- react-intersection-observer
 
 - Supabase
 - Cloudinary
