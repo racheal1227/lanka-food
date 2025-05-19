@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import DesktopNavigation from '@components/DesktopNavigation'
 import MobileHeader from '@components/MobileHeader'
 import MobileNavigation from '@components/MobileNavigation'
-import useIsMobile from '@hooks/use-mobile'
+import { useIsMobile } from '@hooks/use-mobile'
 
 export default function MainNavigation() {
   const isMobile = useIsMobile()
