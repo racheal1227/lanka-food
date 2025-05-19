@@ -103,11 +103,6 @@ export default function ProductList() {
     return <Loading />
   }
 
-  // 에러 상태 처리
-  if (status === 'error') {
-    return <div>오류가 발생했습니다.</div>
-  }
-
   // 정렬 옵션 UI에 사용할 도우미 함수
   const getSortIcon = (field: string) => {
     if (sortBy !== field) return null
@@ -115,12 +110,12 @@ export default function ProductList() {
   }
 
   return (
-    <div>
+    <>
       {/* 상단 영역: 검색어 뱃지와 정렬 버튼 */}
       {data && data.pages[0].content.length !== 0 && (
         <div className="mb-4">
           {/* 정렬 버튼 */}
-          <div className="flex justify-end gap-2 mb-2">
+          <div className="flex justify-end gap-2">
             <Button
               variant={sortBy === 'published_at' ? 'default' : 'outline'}
               size="sm"
@@ -188,14 +183,14 @@ export default function ProductList() {
 
           {/* 로더 엘리먼트 */}
           {hasNextPage && (
-            <div ref={ref} className="col-span-full flex justify-center p-4">
+            <div ref={ref} className="col-span-full flex justify-center gap-2 p-4">
               {isFetchingNextPage && <Loader2 className="w-4 h-4 animate-spin" />}
             </div>
           )}
         </div>
       ) : (
-        <div>상품이 없습니다.</div>
+        <div className="flex justify-center items-center h-full">상품이 없습니다.</div>
       )}
-    </div>
+    </>
   )
 }
