@@ -26,19 +26,24 @@ export default function DesktopNavigation() {
     window.open('https://example.com/contact', '_blank')
   }
 
+  // 로고 클릭 시 스크롤 맨 위로 이동
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-background border-b shadow-sm">
+    <div className="sticky top-0 z-50 bg-background border-b shadow-sm w-full">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="w-26 flex-shrink-0">
-            <Link href="/" className="font-bold text-lg">
+        <div className="flex flex-col items-center py-4">
+          <div className="w-full text-center mb-2">
+            <Link href="/" className="font-bold text-lg inline-block" onClick={handleLogoClick}>
               Lanka Food
             </Link>
           </div>
 
-          <div className="flex-grow mx-4 overflow-x-auto scrollbar-hide">
+          <div className="w-full overflow-x-auto scrollbar-hide">
             <NavigationMenu className="mx-auto">
-              <NavigationMenuList className="flex justify-center">
+              <NavigationMenuList className="flex flex-wrap justify-center gap-1">
                 <NavigationMenuItem>
                   <Link href="/" legacyBehavior passHref>
                     <NavigationMenuLink className={navigationMenuTriggerStyle()} active={selectedCategory === null}>
