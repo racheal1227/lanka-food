@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowDown, ArrowUp, Loader2, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, Loader2, X } from 'lucide-react'
 import * as React from 'react'
 import { useInView } from 'react-intersection-observer'
 
@@ -14,6 +14,7 @@ import { useIsMobile } from '@hooks/use-mobile'
 import { useProductsByCategory } from '@hooks/use-product'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu'
 
 export default function ProductList() {
   const searchParams = useSearchParams()
@@ -106,7 +107,23 @@ export default function ProductList() {
   // 정렬 옵션 UI에 사용할 도우미 함수
   const getSortIcon = (field: string) => {
     if (sortBy !== field) return null
-    return sortDir === 'asc' ? <ArrowUp className="h-3 w-3 ml-1" /> : <ArrowDown className="h-3 w-3 ml-1" />
+    return sortDir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />
+  }
+
+  // 정렬 옵션 라벨 가져오기
+  const getSortLabel = () => {
+    switch (sortBy) {
+      case 'published_at':
+        return '최신순'
+      case 'name_en':
+        return '이름순(영어)'
+      case 'name_ko':
+        return '이름순(한국어)'
+      case 'name_si':
+        return '이름순(싱할라어)'
+      default:
+        return '정렬'
+    }
   }
 
   return (
@@ -114,41 +131,89 @@ export default function ProductList() {
       {/* 상단 영역: 검색어 뱃지와 정렬 버튼 */}
       {data && data.pages[0].content.length !== 0 && (
         <div className="mb-4">
-          {/* 정렬 버튼 */}
-          <div className="flex justify-end gap-2">
-            <Button
-              variant={sortBy === 'published_at' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleSortChange('published_at')}
-              className="text-xs gap-1"
-            >
-              최신순{getSortIcon('published_at')}
-            </Button>
-            <Button
-              variant={sortBy === 'name_en' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleSortChange('name_en')}
-              className="text-xs gap-1"
-            >
-              이름순(영어){getSortIcon('name_en')}
-            </Button>
-            <Button
-              variant={sortBy === 'name_ko' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleSortChange('name_ko')}
-              className="text-xs gap-1"
-            >
-              이름순(한국어){getSortIcon('name_ko')}
-            </Button>
-            <Button
-              variant={sortBy === 'name_si' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleSortChange('name_si')}
-              className="text-xs gap-1"
-            >
-              이름순(싱할라어){getSortIcon('name_si')}
-            </Button>
-          </div>
+          {/* 정렬 버튼 - 모바일에서는 드롭다운, PC에서는 일반 버튼 */}
+          {isMobile ? (
+            <div className="flex justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="text-xs gap-1">
+                    {getSortLabel()}
+                    {getSortIcon(sortBy)}
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => handleSortChange('published_at')}
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>최신순</span>
+                    {sortBy === 'published_at' &&
+                      (sortDir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleSortChange('name_en')}
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>이름순(영어)</span>
+                    {sortBy === 'name_en' &&
+                      (sortDir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleSortChange('name_ko')}
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>이름순(한국어)</span>
+                    {sortBy === 'name_ko' &&
+                      (sortDir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleSortChange('name_si')}
+                    className="flex items-center justify-between cursor-pointer"
+                  >
+                    <span>이름순(싱할라어)</span>
+                    {sortBy === 'name_si' &&
+                      (sortDir === 'asc' ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          ) : (
+            <div className="flex justify-end gap-2">
+              <Button
+                variant={sortBy === 'published_at' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleSortChange('published_at')}
+                className="text-xs gap-1"
+              >
+                최신순{getSortIcon('published_at')}
+              </Button>
+              <Button
+                variant={sortBy === 'name_en' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleSortChange('name_en')}
+                className="text-xs gap-1"
+              >
+                이름순(영어){getSortIcon('name_en')}
+              </Button>
+              <Button
+                variant={sortBy === 'name_ko' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleSortChange('name_ko')}
+                className="text-xs gap-1"
+              >
+                이름순(한국어){getSortIcon('name_ko')}
+              </Button>
+              <Button
+                variant={sortBy === 'name_si' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => handleSortChange('name_si')}
+                className="text-xs gap-1"
+              >
+                이름순(싱할라어){getSortIcon('name_si')}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
