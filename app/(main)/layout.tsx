@@ -19,9 +19,9 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
   const showMobileLayout = !isClient || isMobile
 
   return (
-    <>
-      {/* 네비게이션 영역 - 고정 높이 확보하여 컨텐츠 점프 방지 */}
-      <div className="navigation-container">
+    <div className="flex flex-col min-h-screen">
+      {/* 네비게이션 영역 */}
+      <div className="w-full">
         <MainNavigation />
       </div>
 
@@ -66,6 +66,6 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
           )}
         </footer>
       </div>
-    </>
+    </div>
   )
 }
