@@ -50,7 +50,7 @@ export default function MobileNavigation() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-sm">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-gray-50 border-t shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">
       <div className="flex items-center justify-around h-16">
         <TooltipProvider>
           <Tooltip>
