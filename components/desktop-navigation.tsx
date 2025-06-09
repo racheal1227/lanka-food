@@ -1,11 +1,12 @@
 'use client'
 
-import { MessageCircle, Send } from 'lucide-react'
+import { MessageCircle, Send, ShoppingBag } from 'lucide-react'
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
 import WishlistIcon from '@/components/wishlist/wishlist-icon'
+import { useWishlistStore } from '@/stores/wishlist'
 import { useCategoriesQuery } from '@hooks/use-category'
 import { Button } from '@ui/button'
 import {
@@ -21,6 +22,7 @@ export default function DesktopNavigation() {
   const searchParams = useSearchParams()
   const selectedCategory = searchParams.get('category')
   const { data: categories } = useCategoriesQuery()
+  const { loadItems, getItemCount } = useWishlistStore()
 
   // 연락하기 핸들러
   const handleContact = () => {
@@ -42,7 +44,11 @@ export default function DesktopNavigation() {
               Lanka Food
             </Link>
             <div className="flex-1 flex justify-end">
-              <WishlistIcon />
+              <Link href="/wishlist">
+                <Button variant="ghost" size="default" aria-label="장바구니">
+                  <ShoppingBag className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
           </div>
 
