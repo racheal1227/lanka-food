@@ -45,6 +45,26 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
     })
   },
 
+  removeSelectedItems: () => {
+    const { selectedItems, items } = get()
+    if (selectedItems.size === 0) return
+
+    // 선택된 상품들을 localStorage에서 제거
+    let updatedItems = [...items]
+    selectedItems.forEach((productId) => {
+      updatedItems = updatedItems.filter((item) => item.id !== productId)
+    })
+
+    // localStorage 업데이트
+    localStorage.setItem('lanka-food-wishlist', JSON.stringify(updatedItems))
+
+    // 상태 업데이트
+    set({
+      items: updatedItems,
+      selectedItems: new Set(),
+    })
+  },
+
   clearItems: () => {
     clearWishlistStorage()
     set({ items: [], selectedItems: new Set() })

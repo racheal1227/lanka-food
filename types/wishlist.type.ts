@@ -44,6 +44,7 @@ export interface WishlistActions {
   // 관심상품 관리
   addItem: (product: Product) => void
   removeItem: (productId: string) => void
+  removeSelectedItems: () => void
   clearItems: () => void
   loadItems: () => void
 

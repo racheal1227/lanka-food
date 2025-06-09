@@ -20,6 +20,7 @@ export default function WishlistPage() {
     selectedItems,
     loadItems,
     removeItem,
+    removeSelectedItems,
     clearItems,
     toggleSelection,
     selectAll,
@@ -64,6 +65,12 @@ export default function WishlistPage() {
     setShowInquiryForm(false)
   }
 
+  const handleRemoveSelected = () => {
+    if (selectedCount !== 0) {
+      removeSelectedItems()
+    }
+  }
+
   if (totalCount === 0) {
     return <EmptyWishlist />
   }
@@ -93,12 +100,15 @@ export default function WishlistPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={clearSelection} disabled={selectedCount === 0}>
-                선택 해제
-              </Button>
-              <Button variant="outline" size="sm" onClick={clearItems} className="text-red-600 hover:text-red-700">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRemoveSelected}
+                disabled={selectedCount === 0}
+                className="text-red-600 hover:text-red-700"
+              >
                 <Trash2 className="h-4 w-4 mr-1" />
-                전체 삭제
+                선택 삭제 ({selectedCount})
               </Button>
               <Button
                 size="sm"
