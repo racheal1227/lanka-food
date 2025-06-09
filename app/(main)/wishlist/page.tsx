@@ -1,18 +1,20 @@
 'use client'
 
-import { Trash2, MessageCircle, Heart } from 'lucide-react'
-import React, { useEffect } from 'react'
+import { Trash2, MessageCircle, Heart, Plus, Minus } from 'lucide-react'
+import * as React from 'react'
 
 import { CldImage } from 'next-cloudinary'
 
 import EmptyWishlist from '@/components/wishlist/empty-wishlist'
 import WishlistForm from '@/components/wishlist/wishlist-form'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 import { Checkbox } from '@ui/checkbox'
 
 export default function WishlistPage() {
+  const isMobile = useIsMobile()
   const {
     items,
     selectedItems,
@@ -24,12 +26,15 @@ export default function WishlistPage() {
     clearSelection,
     getSelectedCount,
     getItemCount,
+    updateQuantity,
+    incrementQuantity,
+    decrementQuantity,
   } = useWishlistStore()
 
   const [showInquiryForm, setShowInquiryForm] = React.useState(false)
 
   // 페이지 로드 시 위시리스트 아이템 로드
-  useEffect(() => {
+  React.useEffect(() => {
     loadItems()
   }, [loadItems])
 
@@ -125,7 +130,7 @@ export default function WishlistPage() {
                       width="80"
                       height="80"
                       src={item.featured_images[0]}
-                      alt={item.name_ko || item.name_en}
+                      alt={item.name_en}
                       crop="fill"
                       gravity="center"
                       loading="lazy"
@@ -140,12 +145,66 @@ export default function WishlistPage() {
 
                 {/* 상품 정보 */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-lg mb-1 truncate">{item.name_ko || item.name_en}</h3>
-                  {item.name_ko && <p className="text-sm text-muted-foreground mb-2">{item.name_en}</p>}
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <h5 className="font-semibold text-md">{item.name_en}</h5>
+                  {item.name_ko && <p className="text-sm text-muted-foreground mb-1">{item.name_ko}</p>}
+                  <p className="text-xs text-muted-foreground mb-1">
                     {new Date(item.addedAt).toLocaleDateString('ko-KR')} 추가
                   </p>
+
+                  {/* 모바일용 수량 컨트롤 - 상품 정보 아래 배치 */}
+                  {isMobile && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center border rounded-md overflow-hidden">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => decrementQuantity(item.id)}
+                          disabled={item.quantity <= 1}
+                          className="h-8 w-8 p-0 rounded-none hover:bg-gray-100"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="px-3 py-1 text-sm font-medium min-w-[32px] text-center">{item.quantity}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => incrementQuantity(item.id)}
+                          className="h-8 w-8 p-0 rounded-none hover:bg-gray-100"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* PC용 수량 컨트롤 */}
+                {!isMobile && (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center border rounded-md overflow-hidden">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => decrementQuantity(item.id)}
+                        disabled={item.quantity <= 1}
+                        className="h-8 w-8 p-0 rounded-none hover:bg-gray-100"
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <div className="flex items-center justify-center w-12 h-8 text-sm font-medium">
+                        {item.quantity}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => incrementQuantity(item.id)}
+                        className="h-8 w-8 p-0 rounded-none hover:bg-gray-100"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* 액션 버튼 */}
                 <div className="flex flex-col gap-2">

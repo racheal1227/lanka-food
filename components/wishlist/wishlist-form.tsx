@@ -35,6 +35,7 @@ interface WishlistFormProps {
 export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
   const { items, selectedItems } = useWishlistStore()
   const selectedProducts = items.filter((item) => selectedItems.has(item.id))
+  const totalQuantity = selectedProducts.reduce((sum, product) => sum + product.quantity, 0)
 
   // 전화번호 포맷팅 함수
   const formatPhoneNumber = (value: string): string => {
@@ -63,13 +64,18 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
   const createInquiryTemplate = (inquirer: InquirerInfo): InquiryTemplate => {
     const subject = `[상품 문의] 장바구니 상품 문의 - ${inquirer.name}`
 
-    const productList = selectedProducts.map((product) => `- ${product.name_ko || product.name_en}`).join('\n')
+    const productList = selectedProducts
+      .map((product) => {
+        const productName = `${product.name_ko} / ${product.name_en}`
+        return `- ${productName} (수량: ${product.quantity}개)`
+      })
+      .join('\n')
 
     const body = `안녕하세요,
 
 다음 상품들에 관심이 있어 문의드립니다.
 
-📦 장바구니 상품:
+📦 장바구니 상품 (총 ${selectedProducts.length}종, ${totalQuantity}개):
 ${productList}
 
 👤 문의자 정보:
@@ -82,7 +88,7 @@ ${inquirer.message || '(특별한 문의사항 없음)'}
 답변 부탁드립니다.
 
 ---
-Lanka Food 장바구니 문의시스템`
+Lanka Food 문의 시스템`
 
     return { subject, body }
   }
@@ -140,7 +146,9 @@ Lanka Food 장바구니 문의시스템`
         {/* 선택된 상품 목록 */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-lg">선택된 상품 ({selectedProducts.length}개)</CardTitle>
+            <CardTitle className="text-lg">
+              선택된 상품 ({selectedProducts.length}종 • 총 {totalQuantity}개)
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -152,7 +160,7 @@ Lanka Food 장바구니 문의시스템`
                         width="48"
                         height="48"
                         src={product.featured_images[0]}
-                        alt={product.name_ko || product.name_en}
+                        alt={product.name_en}
                         crop="fill"
                         gravity="center"
                         loading="lazy"
@@ -165,10 +173,11 @@ Lanka Food 장바구니 문의시스템`
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{product.name_ko || product.name_en}</p>
-                    {product.name_ko && product.name_en && (
-                      <p className="text-sm text-muted-foreground truncate">{product.name_en}</p>
-                    )}
+                    <p className="font-medium truncate">{product.name_en}</p>
+                    {product.name_ko && <p className="text-sm text-muted-foreground truncate">{product.name_ko}</p>}
+                  </div>
+                  <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium">
+                    <span>수량: {product.quantity}개</span>
                   </div>
                 </div>
               ))}

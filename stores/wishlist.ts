@@ -26,6 +26,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
       featured_images: product.featured_images,
       category_id: product.category_id,
       addedAt: new Date().toISOString(),
+      quantity: 1, // 기본 수량
     }
 
     const updatedItems = addItemToStorage(wishlistItem)
@@ -57,6 +58,35 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
     } catch (error) {
       console.error('장바구니 로딩 중 오류:', error)
       set({ items: [], isLoading: false })
+    }
+  },
+
+  // 수량 관리
+  updateQuantity: (productId: string, quantity: number) => {
+    if (quantity < 1) return // 최소 수량 1개
+
+    set((state) => ({
+      items: state.items.map((item) => (item.id === productId ? { ...item, quantity } : item)),
+    }))
+
+    // localStorage 업데이트
+    const updatedItems = get().items
+    localStorage.setItem('lanka-food-wishlist', JSON.stringify(updatedItems))
+  },
+
+  incrementQuantity: (productId: string) => {
+    const { updateQuantity, items } = get()
+    const item = items.find((item) => item.id === productId)
+    if (item) {
+      updateQuantity(productId, item.quantity + 1)
+    }
+  },
+
+  decrementQuantity: (productId: string) => {
+    const { updateQuantity, items } = get()
+    const item = items.find((item) => item.id === productId)
+    if (item && item.quantity > 1) {
+      updateQuantity(productId, item.quantity - 1)
     }
   },
 

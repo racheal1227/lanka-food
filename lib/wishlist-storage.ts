@@ -24,8 +24,15 @@ export function getWishlistFromStorage(): WishlistItem[] {
     const stored = localStorage.getItem(WISHLIST_STORAGE_KEY)
     if (!stored) return []
 
-    const items: WishlistItem[] = JSON.parse(stored)
-    return items.filter(isNotExpired)
+    const items: any[] = JSON.parse(stored)
+
+    // 기존 데이터에 quantity 필드가 없을 수 있으므로 기본값 설정
+    const itemsWithQuantity: WishlistItem[] = items.map((item) => ({
+      ...item,
+      quantity: item.quantity || 1, // 기존 아이템에 quantity가 없으면 1로 설정
+    }))
+
+    return itemsWithQuantity.filter(isNotExpired)
   } catch (error) {
     console.error('위시리스트 로딩 중 오류:', error)
     return []
@@ -56,7 +63,8 @@ export function addItemToStorage(item: WishlistItem): WishlistItem[] {
   const existingIndex = currentItems.findIndex((existing) => existing.id === item.id)
 
   if (existingIndex !== -1) {
-    // 이미 존재하면 시간만 업데이트
+    // 이미 존재하면 수량 증가 및 시간 업데이트
+    currentItems[existingIndex].quantity += 1
     currentItems[existingIndex].addedAt = new Date().toISOString()
   } else {
     // 새 아이템 추가

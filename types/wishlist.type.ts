@@ -8,6 +8,7 @@ export interface WishlistItem {
   featured_images: string[] | null
   category_id: string
   addedAt: string // 추가된 시간 (30일 만료용)
+  quantity: number // 수량
 }
 
 // 문의자 정보
@@ -45,6 +46,11 @@ export interface WishlistActions {
   removeItem: (productId: string) => void
   clearItems: () => void
   loadItems: () => void
+
+  // 수량 관리
+  updateQuantity: (productId: string, quantity: number) => void
+  incrementQuantity: (productId: string) => void
+  decrementQuantity: (productId: string) => void
 
   // 문의 상품 선택
   toggleSelection: (productId: string) => void
