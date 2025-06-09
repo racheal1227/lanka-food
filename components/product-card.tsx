@@ -6,9 +6,9 @@ import * as React from 'react'
 import { CldImage } from 'next-cloudinary'
 
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import WishlistButton from '@/components/wishlist/wishlist-button'
 import { cn } from '@/lib/utils'
 import { Product } from '@/types/database.models'
-import WishlistButton from '@/components/wishlist/wishlist-button'
 
 interface ProductCardProps {
   product: Product
@@ -89,9 +89,9 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
       </div>
 
       <CardContent className={cn(size === 'small' ? 'p-2' : 'p-4')}>
-        <h3 className={cn('font-semibold truncate', size === 'small' ? 'text-xs' : '')}>{product.name_en}</h3>
+        <h3 className={cn('font-semibold', size === 'small' ? 'text-xs' : '')}>{product.name_en}</h3>
         {size === 'small' ? (
-          <p lang="ko" className="text-xs text-gray-500 truncate">
+          <p lang="ko" className="text-xs text-gray-500">
             {product.name_ko}
           </p>
         ) : (
