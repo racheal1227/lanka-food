@@ -5,6 +5,7 @@ import { MessageCircle, Send } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
+import WishlistIcon from '@/components/wishlist/wishlist-icon'
 import { useCategoriesQuery } from '@hooks/use-category'
 import { Button } from '@ui/button'
 import {
@@ -35,10 +36,14 @@ export default function DesktopNavigation() {
     <div className="sticky top-0 z-50 bg-background border-b shadow-sm w-full">
       <div className="container mx-auto px-4">
         <div className="flex flex-col items-center py-4">
-          <div className="w-full text-center mb-2">
-            <Link href="/" className="font-bold text-lg inline-block" onClick={handleLogoClick}>
+          <div className="w-full flex items-center justify-between mb-2">
+            <div className="flex-1" />
+            <Link href="/" className="font-bold text-lg" onClick={handleLogoClick}>
               Lanka Food
             </Link>
+            <div className="flex-1 flex justify-end">
+              <WishlistIcon />
+            </div>
           </div>
 
           <div className="w-full overflow-x-auto scrollbar-hide">

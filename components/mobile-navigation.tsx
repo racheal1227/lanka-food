@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, Menu, MessageCircle, Search, X } from 'lucide-react'
+import { Home, Menu, MessageCircle, Search, ShoppingBag, X } from 'lucide-react'
 import { useState } from 'react'
 
 import Link from 'next/link'
@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import ProductCard from '@components/product-card'
 import { useCategoriesQuery } from '@hooks/use-category'
 import { useRecommendedProducts } from '@hooks/use-product'
+import { useWishlistStore } from '@stores/wishlist'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@ui/drawer'
@@ -28,6 +29,9 @@ export default function MobileNavigation() {
 
   // 추천 상품 가져오기
   const { data: recommendedProducts } = useRecommendedProducts()
+
+  // 장바구니 스토어
+  const { loadItems } = useWishlistStore()
 
   // 연락하기 핸들러
   const handleContact = () => {
@@ -198,6 +202,24 @@ export default function MobileNavigation() {
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href="/wishlist">
+                <Button
+                  variant="ghost"
+                  className="p-0 flex items-center justify-center w-12 h-12 text-muted-foreground hover:text-foreground bg-transparent"
+                >
+                  <ShoppingBag className="!h-6 !w-6" />
+                </Button>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>장바구니</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {/* <TooltipProvider>
           <Tooltip>

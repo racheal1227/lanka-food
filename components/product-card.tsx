@@ -8,6 +8,7 @@ import { CldImage } from 'next-cloudinary'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { Product } from '@/types/database.models'
+import WishlistButton from '@/components/wishlist/wishlist-button'
 
 interface ProductCardProps {
   product: Product
@@ -76,6 +77,15 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
         ) : (
           placeholder
         )}
+
+        {/* 장바구니 버튼 */}
+        <div className="absolute bottom-2 right-2">
+          <WishlistButton
+            product={product}
+            size={size === 'small' ? 'sm' : 'icon'}
+            className="bg-white/90 hover:bg-white shadow-md hover:scale-110 transition-transform duration-200"
+          />
+        </div>
       </div>
 
       <CardContent className={cn(size === 'small' ? 'p-2' : 'p-4')}>
