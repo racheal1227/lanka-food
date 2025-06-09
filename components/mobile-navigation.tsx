@@ -1,7 +1,7 @@
 'use client'
 
 import { Home, Menu, MessageCircle, Search, ShoppingBag, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -31,7 +31,14 @@ export default function MobileNavigation() {
   const { data: recommendedProducts } = useRecommendedProducts()
 
   // 장바구니 스토어
-  const { loadItems } = useWishlistStore()
+  const { loadItems, getItemCount } = useWishlistStore()
+
+  // 컴포넌트 마운트 시 위시리스트 로드
+  useEffect(() => {
+    loadItems()
+  }, [loadItems])
+
+  const itemCount = getItemCount()
 
   // 연락하기 핸들러
   const handleContact = () => {
@@ -209,9 +216,14 @@ export default function MobileNavigation() {
               <Link href="/wishlist">
                 <Button
                   variant="ghost"
-                  className="p-0 flex items-center justify-center w-12 h-12 text-muted-foreground hover:text-foreground bg-transparent"
+                  className="p-0 flex items-center justify-center w-12 h-12 text-muted-foreground hover:text-foreground bg-transparent relative"
                 >
                   <ShoppingBag className="!h-6 !w-6" />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center min-w-[20px]">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
             </TooltipTrigger>
