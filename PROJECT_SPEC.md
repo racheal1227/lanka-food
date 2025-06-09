@@ -331,9 +331,10 @@ export type ProductUpdate = TablesUpdate<'products'>
 
 ### 8.4 파일 명명 규칙
 
+- **Components**: kebab-case (예: `product-list.tsx`)
 - **Pages**: kebab-case (예: `product-list.tsx`)
-- **Services**: camelCase + .service (예: `product.service.ts`)
-- **Types**: camelCase + .type (예: `product.type.ts`)
+- **Services**: kebab-case + .service (예: `product.service.ts`)
+- **Types**: kebab-case + .type (예: `product.type.ts`)
 
 ### 8.5 브랜치 전략
 
