@@ -68,10 +68,10 @@ export default function WishlistPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">장바구니</h1>
-        <p className="text-muted-foreground">관심있는 스리랑카 수입품들을 모아보고 판매자에게 문의해보세요.</p>
+        <p className="text-muted-foreground">관심있는 상품들을 모아보고 판매자에게 문의해보세요.</p>
       </div>
 
       {/* 컨트롤 바 */}
@@ -163,6 +163,6 @@ export default function WishlistPage() {
           </Card>
         ))}
       </div>
-    </div>
+    </>
   )
 }

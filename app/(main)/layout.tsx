@@ -26,7 +26,9 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
       </div>
 
       <div className="flex-grow flex flex-col overflow-y-auto pb-16 md:pb-0">
-        <main className="flex-grow flex flex-col items-center w-full p-5 pt-5 pb-5">{children}</main>
+        <main className="flex-grow flex flex-col items-center w-full">
+          <div className="container mx-auto px-4 py-8 w-full">{children}</div>
+        </main>
         {/* <FloatingContact contactUrl="https://example.com/contact" /> */}
         <footer className="w-full flex items-center justify-center border-t text-center text-xs gap-8 py-8">
           {showMobileLayout ? (
