@@ -61,63 +61,41 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
     },
   })
 
-  const createInquiryTemplate = (inquirer: InquirerInfo): InquiryTemplate => {
-    const subject = `[상품 문의] 장바구니 상품 문의 - ${inquirer.name}`
-
-    const productList = selectedProducts
-      .map((product) => {
-        const productName = `${product.name_ko} / ${product.name_en}`
-        return `- ${productName} (수량: ${product.quantity}개)`
-      })
-      .join('\n')
-
-    const body = `안녕하세요,
-
-다음 상품들에 관심이 있어 문의드립니다.
-
-📦 장바구니 상품 (총 ${selectedProducts.length}종, ${totalQuantity}개):
-${productList}
-
-👤 문의자 정보:
-- 이름: ${inquirer.name}
-- 전화번호: ${inquirer.phone}${inquirer.email ? `\n- 이메일: ${inquirer.email}` : ''}
-
-📝 문의내용:
-${inquirer.message || '(특별한 문의사항 없음)'}
-
-답변 부탁드립니다.
-
----
-Lanka Food 문의 시스템`
-
-    return { subject, body }
-  }
-
   // 문의 전송 함수
   const sendInquiry = async (data: InquiryFormData) => {
-    const inquiryTemplate = createInquiryTemplate(data)
+    try {
+      // 선택된 상품 데이터 구성
+      const selectedProductsData = selectedProducts.map((product) => ({
+        name: `${product.name_ko || ''} / ${product.name_en}`.trim().replace(/^\/\s*/, ''),
+        quantity: product.quantity,
+      }))
 
-    // 실제로는 이메일 API나 문의 시스템을 통해 전송
-    // 여기서는 데모용으로 mailto 링크 생성
-    const mailtoLink = `mailto:contact@lankafood.com?subject=${encodeURIComponent(
-      inquiryTemplate.subject,
-    )}&body=${encodeURIComponent(inquiryTemplate.body)}`
+      // 이메일 API 호출
+      const response = await fetch('/api/email/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          message: data.message || '(특별한 문의사항 없음)',
+          selectedProducts: selectedProductsData,
+        }),
+      })
 
-    // 새 창에서 이메일 클라이언트 열기
-    window.open(mailtoLink, '_blank')
+      const result = await response.json()
 
-    // 문의자 본인에게도 복사본 전송 (이메일이 제공된 경우)
-    if (data.email && data.email.trim()) {
-      const copyMailtoLink = `mailto:${data.email}?subject=[문의 복사본] ${encodeURIComponent(
-        inquiryTemplate.subject,
-      )}&body=${encodeURIComponent(`문의 내용 복사본:\n\n${inquiryTemplate.body}`)}`
+      if (!response.ok) {
+        throw new Error(result.message || '이메일 발송에 실패했습니다.')
+      }
 
-      setTimeout(() => {
-        window.open(copyMailtoLink, '_blank')
-      }, 1000)
+      return data
+    } catch (error) {
+      console.error('문의 전송 오류:', error)
+      throw error
     }
-
-    return data
   }
 
   const mutation = useMutation({
