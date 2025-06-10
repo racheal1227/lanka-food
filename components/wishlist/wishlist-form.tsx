@@ -195,7 +195,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
                       id="phone"
                       type="tel"
                       maxLength={15}
-                      placeholder="010-1234-5678"
+                      placeholder="전화번호를 입력해주세요"
                       className="mt-1"
                       value={field.value}
                       onChange={(event) => {
