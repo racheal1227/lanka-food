@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { NextRequest, NextResponse } from 'next/server'
 
-import { sendContactEmail } from '@/services/email.service'
+import { sendContactEmail, sendOrderCopyToUser } from '@/services/email.service'
 
 // 문의 데이터 유효성 검사 스키마
 const contactSchema = z.object({
@@ -27,18 +27,38 @@ export async function POST(request: NextRequest) {
     // 요청 데이터 유효성 검사
     const validatedData = contactSchema.parse(body)
 
-    // 이메일 발송
-    const success = await sendContactEmail(validatedData)
+    // 관리자에게 이메일 발송
+    const adminEmailSuccess = await sendContactEmail(validatedData)
 
-    if (success) {
+    let userEmailSuccess = true
+    // 사용자가 이메일을 제공했다면 복사본 발송
+    if (validatedData.email && validatedData.email.trim()) {
+      userEmailSuccess = await sendOrderCopyToUser(validatedData)
+    }
+
+    if (adminEmailSuccess) {
+      if (validatedData.email && !userEmailSuccess) {
+        return NextResponse.json(
+          {
+            message: '문의는 접수되었으나, 복사본 발송에 실패했습니다.',
+            success: true,
+            warning: '복사본 이메일 발송 실패',
+          },
+          { status: 200 },
+        )
+      }
+
       return NextResponse.json(
         {
-          message: '문의가 성공적으로 전송되었습니다.',
+          message: validatedData.email
+            ? '문의가 성공적으로 전송되었습니다. 입력하신 이메일로 복사본을 발송했습니다.'
+            : '문의가 성공적으로 전송되었습니다.',
           success: true,
         },
         { status: 200 },
       )
     }
+
     return NextResponse.json(
       {
         message: '이메일 발송에 실패했습니다. 잠시 후 다시 시도해주세요.',
