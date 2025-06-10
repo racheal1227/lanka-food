@@ -157,9 +157,6 @@ export default function WishlistPage() {
                 <div className="flex-1 min-w-0">
                   <h5 className="font-semibold text-md">{item.name_en}</h5>
                   {item.name_ko && <p className="text-sm text-muted-foreground mb-1">{item.name_ko}</p>}
-                  <p className="text-xs text-muted-foreground mb-1">
-                    {new Date(item.addedAt).toLocaleDateString('ko-KR')} 추가
-                  </p>
 
                   {/* 모바일용 수량 컨트롤 - 상품 정보 아래 배치 */}
                   {isMobile && (
