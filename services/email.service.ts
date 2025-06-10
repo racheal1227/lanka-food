@@ -116,7 +116,7 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
     // 메일 옵션 설정
     const mailOptions = {
       from: `"Lanka Food" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
-      to: 'racheal1227@gmail.com',
+      to: process.env.EMAIL_ADMIN,
       subject,
       html: htmlContent,
       replyTo: data.email, // 답장 시 문의자 이메일로 전송

@@ -15,8 +15,9 @@
 - 🏪 판매 상품 쇼룸 전시
 - 🔍 제품 목록 조회 및 검색
 - 📂 카테고리별 상품 분류
-- ✅ 관심 상품 체크 및 문의 기능
+- 🛒 위시리스트 시스템 (상품 담기 및 문의 기능)
 - 📞 판매자 연락처 연결 기능 (예정)
+- 📧 이메일 알림 및 문의 발송 (Nodemailer)
 - 🖼️ 이미지 업로드 및 관리 (Cloudinary 연동)
 - 👨‍💼 관리자 상품/카테고리 관리
 - 🔐 사용자 인증 시스템
@@ -39,12 +40,18 @@
 - **Drag & Drop**: @dnd-kit
 - **Intersection Observer**: react-intersection-observer
 - **Theme**: next-themes
+- **Date Handling**: date-fns
+- **Validation**: Zod
+- **Resizable Panels**: react-resizable-panels
+- **Calendar**: react-day-picker
+- **Drawer**: vaul
 
 ### Backend & Database
 
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **File Storage**: Cloudinary
+- **Email Service**: Nodemailer
 
 ### Development Tools
 
@@ -64,20 +71,28 @@ lanka-food/
 │   │   ├── product/        # 상품 관리
 │   │   └── category/       # 카테고리 관리
 │   ├── api/                # API 라우트
-│   │   └── cloudinary/     # 이미지 업로드 API
+│   │   ├── cloudinary/     # 이미지 업로드 API
+│   │   └── email/          # 이메일 발송 API
 │   ├── login/              # 로그인 페이지
 │   ├── products/           # 상품 상세 페이지
+│   ├── wishlist/           # 위시리스트 페이지
 │   ├── layout.tsx          # 루트 레이아웃
 │   ├── globals.css         # 전역 스타일
-│   └── providers.tsx       # 전역 프로바이더
+│   ├── providers.tsx       # 전역 프로바이더
+│   ├── error.tsx           # 에러 페이지
+│   ├── loading.tsx         # 로딩 페이지
+│   └── not-found.tsx       # 404 페이지
 ├── components/             # 재사용 가능한 컴포넌트
 │   ├── ui/                 # shadcn/ui 컴포넌트
 │   ├── admin/              # 관리자 전용 컴포넌트
 │   ├── auth/               # 인증 관련 컴포넌트
-│   ├── table/              # 테이블 컴포넌트
+│   ├── table/              # 테이블 컴포넌트 시스템
+│   ├── wishlist/           # 위시리스트 관련 컴포넌트
 │   ├── navigation.tsx      # 네비게이션
+│   ├── mobile-navigation.tsx # 모바일 네비게이션
 │   ├── product-list.tsx    # 상품 목록
-│   └── product-card.tsx    # 상품 카드
+│   ├── product-card.tsx    # 상품 카드
+│   └── theme-switcher.tsx  # 테마 스위처
 ├── hooks/                  # 커스텀 React 훅
 ├── lib/                    # 유틸리티 라이브러리
 │   ├── supabase/          # Supabase 관련 코드
@@ -86,7 +101,8 @@ lanka-food/
 ├── services/              # 비즈니스 로직
 │   ├── auth.service.ts    # 인증 서비스
 │   ├── product.service.ts # 상품 서비스
-│   └── category.service.ts # 카테고리 서비스
+│   ├── category.service.ts # 카테고리 서비스
+│   └── email.service.ts   # 이메일 서비스
 ├── stores/                # Zustand 상태 관리
 │   └── auth.ts           # 인증 상태
 ├── types/                 # TypeScript 타입 정의
@@ -133,6 +149,12 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 NEXT_CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
 NEXT_CLOUDINARY_API_KEY=your-cloudinary-api-key
 NEXT_CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+EMAIL_HOST=your-smtp-host
+EMAIL_PORT=your-smtp-port
+EMAIL_USER=your-email-username
+EMAIL_PASS=your-email-password
+EMAIL_FROM=noreply@lankafood.com
+EMAIL_ADMIN=admin@company.com
 ```
 
 ### 실행 명령어
@@ -159,11 +181,11 @@ npm run lint
 - **기술**: Supabase Database, TanStack Query, React Intersection Observer
 - **구현**: `components/product-list.tsx`, `components/product-card.tsx`, `app/(main)/page.tsx`
 
-### 5.2 관심 상품 및 문의 시스템 (예정)
+### 5.2 위시리스트 시스템
 
-- **기능**: 관심 상품 체크, 선택 상품 목록 관리, 판매자 연락처 연결
-- **기술**: Zustand (상태 관리), React Hook Form
-- **구현**: 향후 개발 예정
+- **기능**: 상품 담기/제거, 선택 상품 목록 관리, 이메일 문의 발송
+- **기술**: Zustand (상태 관리), React Hook Form, Nodemailer, Zod (유효성 검사)
+- **구현**: `components/wishlist/`, `app/wishlist/`, 문의 폼 생성, 이메일 발송 API 구축
 
 ### 5.3 제품 관리 시스템 (관리자)
 
@@ -201,6 +223,16 @@ npm run lint
 - **기술**: next-themes
 - **구현**: `components/theme-switcher.tsx`
 
+### 5.9 이메일 발송 시스템
+
+- **기능**: 문의 이메일 자동 발송, 관리자 알림, 사용자 복사본 발송
+- **기술**: Nodemailer, Zod (유효성 검사)
+- **구현**: `services/email.service.ts`, `app/api/email/`
+- **세부 기능**:
+  - 관리자에게 문의 내용 전송
+  - 사용자가 이메일 입력 시 주문서 복사본 자동 발송
+  - 이메일 발송 성공/실패 상태 관리
+
 ## 6. API 명세
 
 ### 6.1 Cloudinary API
@@ -217,12 +249,30 @@ Content-Type: application/json
 Body: { publicId: string }
 ```
 
-### 6.2 Supabase Database API
+### 6.2 Email API
+
+```typescript
+// 문의 이메일 발송
+POST /api/email/contact
+Content-Type: application/json
+Body: {
+  name: string
+  email: string
+  phone?: string
+  message?: string
+  selectedProducts?: {
+    name: string
+    quantity: number
+  }[]
+}
+```
+
+### 6.3 Supabase Database API
 
 - **Products**: 상품 데이터 CRUD (쇼룸 전시용)
 - **Categories**: 카테고리 데이터 CRUD
 - **Users**: 사용자 인증 및 프로필 관리
-- **Inquiries**: 상품 문의 데이터 (향후 개발 예정)
+- **Inquiries**: 상품 문의 데이터 및 이메일 로그
 
 ## 7. 데이터 모델
 
@@ -376,12 +426,26 @@ export type ProductUpdate = TablesUpdate<'products'>
 - **Development**: `.env`
 - **Production**: 플랫폼별 환경 변수 설정
 
-### 9.3 성능 최적화
+### 9.3 에러 및 로딩 상태 관리
+
+- **Error Boundary**: `app/error.tsx` - 런타임 에러 처리
+- **Loading States**: `app/loading.tsx` - 페이지 로딩 상태
+- **404 Page**: `app/not-found.tsx` - 페이지를 찾을 수 없음 처리
+- **향후 계획**: 에러 추적 도구 (Sentry 등) 도입 예정
+
+### 9.4 성능 최적화
 
 - Next.js Image 컴포넌트 사용
 - Cloudinary 자동 이미지 최적화
 - TanStack Query를 통한 데이터 캐싱
 - 코드 스플리팅 (Next.js 자동)
+
+### 9.5 SEO 최적화
+
+- **메타데이터**: Next.js 15 Metadata API 기본 활용 (동적 메타데이터는 향후 계획)
+- **구조화된 데이터**: 상품 정보 JSON-LD 스키마 (향후 계획)
+- **Sitemap**: 동적 sitemap 생성 (향후 계획)
+- **Open Graph**: 소셜 미디어 공유 최적화 (향후 계획)
 
 ## 10. 기타 참고 자료
 
