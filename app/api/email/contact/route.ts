@@ -7,8 +7,8 @@ import { sendContactEmail } from '@/services/email.service'
 // 문의 데이터 유효성 검사 스키마
 const contactSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요').max(50, '이름은 50자 이하로 입력해주세요'),
-  email: z.string().email('올바른 이메일 주소를 입력해주세요'),
-  phone: z.string().optional(),
+  phone: z.string().min(1, '연락처를 입력해주세요'),
+  email: z.string().email('올바른 이메일 주소를 입력해주세요').optional(),
   message: z.string().max(1000, '문의 내용은 1000자 이하로 입력해주세요').optional(),
   selectedProducts: z
     .array(
@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
 
     // Zod 유효성 검사 오류 처리
     if (error instanceof z.ZodError) {
+      console.error('유효성 검사 오류:', error.errors)
       return NextResponse.json(
         {
           message: '입력 데이터가 올바르지 않습니다.',
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest) {
       {
         message: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
         success: false,
+        error: error instanceof Error ? error.message : '알 수 없는 오류',
       },
       { status: 500 },
     )

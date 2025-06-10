@@ -2,14 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { ArrowLeft, Send, Heart } from 'lucide-react'
-import React from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { ArrowLeft, Heart, Send } from 'lucide-react'
+import { Controller, useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 import { CldImage } from 'next-cloudinary'
 
-import { InquirerInfo, InquiryTemplate } from '@/types/wishlist.type'
 import { showErrorToast } from '@/utils/show-error-toast'
 import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
@@ -78,7 +76,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
         },
         body: JSON.stringify({
           name: data.name,
-          email: data.email,
+          email: data.email?.trim() || undefined,
           phone: data.phone,
           message: data.message || '(특별한 문의사항 없음)',
           selectedProducts: selectedProductsData,

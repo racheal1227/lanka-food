@@ -15,12 +15,9 @@ interface EmailConfig {
 interface ContactEmailData {
   name: string
   phone: string
-  message: string
   email?: string
-  selectedProducts: {
-    name: string
-    quantity: number
-  }[]
+  message?: string
+  selectedProducts?: { name: string; quantity: number }[]
 }
 
 // 이메일 transporter 생성
@@ -47,8 +44,9 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
     const subject = `[Lanka Food 상품 문의] - ${data.name}`
 
     // 선택된 상품 목록을 HTML로 변환
-    const selectedProductsHtml = `
-      <h3 style="color: #555; margin-top: 0; margin-bottom: 15px;">선택된 상품 (총 ${data.selectedProducts.length}종)</h3>
+    const selectedProductsHtml = data.selectedProducts?.length
+      ? `
+      <h3 style="margin-top: 0; margin-bottom: 15px;">선택된 상품 (총 ${data.selectedProducts.length}종)</h3>
       <table style="width: 100%; border-collapse: collapse; margin: 0;">
         <thead>
           <tr style="background-color: #f8f9fa;">
@@ -70,30 +68,43 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
         </tbody>
       </table>
     `
+      : ''
 
     // 이메일 내용 구성
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #333; border-bottom: 2px solid #cccccc; padding-bottom: 10px;">Lanka Food 상품 문의</h2>
+        <h2 style="border-bottom: 2px solid #cccccc; padding-bottom: 10px;">Lanka Food 상품 문의</h2>
         <div style="padding: 20px; margin: 20px 0;">
-          <h3 style="color: #555; margin-top: 0; margin-bottom: 15px;">문의자 정보</h3>
+          <h3 style="margin-top: 0; margin-bottom: 15px;">문의자 정보</h3>
           <p style="margin: 0 0 8px 0; line-height: 1.5;">
-            <strong>이름:</strong> ${data.name}
+            • 이름: ${data.name}
           </p>
           <p style="margin: 0 0 8px 0; line-height: 1.5;">
-            <strong>연락처:</strong> ${data.phone}
+            • 연락처: ${data.phone}
           </p>
-          ${data.email ? `<p style="margin: 0; line-height: 1.5;"><strong>이메일:</strong> ${data.email}</p>` : ''}
+          ${data.email ? `<p style="margin: 0; line-height: 1.5;">• 이메일: ${data.email}</p>` : ''}
         </div>
 
+        ${
+          selectedProductsHtml
+            ? `
         <div style="padding: 20px; margin: 20px 0;">
           ${selectedProductsHtml}
         </div>
+        `
+            : ''
+        }
         
+        ${
+          data.message
+            ? `
         <div style="padding: 20px; margin: 20px 0;">
-          <h3 style="color: #555; margin-top: 0; margin-bottom: 15px;">문의 내용</h3>
+          <h3 style="margin-top: 0; margin-bottom: 15px;">문의 내용</h3>
           <p style="line-height: 1.6; white-space: pre-wrap; color: #333; margin: 0;">${data.message}</p>
         </div>
+        `
+            : ''
+        }
 
         <div style="background-color: #f0f0f0; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #666;">
           <p style="margin: 0;">이 이메일은 Lanka Food 웹사이트에서 자동으로 발송되었습니다.</p>
