@@ -69,7 +69,7 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
               crop="fill"
               gravity="center"
               loading="lazy"
-              className="w-full h-full object-cover"
+              className={cn('w-full h-full object-cover', !product.is_available && 'opacity-50')}
             />
           ) : (
             placeholder
@@ -78,28 +78,48 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
           placeholder
         )}
 
-        {/* 장바구니 버튼 */}
-        <div className="absolute bottom-2 right-2">
-          <WishlistButton
-            product={product}
-            size={size === 'small' ? 'sm' : 'icon'}
-            className="bg-white/90 hover:bg-white shadow-md hover:scale-110 transition-transform duration-200"
-          />
-        </div>
+        {/* Sold Out 대각선 리본 */}
+        {!product.is_available && (
+          <div className="absolute inset-0 flex items-center justify-center z-10">
+            <div className="transform rotate-12">
+              <div
+                className={cn(
+                  'bg-white text-red-600 font-bold shadow-lg border-l-2 border-r-2 border-red-600',
+                  size === 'small' ? 'px-2 py-0.5 text-[9px] tracking-wider' : 'px-3 py-1 text-[10px] tracking-wide',
+                )}
+              >
+                SOLD OUT
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 장바구니 버튼 - sold out 상태일 때는 숨김 */}
+        {product.is_available && (
+          <div className="absolute bottom-2 right-2">
+            <WishlistButton
+              product={product}
+              size={size === 'small' ? 'sm' : 'icon'}
+              className="bg-white/90 hover:bg-white shadow-md hover:scale-110 transition-transform duration-200"
+            />
+          </div>
+        )}
       </div>
 
       <CardContent className={cn(size === 'small' ? 'p-2' : 'p-4')}>
-        <h3 className={cn('font-semibold', size === 'small' ? 'text-xs' : '')}>{product.name_en}</h3>
+        <h3 className={cn('font-semibold', size === 'small' ? 'text-xs' : '', !product.is_available && 'opacity-60')}>
+          {product.name_en}
+        </h3>
         {size === 'small' ? (
-          <p lang="ko" className="text-xs text-gray-500">
+          <p lang="ko" className={cn('text-xs text-gray-500', !product.is_available && 'opacity-60')}>
             {product.name_ko}
           </p>
         ) : (
           <>
-            <p lang="ko" className="text-sm text-gray-500">
+            <p lang="ko" className={cn('text-sm text-gray-500', !product.is_available && 'opacity-60')}>
               {product.name_ko}
             </p>
-            <p lang="si" className="text-sm text-gray-500">
+            <p lang="si" className={cn('text-sm text-gray-500', !product.is_available && 'opacity-60')}>
               {product.name_si}
             </p>
           </>
