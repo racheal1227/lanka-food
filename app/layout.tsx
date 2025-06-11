@@ -1,5 +1,7 @@
 import '@/app/globals.css'
 
+import { Analytics } from '@vercel/analytics/next'
+
 import { Geist } from 'next/font/google'
 
 import Providers from '@/app/providers'
@@ -28,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="bg-background text-foreground h-screen overflow-x-hidden" suppressHydrationWarning>
         <Providers>
           <div className="flex flex-col h-screen">{children}</div>
+          <Analytics />
         </Providers>
       </body>
     </html>
