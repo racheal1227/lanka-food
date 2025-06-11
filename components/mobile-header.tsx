@@ -9,7 +9,7 @@ export default function MobileHeader() {
   }
 
   return (
-    <div className="w-full bg-background border-b py-4 px-6 flex items-center">
+    <div className="w-full bg-gray-50 border-b py-4 px-6 flex items-center">
       <Link href="/" className="inline-block" onClick={handleLogoClick}>
         <b>Lanka Food</b>
       </Link>

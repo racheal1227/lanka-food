@@ -1,18 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import * as React from 'react'
 
-import DesktopNavigation from '@components/DesktopNavigation'
-import MobileHeader from '@components/MobileHeader'
-import MobileNavigation from '@components/MobileNavigation'
+import DesktopNavigation from '@/components/desktop-navigation'
+import MobileHeader from '@/components/mobile-header'
+import MobileNavigation from '@/components/mobile-navigation'
 import { useIsMobile } from '@hooks/use-mobile'
 
 export default function MainNavigation() {
   const isMobile = useIsMobile()
-  const [isClient, setIsClient] = useState(false)
+  const [isClient, setIsClient] = React.useState(false)
 
   // 클라이언트 사이드 렌더링 감지
-  useEffect(() => {
+  React.useEffect(() => {
     setIsClient(true)
   }, [])
 

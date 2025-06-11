@@ -1,7 +1,8 @@
 import '@/app/globals.css'
 
+import { Analytics } from '@vercel/analytics/next'
+
 import { Geist } from 'next/font/google'
-import { ThemeProvider } from 'next-themes'
 
 import Providers from '@/app/providers'
 
@@ -28,9 +29,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="bg-background text-foreground h-screen overflow-x-hidden" suppressHydrationWarning>
         <Providers>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <div className="flex flex-col h-screen">{children}</div>
-          </ThemeProvider>
+          <div className="flex flex-col h-screen">{children}</div>
+          <Analytics />
         </Providers>
       </body>
     </html>
