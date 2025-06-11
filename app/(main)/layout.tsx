@@ -38,7 +38,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
               <p>010-7338-0028</p>
               <p>평일 9:30~17:00 (주말 및 공휴일 제외)</p>
               <p>Weekdays 9:30~17:00 (Closed on weekends & holidays)</p>
-              <p>이외 시간에는 메세지를 남겨주세요.</p>
+              <p>이외 시간에는 메시지를 남겨주세요.</p>
               <p>Please leave a message outside office hours.</p>
               <Separator className="w-full my-1" />
               <p className="text-sm font-medium">🏢 오피스 / Office</p>
@@ -53,7 +53,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
                 <p>010-7338-0028</p>
                 <p>평일 9:30~17:00 (주말 및 공휴일 제외)</p>
                 <p>Weekdays 9:30~17:00 (Closed on weekends & holidays)</p>
-                <p>이외 시간에는 메세지를 남겨주세요.</p>
+                <p>이외 시간에는 메시지를 남겨주세요.</p>
                 <p>Please leave a message outside office hours.</p>
               </div>
 

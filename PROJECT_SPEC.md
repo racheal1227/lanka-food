@@ -39,7 +39,6 @@
 - **Table**: TanStack Table
 - **Drag & Drop**: @dnd-kit
 - **Intersection Observer**: react-intersection-observer
-- **Theme**: next-themes
 - **Date Handling**: date-fns
 - **Validation**: Zod
 - **Resizable Panels**: react-resizable-panels
@@ -91,8 +90,7 @@ lanka-food/
 │   ├── navigation.tsx      # 네비게이션
 │   ├── mobile-navigation.tsx # 모바일 네비게이션
 │   ├── product-list.tsx    # 상품 목록
-│   ├── product-card.tsx    # 상품 카드
-│   └── theme-switcher.tsx  # 테마 스위처
+│   └── product-card.tsx    # 상품 카드
 ├── hooks/                  # 커스텀 React 훅
 ├── lib/                    # 유틸리티 라이브러리
 │   ├── supabase/          # Supabase 관련 코드
@@ -217,13 +215,7 @@ npm run lint
 - **기술**: Tailwind CSS, shadcn/ui (Radix UI 기반)
 - **구현**: `components/navigation.tsx`, `components/MobileNavigation.tsx`
 
-### 5.8 테마 시스템
-
-- **기능**: 라이트/다크 모드 토글
-- **기술**: next-themes
-- **구현**: `components/theme-switcher.tsx`
-
-### 5.9 이메일 발송 시스템
+### 5.8 이메일 발송 시스템
 
 - **기능**: 주문 이메일 자동 발송, 관리자 알림, 사용자 복사본 발송
 - **기술**: Nodemailer, Zod (유효성 검사)
