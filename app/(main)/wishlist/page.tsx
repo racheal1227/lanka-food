@@ -3,6 +3,7 @@
 import { Trash2, MessageCircle, Heart, Plus, Minus } from 'lucide-react'
 import * as React from 'react'
 
+import { useRouter } from 'next/navigation'
 import { CldImage } from 'next-cloudinary'
 
 import EmptyWishlist from '@/components/wishlist/empty-wishlist'
@@ -14,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 import { Checkbox } from '@ui/checkbox'
 
 export default function WishlistPage() {
+  const router = useRouter()
   const isMobile = useIsMobile()
   const {
     items,
@@ -51,18 +53,16 @@ export default function WishlistPage() {
     }
   }
 
-  const handleInquirySubmit = () => {
-    // 문의 전송 후 선택된 상품들을 위시리스트에서 제거할지 사용자에게 묻기
-    const shouldRemove = window.confirm('문의가 전송되었습니다. 문의한 상품들을 장바구니에서 제거하시겠습니까?')
-
-    if (shouldRemove) {
-      selectedItems.forEach((productId) => {
-        removeItem(productId)
-      })
-    }
+  const handleOrderSubmit = () => {
+    selectedItems.forEach((productId) => {
+      removeItem(productId)
+    })
 
     clearSelection()
-    setShowInquiryForm(false)
+    setShowOrderForm(false)
+
+    // 주문 제출 완료 후 루트 페이지로 이동
+    router.push('/')
   }
 
   const handleRemoveSelected = () => {
