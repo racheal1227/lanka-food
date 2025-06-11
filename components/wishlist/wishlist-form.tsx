@@ -16,14 +16,14 @@ import { Input } from '@ui/input'
 import { Label } from '@ui/label'
 import { Textarea } from '@ui/textarea'
 
-const inquiryFormSchema = z.object({
+const orderFormSchema = z.object({
   name: z.string().min(1, '이름 또는 회사명을 입력해주세요'),
   phone: z.string().min(1, '전화번호를 입력해주세요'),
   email: z.string().email('올바른 이메일 주소를 입력해주세요').optional().or(z.literal('')),
   message: z.string().optional(),
 })
 
-type InquiryFormData = z.infer<typeof inquiryFormSchema>
+type OrderFormData = z.infer<typeof orderFormSchema>
 
 interface WishlistFormProps {
   onClose: () => void
@@ -48,8 +48,8 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
     return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`
   }
 
-  const form = useForm<InquiryFormData>({
-    resolver: zodResolver(inquiryFormSchema),
+  const form = useForm<OrderFormData>({
+    resolver: zodResolver(orderFormSchema),
     mode: 'onBlur',
     defaultValues: {
       name: '',
@@ -59,8 +59,8 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
     },
   })
 
-  // 문의 전송 함수
-  const sendInquiry = async (data: InquiryFormData) => {
+  // 주문 전송 함수
+  const sendOrder = async (data: OrderFormData) => {
     try {
       // 선택된 상품 데이터 구성
       const selectedProductsData = selectedProducts.map((product) => ({
@@ -78,7 +78,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
           name: data.name,
           email: data.email?.trim() || undefined,
           phone: data.phone,
-          message: data.message || '(특별한 문의사항 없음)',
+          message: data.message || '(특별한 주문사항 없음)',
           selectedProducts: selectedProductsData,
         }),
       })
@@ -91,18 +91,18 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
 
       return data
     } catch (error) {
-      console.error('문의 전송 오류:', error)
+      console.error('주문 전송 오류:', error)
       throw error
     }
   }
 
   const mutation = useMutation({
-    mutationFn: sendInquiry,
+    mutationFn: sendOrder,
     onSuccess: () => {
       onSubmit()
     },
     onError: (error) => {
-      showErrorToast(error, '문의 전송 중 오류가 발생했습니다.')
+      showErrorToast(error, '주문 전송 중 오류가 발생했습니다.')
     },
   })
 
@@ -115,8 +115,8 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
             <ArrowLeft className="h-4 w-4 mr-2" />
             장바구니로 돌아가기
           </Button>
-          <h1 className="text-3xl font-bold mb-2">상품 문의</h1>
-          <p className="text-muted-foreground">선택하신 상품에 대해 판매자에게 문의하실 수 있습니다.</p>
+          <h1 className="text-3xl font-bold mb-2">상품 주문</h1>
+          <p className="text-muted-foreground">선택하신 상품에 대해 판매자에게 주문하실 수 있습니다.</p>
         </div>
 
         {/* 선택된 상품 목록 */}
@@ -161,10 +161,10 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
           </CardContent>
         </Card>
 
-        {/* 문의 폼 */}
+        {/* 주문 폼 */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">문의자 정보</CardTitle>
+            <CardTitle className="text-lg">주문자 정보</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={form.handleSubmit((data) => mutation.mutate(data))} className="space-y-4">
@@ -216,7 +216,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
                   id="email"
                   type="email"
                   {...form.register('email')}
-                  placeholder="문의 복사본을 받으시려면 이메일을 입력해주세요"
+                  placeholder="주문 복사본을 받으시려면 이메일을 입력해주세요"
                   className="mt-1"
                 />
                 {form.formState.errors.email && (
@@ -225,11 +225,11 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
               </div>
 
               <div>
-                <Label htmlFor="message">문의 내용 (선택사항)</Label>
+                <Label htmlFor="message">주문 내용 (선택사항)</Label>
                 <Textarea
                   id="message"
                   {...form.register('message')}
-                  placeholder="구체적인 문의사항이 있으시면 적어주세요 (예: 수량, 배송, 가격 협의 등)"
+                  placeholder="구체적인 주문사항이 있으시면 적어주세요 (예: 수량, 배송, 가격 협의 등)"
                   rows={4}
                   className="mt-1"
                 />
@@ -245,7 +245,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      문의 전송
+                      주문 전송
                     </>
                   )}
                 </Button>
@@ -256,11 +256,11 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
 
         {/* 안내 사항 */}
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">📧 문의 전송 안내</h4>
+          <h4 className="font-medium text-blue-900 mb-2">📧 주문 전송 안내</h4>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• 문의 내용이 판매자에게 이메일로 전송됩니다.</li>
+            <li>• 주문 내용이 판매자에게 이메일로 전송됩니다.</li>
             <li>• 보통 1-2일 내에 답변을 받으실 수 있습니다.</li>
-            <li>• 답변이 늦어질 경우, 전화번호로 문의해주세요.</li>
+            <li>• 답변이 늦어질 경우, 전화번호로 연락해주세요.</li>
           </ul>
         </div>
       </div>

@@ -11,23 +11,23 @@ export interface WishlistItem {
   quantity: number // 수량
 }
 
-// 문의자 정보
-export interface InquirerInfo {
+// 주문자 정보
+export interface OrdererInfo {
   name: string // 개인명 또는 회사명
   phone: string // 전화번호 (필수)
   email?: string // 이메일 (선택사항, 복사본 받기용)
-  message?: string // 선택적 문의 내용
+  message?: string // 선택적 주문 내용
 }
 
-// 문의 요청 데이터
-export interface InquiryRequest {
-  inquirer: InquirerInfo
+// 주문 요청 데이터
+export interface OrderRequest {
+  orderer: OrdererInfo
   selectedProducts: WishlistItem[]
   timestamp: string
 }
 
-// 문의 템플릿 데이터
-export interface InquiryTemplate {
+// 주문 템플릿 데이터
+export interface OrderTemplate {
   subject: string
   body: string
 }
@@ -35,7 +35,7 @@ export interface InquiryTemplate {
 // 관심상품 스토어 상태
 export interface WishlistState {
   items: WishlistItem[]
-  selectedItems: Set<string> // 문의할 상품 ID들
+  selectedItems: Set<string> // 주문할 상품 ID들
   isLoading: boolean
 }
 
@@ -53,7 +53,7 @@ export interface WishlistActions {
   incrementQuantity: (productId: string) => void
   decrementQuantity: (productId: string) => void
 
-  // 문의 상품 선택
+  // 주문 상품 선택
   toggleSelection: (productId: string) => void
   selectAll: () => void
   clearSelection: () => void

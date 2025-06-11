@@ -11,7 +11,7 @@ interface EmailConfig {
   }
 }
 
-// 문의 이메일 데이터 타입
+// 주문 이메일 데이터 타입
 interface ContactEmailData {
   name: string
   phone: string
@@ -35,13 +35,13 @@ const createTransporter = () => {
   return nodemailer.createTransport(config)
 }
 
-// 문의 이메일 발송
+// 주문 이메일 발송
 export const sendContactEmail = async (data: ContactEmailData): Promise<boolean> => {
   try {
     const transporter = createTransporter()
 
     // 제목 자동 생성
-    const subject = `[Lanka Food 상품 문의] - ${data.name}`
+    const subject = `[Lanka Food 상품 주문] - ${data.name}`
 
     // 선택된 상품 목록을 HTML로 변환
     const selectedProductsHtml = data.selectedProducts?.length
@@ -73,9 +73,9 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
     // 이메일 내용 구성
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <h2 style="border-bottom: 2px solid #cccccc; padding-bottom: 10px; color: #333;">Lanka Food 상품 문의</h2>
+        <h2 style="border-bottom: 2px solid #cccccc; padding-bottom: 10px; color: #333;">Lanka Food 상품 주문</h2>
         <div style="padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">문의자 정보</h3>
+          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">주문자 정보</h3>
           <p style="margin: 0 0 8px 0; line-height: 1.5; color: #333;">
             • 이름: ${data.name}
           </p>
@@ -99,7 +99,7 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
           data.message
             ? `
         <div style="padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">문의 내용</h3>
+          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">주문 내용</h3>
           <p style="line-height: 1.6; white-space: pre-wrap; color: #333; margin: 0;">${data.message}</p>
         </div>
         `
@@ -119,7 +119,7 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
       to: process.env.EMAIL_ADMIN,
       subject,
       html: htmlContent,
-      replyTo: data.email, // 답장 시 문의자 이메일로 전송
+      replyTo: data.email, // 답장 시 주문자 이메일로 전송
     }
 
     // 이메일 발송
@@ -168,19 +168,19 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
     // 사용자용 이메일 내용 구성
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Lanka Food 문의 접수 확인</h2>
+        <h2 style="color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;">Lanka Food 주문 접수 확인</h2>
         
         <div style="padding: 20px; margin: 20px 0; background-color: #f0f8ff; border-radius: 8px;">
-          <h3 style="color: #2e7d32; margin-top: 0; margin-bottom: 10px;">✅ 문의가 성공적으로 접수되었습니다</h3>
+          <h3 style="color: #2e7d32; margin-top: 0; margin-bottom: 10px;">✅ 주문이 성공적으로 접수되었습니다</h3>
           <p style="margin: 0; color: #333; line-height: 1.5;">
             안녕하세요 <strong>${data.name}</strong>님,<br/>
-            Lanka Food에 문의해 주셔서 감사합니다. 보내주신 문의 내용을 확인했으며,<br/>
+            Lanka Food에 주문해 주셔서 감사합니다. 보내주신 주문 내용을 확인했으며,<br/>
             담당자가 검토 후 <strong>1-2일 내</strong>에 연락드리겠습니다.<br/>
           </p>
         </div>
 
         <div style="padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">문의자 정보</h3>
+          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">주문자 정보</h3>
           <p style="margin: 0 0 8px 0; line-height: 1.5; color: #333;">
             • 이름: ${data.name}
           </p>
@@ -204,7 +204,7 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
           data.message
             ? `
         <div style="padding: 20px; margin: 20px 0;">
-          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">문의 내용</h3>
+          <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">주문 내용</h3>
           <p style="line-height: 1.6; white-space: pre-wrap; color: #333; margin: 0;">${data.message}</p>
         </div>
         `
@@ -212,9 +212,9 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
         }
 
         <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
-          <h4 style="color: #333; margin: 0 0 10px 0;">📞 빠른 문의</h4>
+          <h4 style="color: #333; margin: 0 0 10px 0;">📞 빠른 연락</h4>
           <p style="color: #333; margin: 0; line-height: 1.5;">
-            급하신 경우 전화로 문의해 주세요: <strong>010-7338-0028</strong><br/>
+            급하신 경우 전화로 연락해 주세요: <strong>010-7338-0028</strong><br/>
             (평일 9:30~17:00, 주말 및 공휴일 제외)
           </p>
         </div>
@@ -230,7 +230,7 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
     const mailOptions = {
       from: `"Lanka Food" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
       to: data.email,
-      subject: `[Lanka Food] 문의 접수 확인 - ${data.name}님`,
+      subject: `[Lanka Food] 주문 접수 확인 - ${data.name}님`,
       html: htmlContent,
     }
 

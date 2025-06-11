@@ -110,7 +110,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
     }
   },
 
-  // 문의 상품 선택
+  // 주문 상품 선택
   toggleSelection: (productId: string) => {
     set((state) => {
       const newSelected = new Set(state.selectedItems)

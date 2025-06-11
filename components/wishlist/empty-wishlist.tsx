@@ -10,7 +10,7 @@ export default function EmptyWishlist() {
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">장바구니</h1>
-        <p className="text-muted-foreground">관심있는 상품들을 모아보고 판매자에게 문의해보세요.</p>
+        <p className="text-muted-foreground">관심있는 상품들을 모아보고 판매자에게 주문해보세요.</p>
       </div>
 
       {/* 빈 장바구니 영역 - 물건이 있는 페이지와 동일한 여백 사용 */}

@@ -34,7 +34,7 @@ export default function WishlistPage() {
     decrementQuantity,
   } = useWishlistStore()
 
-  const [showInquiryForm, setShowInquiryForm] = React.useState(false)
+  const [showOrderForm, setShowOrderForm] = React.useState(false)
 
   // 페이지 로드 시 위시리스트 아이템 로드
   React.useEffect(() => {
@@ -75,15 +75,15 @@ export default function WishlistPage() {
     return <EmptyWishlist />
   }
 
-  if (showInquiryForm) {
-    return <WishlistForm onClose={() => setShowInquiryForm(false)} onSubmit={handleInquirySubmit} />
+  if (showOrderForm) {
+    return <WishlistForm onClose={() => setShowOrderForm(false)} onSubmit={handleOrderSubmit} />
   }
 
   return (
     <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">장바구니</h1>
-        <p className="text-muted-foreground">관심있는 상품들을 모아보고 판매자에게 문의해보세요.</p>
+        <p className="text-muted-foreground">관심있는 상품들을 모아보고 판매자에게 주문해보세요.</p>
       </div>
 
       {/* 컨트롤 바 */}
@@ -112,12 +112,12 @@ export default function WishlistPage() {
               </Button>
               <Button
                 size="sm"
-                onClick={() => setShowInquiryForm(true)}
+                onClick={() => setShowOrderForm(true)}
                 disabled={selectedCount === 0}
                 className="bg-green-600 hover:bg-green-700"
               >
                 <MessageCircle className="h-4 w-4 mr-1" />
-                선택 상품 문의 ({selectedCount})
+                선택 상품 주문 ({selectedCount})
               </Button>
             </div>
           </div>

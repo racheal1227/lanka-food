@@ -4,12 +4,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { sendContactEmail, sendOrderCopyToUser } from '@/services/email.service'
 
-// 문의 데이터 유효성 검사 스키마
+// 주문 데이터 유효성 검사 스키마
 const contactSchema = z.object({
   name: z.string().min(1, '이름을 입력해주세요').max(50, '이름은 50자 이하로 입력해주세요'),
   phone: z.string().min(1, '연락처를 입력해주세요'),
   email: z.string().email('올바른 이메일 주소를 입력해주세요').optional(),
-  message: z.string().max(1000, '문의 내용은 1000자 이하로 입력해주세요').optional(),
+  message: z.string().max(1000, '주문 내용은 1000자 이하로 입력해주세요').optional(),
   selectedProducts: z
     .array(
       z.object({
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       if (validatedData.email && !userEmailSuccess) {
         return NextResponse.json(
           {
-            message: '문의는 접수되었으나, 복사본 발송에 실패했습니다.',
+            message: '주문은 접수되었으나, 복사본 발송에 실패했습니다.',
             success: true,
             warning: '복사본 이메일 발송 실패',
           },
@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           message: validatedData.email
-            ? '문의가 성공적으로 전송되었습니다. 입력하신 이메일로 복사본을 발송했습니다.'
-            : '문의가 성공적으로 전송되었습니다.',
+            ? '주문이 성공적으로 전송되었습니다. 입력하신 이메일로 복사본을 발송했습니다.'
+            : '주문이 성공적으로 전송되었습니다.',
           success: true,
         },
         { status: 200 },
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     )
   } catch (error) {
-    console.error('문의 이메일 API 오류:', error)
+    console.error('주문 이메일 API 오류:', error)
 
     // Zod 유효성 검사 오류 처리
     if (error instanceof z.ZodError) {
