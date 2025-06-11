@@ -1,7 +1,7 @@
 'use client'
 
-import { Home, Menu, MessageCircle, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { Home, Menu, MessageCircle, Search, ShoppingBag, X } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import ProductCard from '@components/product-card'
 import { useCategoriesQuery } from '@hooks/use-category'
 import { useRecommendedProducts } from '@hooks/use-product'
+import { useWishlistStore } from '@stores/wishlist'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from '@ui/drawer'
@@ -28,6 +29,16 @@ export default function MobileNavigation() {
 
   // 추천 상품 가져오기
   const { data: recommendedProducts } = useRecommendedProducts()
+
+  // 장바구니 스토어
+  const { loadItems, getItemCount } = useWishlistStore()
+
+  // 컴포넌트 마운트 시 위시리스트 로드
+  useEffect(() => {
+    loadItems()
+  }, [loadItems])
+
+  const itemCount = getItemCount()
 
   // 연락하기 핸들러
   const handleContact = () => {
@@ -198,6 +209,29 @@ export default function MobileNavigation() {
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href="/wishlist">
+                <Button
+                  variant="ghost"
+                  className="p-0 flex items-center justify-center w-12 h-12 text-muted-foreground hover:text-foreground bg-transparent relative"
+                >
+                  <ShoppingBag className="!h-6 !w-6" />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center min-w-[20px]">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              <p>장바구니</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
 
         {/* <TooltipProvider>
           <Tooltip>

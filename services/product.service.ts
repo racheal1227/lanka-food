@@ -47,7 +47,7 @@ export const getProductsByCategoryName = async ({
   searchTerm,
   categoryName,
 }: QueryParams & { categoryName?: string }): Promise<PageResponse<Product>> => {
-  let query = supabase.from('products').select('*', { count: 'exact' }).eq('is_available', true)
+  let query = supabase.from('products').select('*', { count: 'exact' })
 
   // 카테고리 이름으로 카테고리 ID 찾기
   if (categoryName) {
@@ -64,6 +64,9 @@ export const getProductsByCategoryName = async ({
     const searchTerms = parseSearchTerms(searchTerm)
     query = applySearchTermsFilter(query, searchTerms)
   }
+  // 재고가 있는 상품을 먼저 정렬
+  query = query.order('is_available', { ascending: false })
+
   sorting.forEach((sort) => {
     const [column, option] = formatToSupabaseSort(sort)
     query = query.order(column, option)
@@ -92,8 +95,8 @@ export const getRecommendedProducts = async (): Promise<Product[]> => {
   const { data, error } = await supabase
     .from('products')
     .select('*')
-    .eq('is_available', true)
     .eq('is_recommended', true)
+    .order('is_available', { ascending: false })
     .order('published_at', { ascending: false })
     .limit(6)
 
