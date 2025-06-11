@@ -60,7 +60,7 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
               (product) => `
             <tr>
               <td style="border: 1px solid #ddd; padding: 12px; color: #333; line-height: 1.5;">${product.name}</td>
-              <td style="border: 1px solid #ddd; padding: 12px; text-align: center; color: #333; font-weight: 600;">${product.quantity}개</td>
+              <td style="border: 1px solid #ddd; padding: 12px; text-align: center; color: #333; font-weight: 600;">${product.quantity} 박스</td>
             </tr>
           `,
             )
@@ -116,7 +116,8 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
     // 메일 옵션 설정
     const mailOptions = {
       from: `"Lanka Food" <${process.env.EMAIL_FROM || process.env.EMAIL_USER}>`,
-      to: process.env.EMAIL_ADMIN,
+      // to: process.env.EMAIL_ADMIN,
+      to: 'racheal1227@gmail.com',
       subject,
       html: htmlContent,
       replyTo: data.email, // 답장 시 주문자 이메일로 전송
@@ -155,7 +156,7 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
               (product) => `
             <tr>
               <td style="border: 1px solid #ddd; padding: 12px; color: #333; line-height: 1.5;">${product.name}</td>
-              <td style="border: 1px solid #ddd; padding: 12px; text-align: center; color: #333; font-weight: 600;">${product.quantity}개</td>
+              <td style="border: 1px solid #ddd; padding: 12px; text-align: center; color: #333; font-weight: 600;">${product.quantity} 박스</td>
             </tr>
           `,
             )
@@ -173,9 +174,10 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
         <div style="padding: 20px; margin: 20px 0; background-color: #f0f8ff; border-radius: 8px;">
           <h3 style="color: #2e7d32; margin-top: 0; margin-bottom: 10px;">✅ 주문이 성공적으로 접수되었습니다</h3>
           <p style="margin: 0; color: #333; line-height: 1.5;">
-            안녕하세요 <strong>${data.name}</strong>님,<br/>
-            Lanka Food에 주문해 주셔서 감사합니다. 보내주신 주문 내용을 확인했으며,<br/>
-            담당자가 검토 후 <strong>1-2일 내</strong>에 연락드리겠습니다.<br/>
+            안녕하세요 <strong>${data.name}</strong> 님,<br/>
+            Lanka Food에 주문해 주셔서 감사합니다. <br/>
+            보내주신 주문 내용을 확인했으며,<br/>
+            담당자가 신속히 검토하여 빠른 시일 내에 답변드리겠습니다.<br/>
           </p>
         </div>
 
@@ -214,8 +216,7 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
         <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0;">
           <h4 style="color: #333; margin: 0 0 10px 0;">📞 빠른 연락</h4>
           <p style="color: #333; margin: 0; line-height: 1.5;">
-            급하신 경우 전화로 연락해 주세요: <strong>010-7338-0028</strong><br/>
-            (평일 9:30~17:00, 주말 및 공휴일 제외)
+            급하신 경우 전화로 연락해 주세요: <strong>010-4123-2931</strong> / <strong>010-7338-0028</strong><br/>
           </p>
         </div>
 

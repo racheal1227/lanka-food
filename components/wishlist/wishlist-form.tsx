@@ -8,6 +8,7 @@ import * as z from 'zod'
 
 import { CldImage } from 'next-cloudinary'
 
+import { toast } from '@/hooks/use-toast'
 import { showErrorToast } from '@/utils/show-error-toast'
 import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
@@ -99,6 +100,10 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
   const mutation = useMutation({
     mutationFn: sendOrder,
     onSuccess: () => {
+      toast({
+        title: '성공',
+        description: '주문이 성공적으로 전송되었습니다. 담당자가 빠른 시일 내에 연락드리겠습니다.',
+      })
       onSubmit()
     },
     onError: (error) => {
@@ -122,9 +127,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
         {/* 선택된 상품 목록 */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-lg">
-              선택된 상품 ({selectedProducts.length}종 • 총 {totalQuantity}개)
-            </CardTitle>
+            <CardTitle className="text-lg">선택된 상품 ({selectedProducts.length}종)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
@@ -153,7 +156,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
                     {product.name_ko && <p className="text-sm text-muted-foreground truncate">{product.name_ko}</p>}
                   </div>
                   <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-md text-sm font-medium">
-                    <span>수량: {product.quantity}개</span>
+                    <span>수량: {product.quantity} 박스</span>
                   </div>
                 </div>
               ))}
@@ -245,7 +248,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
-                      주문 전송
+                      전송
                     </>
                   )}
                 </Button>
@@ -258,9 +261,12 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
         <div className="mt-6 p-4 bg-blue-50 rounded-lg">
           <h4 className="font-medium text-blue-900 mb-2">📧 주문 전송 안내</h4>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• 주문 내용이 판매자에게 이메일로 전송됩니다.</li>
-            <li>• 보통 1-2일 내에 답변을 받으실 수 있습니다.</li>
-            <li>• 답변이 늦어질 경우, 전화번호로 연락해주세요.</li>
+            <li>• 담당자가 신속히 검토하여 빠른 시일 내에 답변 드리겠습니다.</li>
+            <li>
+              • 답변이 지연될 경우 전화로 연락해 주세요:
+              <br />
+              &nbsp;&nbsp;<strong>010-4123-2931</strong> / <strong>010-7338-0028</strong>
+            </li>
           </ul>
         </div>
       </div>
