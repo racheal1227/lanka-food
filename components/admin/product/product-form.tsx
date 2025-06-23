@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
 import { CalendarIcon, Clock } from 'lucide-react'
 import * as React from 'react'
+import { ko } from 'react-day-picker/locale'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -373,7 +374,8 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
                           mode="single"
                           selected={tempDate}
                           onSelect={(date) => updateDateTime(date)}
-                          initialFocus
+                          autoFocus
+                          locale={ko}
                         />
                         <div className="mt-4 grid grid-cols-2 gap-2">
                           <div>

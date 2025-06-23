@@ -45,7 +45,7 @@ export default function LogoutButton({ children }: LogoutButtonProps) {
         onKeyDown={(e) => e.key === 'Enter' && handleLogout()}
         role="button"
         tabIndex={0}
-        style={{ cursor: 'pointer' }}
+        className="cursor-pointer"
       >
         {children}
       </span>
