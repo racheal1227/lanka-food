@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { NextRequest, NextResponse } from 'next/server'
 
+import { createEmailLog, updateEmailLogSuccess, updateEmailLogFailure } from '@/services/email-log.service'
 import { sendContactEmail, sendOrderCopyToUser } from '@/services/email.service'
 
 // 주문 데이터 유효성 검사 스키마
@@ -27,17 +28,52 @@ export async function POST(request: NextRequest) {
     // 요청 데이터 유효성 검사
     const validatedData = contactSchema.parse(body)
 
-    // 관리자에게 이메일 발송
-    const adminEmailSuccess = await sendContactEmail(validatedData)
+    // 메타데이터 수집
+    const userAgent = request.headers.get('user-agent') || undefined
+    const forwarded = request.headers.get('x-forwarded-for')
+    const realIP = request.headers.get('x-real-ip')
+    const ipAddress = forwarded?.split(',')[0] || realIP || undefined
 
-    let userEmailSuccess = true
-    // 사용자가 이메일을 제공했다면 복사본 발송
-    if (validatedData.email && validatedData.email.trim()) {
-      userEmailSuccess = await sendOrderCopyToUser(validatedData)
+    // 이메일 로그 생성
+    const emailLog = await createEmailLog({
+      senderName: validatedData.name,
+      senderPhone: validatedData.phone,
+      senderEmail: validatedData.email,
+      subject: `[Lanka Food 상품 주문] - ${validatedData.name}`,
+      message: validatedData.message,
+      selectedProducts: validatedData.selectedProducts,
+      userAgent,
+      ipAddress,
+    })
+
+    if (!emailLog) {
+      console.error('이메일 로그 생성 실패')
     }
 
-    if (adminEmailSuccess) {
-      if (validatedData.email && !userEmailSuccess) {
+    // 관리자에게 이메일 발송
+    const adminEmailResult = await sendContactEmail(validatedData)
+
+    let userEmailResult: { success: boolean; messageId?: string } = { success: true }
+    // 사용자가 이메일을 제공했다면 복사본 발송
+    if (validatedData.email && validatedData.email.trim()) {
+      userEmailResult = await sendOrderCopyToUser(validatedData)
+    }
+
+    // 로그 업데이트
+    if (emailLog) {
+      if (adminEmailResult.success) {
+        await updateEmailLogSuccess(emailLog.id, {
+          messageId: adminEmailResult.messageId,
+          adminEmailSent: true,
+          userEmailSent: userEmailResult.success,
+        })
+      } else {
+        await updateEmailLogFailure(emailLog.id, '이메일 발송 실패')
+      }
+    }
+
+    if (adminEmailResult.success) {
+      if (validatedData.email && !userEmailResult.success) {
         return NextResponse.json(
           {
             message: '주문은 접수되었으나, 복사본 발송에 실패했습니다.',

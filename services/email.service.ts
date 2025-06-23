@@ -1,4 +1,13 @@
+import { format } from 'date-fns'
+import { ko } from 'date-fns/locale'
 import nodemailer from 'nodemailer'
+
+// 한국 시간으로 포맷팅하는 유틸리티 함수 (관리자 이메일용)
+const getKoreanTime = (): string => {
+  const now = new Date()
+  const koreanTime = new Date(now.getTime() + 9 * 60 * 60 * 1000)
+  return format(koreanTime, 'yyyy-MM-dd HH:mm:ss', { locale: ko })
+}
 
 // 이메일 설정 타입
 interface EmailConfig {
@@ -36,7 +45,7 @@ const createTransporter = () => {
 }
 
 // 주문 이메일 발송
-export const sendContactEmail = async (data: ContactEmailData): Promise<boolean> => {
+export const sendContactEmail = async (data: ContactEmailData): Promise<{ success: boolean; messageId?: string }> => {
   try {
     const transporter = createTransporter()
 
@@ -108,7 +117,7 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
 
         <div style="background-color: #f0f0f0; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #333;">
           <p style="margin: 0;">이 이메일은 Lanka Food 웹사이트에서 자동으로 발송되었습니다.</p>
-          <p style="margin: 5px 0 0 0;">발송 시간: ${new Date().toLocaleString('ko-KR')}</p>
+          <p style="margin: 5px 0 0 0;">발송 시간: ${getKoreanTime()}</p>
         </div>
       </div>
     `
@@ -126,15 +135,17 @@ export const sendContactEmail = async (data: ContactEmailData): Promise<boolean>
     const info = await transporter.sendMail(mailOptions)
     console.log('이메일 발송 성공:', info.messageId)
 
-    return true
+    return { success: true, messageId: info.messageId }
   } catch (error) {
     console.error('이메일 발송 실패:', error)
-    return false
+    return { success: false }
   }
 }
 
 // 사용자에게 주문서 복사본 발송
-export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boolean> => {
+export const sendOrderCopyToUser = async (
+  data: ContactEmailData,
+): Promise<{ success: boolean; messageId?: string }> => {
   try {
     const transporter = createTransporter()
 
@@ -221,7 +232,6 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
 
         <div style="background-color: #f0f0f0; padding: 15px; border-radius: 8px; margin-top: 20px; font-size: 12px; color: #333;">
           <p style="margin: 0;">이 이메일은 Lanka Food 웹사이트에서 자동으로 발송되었습니다.</p>
-          <p style="margin: 5px 0 0 0;">발송 시간: ${new Date().toLocaleString('ko-KR')}</p>
         </div>
       </div>
     `
@@ -238,10 +248,10 @@ export const sendOrderCopyToUser = async (data: ContactEmailData): Promise<boole
     const info = await transporter.sendMail(mailOptions)
     console.log('사용자 복사본 이메일 발송 성공:', info.messageId)
 
-    return true
+    return { success: true, messageId: info.messageId }
   } catch (error) {
     console.error('사용자 복사본 이메일 발송 실패:', error)
-    return false
+    return { success: false }
   }
 }
 
