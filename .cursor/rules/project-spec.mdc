@@ -1,3 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
 # Lanka Food - 프로젝트 스펙 문서
 
 ## 1. 프로젝트 개요
@@ -443,18 +449,18 @@ export type ProductUpdate = TablesUpdate<'products'>
 
 ### 10.1 외부 서비스 문서
 
-- [Next.js 15 문서](https://nextjs.org/docs)
-- [Supabase 문서](https://supabase.com/docs)
-- [Cloudinary 문서](https://cloudinary.com/documentation)
-- [TanStack Query 문서](https://tanstack.com/query/latest)
-- [shadcn/ui 문서](https://ui.shadcn.com/)
+- [Next.js 15 문서](mdc:https:/nextjs.org/docs)
+- [Supabase 문서](mdc:https:/supabase.com/docs)
+- [Cloudinary 문서](mdc:https:/cloudinary.com/documentation)
+- [TanStack Query 문서](mdc:https:/tanstack.com/query/latest)
+- [shadcn/ui 문서](mdc:https:/ui.shadcn.com)
 
 ### 10.2 개발 도구
 
-- [TypeScript 핸드북](https://www.typescriptlang.org/docs/)
-- [Tailwind CSS 문서](https://tailwindcss.com/docs)
-- [ESLint 규칙](https://eslint.org/docs/rules/)
-- [Prettier 옵션](https://prettier.io/docs/en/options.html)
+- [TypeScript 핸드북](mdc:https:/www.typescriptlang.org/docs)
+- [Tailwind CSS 문서](mdc:https:/tailwindcss.com/docs)
+- [ESLint 규칙](mdc:https:/eslint.org/docs/rules)
+- [Prettier 옵션](mdc:https:/prettier.io/docs/en/options.html)
 
 ### 10.3 데이터베이스 관리
 
@@ -468,4 +474,4 @@ npx supabase gen types typescript --project-id "$PROJECT_ID" > types/database.ty
 
 **마지막 업데이트**: 2025년 06월
 **작성자**: white paper
-**버전**: 0.1.0
+**버전**: 0.2.0
