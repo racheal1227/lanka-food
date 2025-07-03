@@ -102,7 +102,7 @@ export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
     onSuccess: () => {
       toast({
         title: '성공',
-        description: '주문이 성공적으로 전송되었습니다. 담당자가 빠른 시일 내에 연락드리겠습니다.',
+        description: '주문이 성공적으로 전송되었습니다.담당자가 빠른 시일 내에 연락드리겠습니다.',
       })
       onSubmit()
     },

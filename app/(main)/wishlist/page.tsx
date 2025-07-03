@@ -94,9 +94,12 @@ export default function WishlistPage() {
               <div className="flex items-center gap-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox id="select-all" checked={allSelected} onCheckedChange={handleSelectAll} />
-                  <label htmlFor="select-all" className="text-sm font-medium whitespace-nowrap">
-                    {isMobile ? `전체 (${selectedCount}/${totalCount})` : `전체 선택 (${selectedCount}/${totalCount})`}
+                  <label htmlFor="select-all" className="text-sm font-medium whitespace-nowrap cursor-pointer">
+                    {isMobile ? '전체' : '전체 선택'}
                   </label>
+                  <span className="text-sm text-muted-foreground">
+                    ({selectedCount}/{totalCount})
+                  </span>
                 </div>
               </div>
 
