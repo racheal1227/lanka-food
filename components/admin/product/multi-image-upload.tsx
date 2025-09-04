@@ -134,6 +134,7 @@ export default function MultiImageUpload({
   const [isMounted, setIsMounted] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const initialRenderRef = React.useRef(true)
+  const inputId = React.useId()
 
   // 센서 설정
   const sensors = useSensors(
@@ -282,10 +283,10 @@ export default function MultiImageUpload({
             multiple
             max={maxFiles}
             className="hidden"
-            id="image-upload"
+            id={inputId}
           />
           <label
-            htmlFor="image-upload"
+            htmlFor={inputId}
             className="flex h-20 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed p-4 text-center transition hover:bg-muted"
           >
             <ImagePlus className="h-6 w-6" />
