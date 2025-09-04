@@ -54,7 +54,7 @@ export interface ProductFormProps {
   onCancel: () => void
 }
 
-function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
+export default function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   const { data: categories } = useCategoriesQuery()
 
   const initialFeaturedImages: ClientImage[] =
@@ -251,337 +251,333 @@ function ProductFormContent({ product, onSubmit, onCancel }: ProductFormProps) {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="category_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    카테고리 <span className="text-red-600">*</span>
-                  </FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="카테고리 선택" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name_en"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    상품명 (영어) <span className="text-red-600">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input placeholder="Product Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name_ko"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>상품명 (한국어)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="상품명" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="name_si"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>상품명 (싱할라어)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Product Name in Sinhala" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>상품 설명</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="상품에 대한 설명을 작성해주세요" {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="published_at"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    상품 등록 일자 <span className="text-red-600">*</span>
-                  </FormLabel>
-                  <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen} modal>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
-                          onClick={openDatePicker}
-                        >
-                          {field.value ? (
-                            format(new Date(field.value), 'yyyy-MM-dd HH:mm')
-                          ) : (
-                            <span>날짜와 시간을 선택하세요</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <div className="p-3">
-                        <Calendar
-                          mode="single"
-                          selected={tempDate}
-                          onSelect={(date) => updateDateTime(date)}
-                          autoFocus
-                          locale={ko}
-                        />
-                        <div className="mt-4 grid grid-cols-2 gap-2">
-                          <div>
-                            <div className="flex items-center">
-                              <Clock className="mr-2 h-4 w-4" />
-                              <span className="text-sm font-medium">시간</span>
-                            </div>
-                            <Select
-                              value={tempHour.toString()}
-                              onValueChange={(value) => updateDateTime(tempDate, parseInt(value, 10))}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="시간 선택" />
-                              </SelectTrigger>
-                              <SelectContent className="max-h-[200px]">
-                                {hours.map((hour) => (
-                                  <SelectItem key={`hour-${hour}`} value={hour.toString()}>
-                                    {hour.toString().padStart(2, '0')}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <div className="flex items-center">
-                              <span className="text-sm font-medium">분</span>
-                            </div>
-                            <Select
-                              value={tempMinute.toString()}
-                              onValueChange={(value) => updateDateTime(tempDate, undefined, parseInt(value, 10))}
-                            >
-                              <SelectTrigger className="mt-1">
-                                <SelectValue placeholder="분 선택" />
-                              </SelectTrigger>
-                              <SelectContent className="max-h-[200px]">
-                                {minutes.map((minute) => (
-                                  <SelectItem key={`minute-${minute}`} value={minute.toString()}>
-                                    {minute.toString().padStart(2, '0')}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="mt-4 flex justify-end space-x-2">
-                          <Button type="button" variant="outline" size="sm" onClick={cancelDateTime}>
-                            취소
-                          </Button>
-                          <Button type="button" size="sm" onClick={applyDateTime}>
-                            확인
-                          </Button>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="price_krw"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    가격 (KRW) <span className="text-red-600">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="가격"
-                      {...field}
-                      onChange={(event) => field.onChange(parseFloat(event.target.value) || 0)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="stock_quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    재고 수량 <span className="text-red-600">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      placeholder="재고 수량"
-                      {...field}
-                      onChange={(event) =>
-                        field.onChange(handleStockQuantityChange(parseInt(event.target.value, 10) || 0))
-                      }
-                    />
-                  </FormControl>
-                  <FormDescription>재고가 0이면 판매 불가능 상태로 자동 설정됩니다.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="is_available"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={(value) => field.onChange(value)}
-                      disabled={isStockZero}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>판매 가능</FormLabel>
-                    <FormDescription>
-                      {isStockZero ? '재고가 0인 상품은 판매할 수 없습니다.' : '상품을 판매 목록에 표시합니다.'}
-                    </FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="is_recommended"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>추천 상품</FormLabel>
-                    <FormDescription>이 상품을 추천 상품으로 표시합니다.</FormDescription>
-                  </div>
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        <FormField
-          control={form.control}
-          name="featured_images"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>대표 이미지</FormLabel>
-              <FormDescription>최대 5장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
-              <FormControl>
-                <MultiImageUpload
-                  value={field.value ?? []}
-                  onChange={field.onChange}
-                  maxFiles={5}
-                  placeholder="대표 이미지 추가하기"
-                  onImagesChange={setFeaturedClientImages}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="detail_images"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>상세 이미지</FormLabel>
-              <FormDescription>최대 5장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
-              <FormControl>
-                <MultiImageUpload
-                  value={field.value ?? []}
-                  onChange={field.onChange}
-                  maxFiles={5}
-                  placeholder="상세 이미지 추가하기"
-                  onImagesChange={setDetailClientImages}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
-            취소
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? '저장 중...' : '저장'}
-          </Button>
-        </div>
-      </form>
-    </Form>
-  )
-}
-
-export default function ProductForm(props: ProductFormProps) {
-  return (
     <React.Suspense fallback={<div>카테고리 로딩 중...</div>}>
-      <ProductFormContent {...props} />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="category_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      카테고리 <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="카테고리 선택" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name_en"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      상품명 (영어) <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Product Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name_ko"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>상품명 (한국어)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="상품명" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name_si"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>상품명 (싱할라어)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Product Name in Sinhala" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>상품 설명</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="상품에 대한 설명을 작성해주세요" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <FormField
+                control={form.control}
+                name="published_at"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      상품 등록 일자 <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen} modal>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className={cn('w-full pl-3 text-left font-normal', !field.value && 'text-muted-foreground')}
+                            onClick={openDatePicker}
+                          >
+                            {field.value ? (
+                              format(new Date(field.value), 'yyyy-MM-dd HH:mm')
+                            ) : (
+                              <span>날짜와 시간을 선택하세요</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <div className="p-3">
+                          <Calendar
+                            mode="single"
+                            selected={tempDate}
+                            onSelect={(date) => updateDateTime(date)}
+                            autoFocus
+                            locale={ko}
+                          />
+                          <div className="mt-4 grid grid-cols-2 gap-2">
+                            <div>
+                              <div className="flex items-center">
+                                <Clock className="mr-2 h-4 w-4" />
+                                <span className="text-sm font-medium">시간</span>
+                              </div>
+                              <Select
+                                value={tempHour.toString()}
+                                onValueChange={(value) => updateDateTime(tempDate, parseInt(value, 10))}
+                              >
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="시간 선택" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[200px]">
+                                  {hours.map((hour) => (
+                                    <SelectItem key={`hour-${hour}`} value={hour.toString()}>
+                                      {hour.toString().padStart(2, '0')}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div>
+                              <div className="flex items-center">
+                                <span className="text-sm font-medium">분</span>
+                              </div>
+                              <Select
+                                value={tempMinute.toString()}
+                                onValueChange={(value) => updateDateTime(tempDate, undefined, parseInt(value, 10))}
+                              >
+                                <SelectTrigger className="mt-1">
+                                  <SelectValue placeholder="분 선택" />
+                                </SelectTrigger>
+                                <SelectContent className="max-h-[200px]">
+                                  {minutes.map((minute) => (
+                                    <SelectItem key={`minute-${minute}`} value={minute.toString()}>
+                                      {minute.toString().padStart(2, '0')}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                          <div className="mt-4 flex justify-end space-x-2">
+                            <Button type="button" variant="outline" size="sm" onClick={cancelDateTime}>
+                              취소
+                            </Button>
+                            <Button type="button" size="sm" onClick={applyDateTime}>
+                              확인
+                            </Button>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price_krw"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      가격 (KRW) <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="가격"
+                        {...field}
+                        onChange={(event) => field.onChange(parseFloat(event.target.value) || 0)}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="stock_quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      재고 수량 <span className="text-red-600">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="재고 수량"
+                        {...field}
+                        onChange={(event) =>
+                          field.onChange(handleStockQuantityChange(parseInt(event.target.value, 10) || 0))
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>재고가 0이면 판매 불가능 상태로 자동 설정됩니다.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_available"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={(value) => field.onChange(value)}
+                        disabled={isStockZero}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>판매 가능</FormLabel>
+                      <FormDescription>
+                        {isStockZero
+                          ? '재고가 0인 상품은 판매할 수 없습니다.'
+                          : '체크 시 판매 목록에 표시되고 담기 버튼이 활성화됩니다. 체크 해제 시에도 상품은 표시되지만 SOLD OUT 배지로 표시되며 담기 버튼은 숨겨집니다.'}
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="is_recommended"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>추천 상품</FormLabel>
+                      <FormDescription>이 상품을 추천 상품으로 표시합니다.</FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <FormField
+            control={form.control}
+            name="featured_images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>대표 이미지</FormLabel>
+                <FormDescription>최대 5장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
+                <FormControl>
+                  <MultiImageUpload
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    maxFiles={5}
+                    placeholder="대표 이미지 추가하기"
+                    onImagesChange={setFeaturedClientImages}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="detail_images"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>상세 이미지</FormLabel>
+                <FormDescription>최대 5장까지 업로드 가능합니다. 드래그하여 순서를 변경할 수 있습니다.</FormDescription>
+                <FormControl>
+                  <MultiImageUpload
+                    value={field.value ?? []}
+                    onChange={field.onChange}
+                    maxFiles={5}
+                    placeholder="상세 이미지 추가하기"
+                    onImagesChange={setDetailClientImages}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
+              취소
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? '저장 중...' : '저장'}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </React.Suspense>
   )
 }
