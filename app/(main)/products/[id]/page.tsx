@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getCldImageUrl } from 'next-cloudinary'
 
 import Gallery from '@/components/product-detail/gallery'
 import InfoTable, { ProductDetailViewModel } from '@/components/product-detail/info-table'
@@ -30,11 +31,19 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
   if (nameEn) descriptionParts.push(nameEn)
   const description = descriptionParts.join(' / ')
 
-  const cloudName = process.env.NEXT_CLOUDINARY_CLOUD_NAME
   const ogImages: string[] = []
   const firstImage = product.featured_images?.[0]
-  if (cloudName && firstImage) {
-    ogImages.push(`https://res.cloudinary.com/${cloudName}/image/upload/${firstImage}`)
+  if (firstImage) {
+    const url = getCldImageUrl({
+      src: firstImage,
+      width: 1200,
+      height: 630,
+      crop: 'fill',
+      gravity: 'auto',
+      format: 'jpg',
+      quality: 'auto',
+    })
+    ogImages.push(url)
   }
 
   return {
