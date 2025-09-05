@@ -40,7 +40,7 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
     <div className="w-full">
       <div className="relative">
         {hasImages ? (
-          <Carousel setApi={setApi} className="w-full">
+          <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
             <CarouselContent>
               {images.map((publicId) => (
                 <CarouselItem key={publicId}>
@@ -79,9 +79,9 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
               aria-label={`슬라이드 ${index + 1}로 이동`}
               className={cn(
                 'relative w-16 h-16 rounded-md overflow-hidden border',
-                current === index ? 'ring-2 ring-primary border-primary' : 'border-transparent',
+                current === index ? 'border-2 border-primary' : 'border-transparent',
               )}
-              onClick={() => api?.scrollTo(index)}
+              onMouseEnter={() => api?.scrollTo(index)}
             >
               <CldImage
                 width="120"
