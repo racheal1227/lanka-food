@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+import 'photoswipe/dist/photoswipe.css'
 
 import MainNavigation from '@/components/navigation'
 import { Separator } from '@/components/ui/separator'

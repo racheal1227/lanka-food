@@ -3,7 +3,7 @@
 import { ImageOff } from 'lucide-react'
 import * as React from 'react'
 
-import { CldImage } from 'next-cloudinary'
+import { CldImage, getCldImageUrl } from 'next-cloudinary'
 
 import {
   Carousel,
@@ -23,6 +23,21 @@ interface GalleryProps {
 export default function Gallery({ images, nameKo }: GalleryProps) {
   const [api, setApi] = React.useState<CarouselApi | null>(null)
   const [current, setCurrent] = React.useState(0)
+  const [isHovering, setIsHovering] = React.useState(false)
+  const [hoverRatio, setHoverRatio] = React.useState<{ x: number; y: number }>({ x: 0.5, y: 0.5 })
+  const currentBoxRef = React.useRef<HTMLDivElement | null>(null)
+  const [previewSize, setPreviewSize] = React.useState<{ w: number; h: number }>({ w: 0, h: 0 })
+  const zoom = 2.5
+
+  React.useEffect(() => {
+    const el = currentBoxRef.current
+    if (!el) return undefined
+    const update = () => setPreviewSize({ w: el.clientWidth, h: el.clientHeight })
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [current])
 
   React.useEffect(() => {
     if (!api) return undefined
@@ -37,14 +52,71 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
   const hasImages = images && images.length > 0
 
   return (
-    <div className="w-full">
+    <div className="relative w-full">
       <div className="relative">
         {hasImages ? (
           <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
             <CarouselContent>
               {images.map((publicId) => (
                 <CarouselItem key={publicId}>
-                  <div className="aspect-square w-full overflow-hidden rounded-md bg-muted">
+                  <div
+                    className="aspect-square w-full overflow-hidden rounded-md bg-muted"
+                    ref={images[current] === publicId ? currentBoxRef : null}
+                    onMouseEnter={() => setIsHovering(true)}
+                    onMouseLeave={() => setIsHovering(false)}
+                    onMouseMove={(e) => {
+                      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect()
+                      const x = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1)
+                      const y = Math.min(Math.max((e.clientY - rect.top) / rect.height, 0), 1)
+                      setHoverRatio({ x, y })
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+                          // eslint-disable-next-line import/no-extraneous-dependencies
+                          import('photoswipe').then(async ({ default: PhotoSwipe }) => {
+                            const pswp = new PhotoSwipe({
+                              dataSource: images.map((id) => ({
+                                src: getCldImageUrl({
+                                  src: id,
+                                  width: 2000,
+                                  format: 'auto',
+                                  quality: 'auto',
+                                  dpr: 'auto',
+                                }),
+                              })),
+                              index: images.indexOf(publicId),
+                            })
+                            pswp.init()
+                          })
+                        }
+                      }
+                    }}
+                    onClick={() => {
+                      // 모바일(coarse pointer)에서는 전체화면 뷰어 진입
+                      if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+                        // eslint-disable-next-line import/no-extraneous-dependencies
+                        import('photoswipe').then(async ({ default: PhotoSwipe }) => {
+                          const pswp = new PhotoSwipe({
+                            dataSource: images.map((id) => ({
+                              src: getCldImageUrl({
+                                src: id,
+                                width: 2000,
+                                format: 'auto',
+                                quality: 'auto',
+                                dpr: 'auto',
+                              }),
+                            })),
+                            index: images.indexOf(publicId),
+                          })
+                          pswp.init()
+                        })
+                      }
+                    }}
+                  >
                     <CldImage
                       width="800"
                       height="800"
@@ -68,6 +140,38 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
           </div>
         )}
       </div>
+
+      {/* Desktop side preview overlay (covers right info column) */}
+      {images.length > 0 && (
+        <div
+          className="hidden md:block absolute top-0 z-20 rounded-md border bg-background overflow-hidden"
+          style={{
+            left: 'calc(100% + 0.5rem)',
+            width: `${previewSize.w}px`,
+            height: `${previewSize.h}px`,
+            visibility:
+              isHovering && typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches
+                ? 'visible'
+                : 'hidden',
+          }}
+        >
+          <CldImage
+            width="2000"
+            height="2000"
+            src={images[current]}
+            alt={(nameKo || '상품 확대 미리보기') as string}
+            crop="fill"
+            gravity="auto"
+            className="absolute top-0 left-0 w-full h-full object-cover select-none pointer-events-none"
+            style={{
+              transform: `translate(${-hoverRatio.x * (zoom - 1) * previewSize.w}px, ${
+                -hoverRatio.y * (zoom - 1) * previewSize.h
+              }px) scale(${zoom})`,
+              transformOrigin: 'top left',
+            }}
+          />
+        </div>
+      )}
 
       {/* Thumbnails */}
       <div className="mt-3 flex gap-2 overflow-x-auto scrollbar-hide">
