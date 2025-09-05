@@ -29,6 +29,41 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
   const [previewSize, setPreviewSize] = React.useState<{ w: number; h: number }>({ w: 0, h: 0 })
   const zoom = 2.5
 
+  const loadImageSize = (src: string) =>
+    new Promise<{ width: number; height: number }>((resolve) => {
+      const img = new Image()
+      img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight })
+      img.onerror = () => resolve({ width: 1600, height: 1200 })
+      img.src = src
+    })
+
+  const openMobileLightbox = async (startIndex: number) => {
+    const isMobile = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+    if (!isMobile) return
+
+    // eslint-disable-next-line import/no-extraneous-dependencies
+    const { default: PhotoSwipe } = await import('photoswipe')
+
+    const urls = images.map((id) =>
+      getCldImageUrl({ src: id, width: 1600, format: 'auto', quality: 'auto', dpr: 'auto' }),
+    )
+
+    const sizes = await Promise.all(urls.map((u) => loadImageSize(u)))
+
+    const dataSource = urls.map((src, i) => ({ src, width: sizes[i].width, height: sizes[i].height }))
+
+    const pswp = new PhotoSwipe({
+      dataSource,
+      index: startIndex,
+      bgOpacity: 1,
+      initialZoomLevel: 'fit',
+      secondaryZoomLevel: 2,
+      maxZoomLevel: 4,
+      zoom: false,
+    })
+    pswp.init()
+  }
+
   React.useEffect(() => {
     const el = currentBoxRef.current
     if (!el) return undefined
@@ -75,46 +110,12 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
-                          // eslint-disable-next-line import/no-extraneous-dependencies
-                          import('photoswipe').then(async ({ default: PhotoSwipe }) => {
-                            const pswp = new PhotoSwipe({
-                              dataSource: images.map((id) => ({
-                                src: getCldImageUrl({
-                                  src: id,
-                                  width: 2000,
-                                  format: 'auto',
-                                  quality: 'auto',
-                                  dpr: 'auto',
-                                }),
-                              })),
-                              index: images.indexOf(publicId),
-                            })
-                            pswp.init()
-                          })
-                        }
+                        openMobileLightbox(images.indexOf(publicId))
                       }
                     }}
                     onClick={() => {
                       // 모바일(coarse pointer)에서는 전체화면 뷰어 진입
-                      if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
-                        // eslint-disable-next-line import/no-extraneous-dependencies
-                        import('photoswipe').then(async ({ default: PhotoSwipe }) => {
-                          const pswp = new PhotoSwipe({
-                            dataSource: images.map((id) => ({
-                              src: getCldImageUrl({
-                                src: id,
-                                width: 2000,
-                                format: 'auto',
-                                quality: 'auto',
-                                dpr: 'auto',
-                              }),
-                            })),
-                            index: images.indexOf(publicId),
-                          })
-                          pswp.init()
-                        })
-                      }
+                      openMobileLightbox(images.indexOf(publicId))
                     }}
                   >
                     <CldImage
