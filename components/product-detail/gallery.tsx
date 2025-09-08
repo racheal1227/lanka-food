@@ -90,12 +90,12 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
     <div className="relative w-full">
       <div className="relative">
         {hasImages ? (
-          <Carousel setApi={setApi} className="w-full" opts={{ loop: true }}>
+          <Carousel setApi={setApi} className="w-full cursor-default" opts={{ loop: true }}>
             <CarouselContent>
               {images.map((publicId) => (
                 <CarouselItem key={publicId}>
                   <div
-                    className="aspect-square w-full overflow-hidden rounded-md bg-muted"
+                    className="relative aspect-square w-full overflow-hidden rounded-md bg-muted cursor-default"
                     ref={images[current] === publicId ? currentBoxRef : null}
                     onMouseEnter={() => setIsHovering(true)}
                     onMouseLeave={() => setIsHovering(false)}
@@ -128,6 +128,23 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
                       loading={publicId === images[0] ? 'eager' : 'lazy'}
                       className="w-full h-full object-cover"
                     />
+                    {isHovering &&
+                      typeof window !== 'undefined' &&
+                      window.matchMedia('(pointer: fine)').matches &&
+                      (() => {
+                        const lensW = previewSize.w / zoom
+                        const lensH = previewSize.h / zoom
+                        const rawLeft = hoverRatio.x * previewSize.w - lensW / 2
+                        const rawTop = hoverRatio.y * previewSize.h - lensH / 2
+                        const left = Math.min(Math.max(rawLeft, 0), Math.max(previewSize.w - lensW, 0))
+                        const top = Math.min(Math.max(rawTop, 0), Math.max(previewSize.h - lensH, 0))
+                        return (
+                          <div
+                            className="pointer-events-none absolute border-2 border-primary/80 shadow-[0_0_0_1px_rgba(255,255,255,0.9)_inset] rounded-sm"
+                            style={{ width: `${lensW}px`, height: `${lensH}px`, left: `${left}px`, top: `${top}px` }}
+                          />
+                        )
+                      })()}
                   </div>
                 </CarouselItem>
               ))}
@@ -156,21 +173,31 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
                 : 'hidden',
           }}
         >
-          <CldImage
-            width="2000"
-            height="2000"
-            src={images[current]}
-            alt={(nameKo || '상품 확대 미리보기') as string}
-            crop="fill"
-            gravity="auto"
-            className="absolute top-0 left-0 w-full h-full object-cover select-none pointer-events-none"
-            style={{
-              transform: `translate(${-hoverRatio.x * (zoom - 1) * previewSize.w}px, ${
-                -hoverRatio.y * (zoom - 1) * previewSize.h
-              }px) scale(${zoom})`,
-              transformOrigin: 'top left',
-            }}
-          />
+          {(() => {
+            const lensW = previewSize.w / zoom
+            const lensH = previewSize.h / zoom
+            const rawLeft = hoverRatio.x * previewSize.w - lensW / 2
+            const rawTop = hoverRatio.y * previewSize.h - lensH / 2
+            const left = Math.min(Math.max(rawLeft, 0), Math.max(previewSize.w - lensW, 0))
+            const top = Math.min(Math.max(rawTop, 0), Math.max(previewSize.h - lensH, 0))
+            const translateX = -left * zoom
+            const translateY = -top * zoom
+            return (
+              <CldImage
+                width="2000"
+                height="2000"
+                src={images[current]}
+                alt={(nameKo || '상품 확대 미리보기') as string}
+                crop="fill"
+                gravity="center"
+                className="absolute top-0 left-0 w-full h-full object-cover select-none pointer-events-none"
+                style={{
+                  transform: `translate(${translateX}px, ${translateY}px) scale(${zoom})`,
+                  transformOrigin: 'top left',
+                }}
+              />
+            )
+          })()}
         </div>
       )}
 
@@ -183,7 +210,7 @@ export default function Gallery({ images, nameKo }: GalleryProps) {
               type="button"
               aria-label={`슬라이드 ${index + 1}로 이동`}
               className={cn(
-                'relative w-16 h-16 rounded-md overflow-hidden border',
+                'relative w-16 h-16 rounded-md overflow-hidden border cursor-pointer',
                 current === index ? 'border-2 border-primary' : 'border-transparent',
               )}
               onMouseEnter={() => api?.scrollTo(index)}
