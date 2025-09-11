@@ -2,25 +2,17 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getCldImageUrl } from 'next-cloudinary'
 
-import Gallery from '@/components/product-detail/gallery'
 import InfoTable, { ProductDetailViewModel } from '@/components/product-detail/info-table'
-import { Product } from '@/types/database.models'
-import { createClient } from '@/utils/supabase/server'
+import Gallery from '@components/product-detail/gallery'
+import { getProduct } from '@services/product.service'
 
 interface PageProps {
   params: Promise<{ id: string }>
 }
 
-const fetchProduct = async (id: string): Promise<Product | null> => {
-  const supabase = await createClient()
-  const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
-  if (error) return null
-  return data as Product
-}
-
 export const generateMetadata = async ({ params }: PageProps): Promise<Metadata> => {
   const { id } = await params
-  const product = await fetchProduct(id)
+  const product = await getProduct(id)
   if (!product) return { title: '상품을 찾을 수 없습니다 | Lanka Food' }
 
   const nameKo = product.name_ko || ''
@@ -59,7 +51,7 @@ export const generateMetadata = async ({ params }: PageProps): Promise<Metadata>
 
 export default async function ProductDetailPage({ params }: PageProps) {
   const { id } = await params
-  const product = await fetchProduct(id)
+  const product = await getProduct(id)
   if (!product) return notFound()
 
   const images: string[] = []

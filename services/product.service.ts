@@ -1,6 +1,5 @@
-import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
-import { SetProductRecommendationParams } from '@/types/product.type'
-import { PageResponse, QueryParams } from '@/types/query.type'
+import { z } from 'zod'
+
 import {
   applySearchTermsFilter,
   convertEmptyToNull,
@@ -9,6 +8,40 @@ import {
   parseSearchTerms,
 } from '@/utils/query.utils'
 import supabase from '@lib/supabase'
+
+import type { Product, ProductInsert, ProductUpdate, ProductAttribute, Category } from '@/types/database.models'
+import type { Json, Tables, TablesUpdate } from '@/types/database.types'
+import type { SetProductRecommendationParams } from '@/types/product.type'
+import type { PageResponse, QueryParams } from '@/types/query.type'
+
+// attributes <Json> ↔ <ProductAttribute[]> 변환 유틸
+const attributeSchema = z.object({
+  key: z.string().min(1),
+  value: z.string().min(1),
+  order: z.number().int().nonnegative(),
+})
+const attributesSchema = z.array(attributeSchema)
+
+const normalizeAttributes = (input: Json | null | undefined): ProductAttribute[] => {
+  if (!input) return []
+  const parsed = attributesSchema.safeParse(input)
+  if (!parsed.success) return []
+  return parsed.data.sort((a, b) => a.order - b.order)
+}
+
+const toJsonAttributes = (attrs: ProductAttribute[] | null | undefined): Json | null => {
+  if (!attrs || attrs.length === 0) return null
+  const plain = attrs.map((a) => ({ key: a.key, value: a.value, order: a.order }))
+  return plain as unknown as Json
+}
+
+const normalizeProduct = (row: Tables<'products'> & { categories?: Category }): Product => {
+  const { attributes: ignoredAttributes, ...rest } = row
+  return {
+    ...rest,
+    attributes: normalizeAttributes(ignoredAttributes as Json | null),
+  }
+}
 
 export const getProducts = async ({
   pageIndex,
@@ -37,7 +70,8 @@ export const getProducts = async ({
   const { data, count, error } = await query
   if (error) throw error
 
-  return createPageResponse<Product>(data, count || 0, pageIndex, pageSize)
+  const normalized = data.map((row) => normalizeProduct(row))
+  return createPageResponse<Product>(normalized, count || 0, pageIndex, pageSize)
 }
 
 export const getProductsByCategoryName = async ({
@@ -81,27 +115,28 @@ export const getProductsByCategoryName = async ({
   const { data, count, error } = await query
   if (error) throw error
 
-  return createPageResponse<Product>(data, count || 0, pageIndex, pageSize)
+  const normalized = data.map((row) => normalizeProduct(row))
+  return createPageResponse<Product>(normalized, count || 0, pageIndex, pageSize)
 }
 
 export const getProduct = async (id: string): Promise<Product> => {
-  const { data, error } = await supabase.from('products').select('*').eq('id', id).single()
+  const { data, error } = await supabase.from('products').select('*, categories(*)').eq('id', id).single()
 
   if (error) throw error
-  return data
+  return normalizeProduct(data)
 }
 
 export const getRecommendedProducts = async (): Promise<Product[]> => {
   const { data, error } = await supabase
     .from('products')
-    .select('*')
+    .select('*, categories(*)')
     .eq('is_recommended', true)
     .order('is_available', { ascending: false })
     .order('published_at', { ascending: false })
     .limit(6)
 
   if (error) throw error
-  return data
+  return data.map((row) => normalizeProduct(row))
 }
 
 export const createProduct = async (product: ProductInsert): Promise<Product> => {
@@ -110,12 +145,13 @@ export const createProduct = async (product: ProductInsert): Promise<Product> =>
     ...product,
     name_ko: convertEmptyToNull(product.name_ko),
     name_si: convertEmptyToNull(product.name_si),
+    attributes: toJsonAttributes(product.attributes),
   }
 
-  const { data, error } = await supabase.from('products').insert([processedProduct]).select()
+  const { data, error } = await supabase.from('products').insert([processedProduct]).select('*, categories(*)')
 
   if (error) throw error
-  return data[0]
+  return normalizeProduct(data[0])
 }
 
 export const updateProduct = async ({ id, product }: { id: string; product: ProductUpdate }): Promise<Product> => {
@@ -124,11 +160,17 @@ export const updateProduct = async ({ id, product }: { id: string; product: Prod
     ...product,
     name_ko: convertEmptyToNull(product.name_ko),
     name_si: convertEmptyToNull(product.name_si),
+    attributes: toJsonAttributes(product.attributes),
   }
-  const { data, error } = await supabase.from('products').update(processedProduct).eq('id', id).select().single()
+  const { data, error } = await supabase
+    .from('products')
+    .update(processedProduct)
+    .eq('id', id)
+    .select('*, categories(*)')
+    .single()
 
   if (error) throw error
-  return data
+  return normalizeProduct(data)
 }
 
 export const deleteImageFromCloudinary = async (publicId: string): Promise<boolean> => {
@@ -143,6 +185,7 @@ export const deleteImageFromCloudinary = async (publicId: string): Promise<boole
     })
 
     if (!response.ok) {
+      // eslint-disable-next-line no-console
       console.error(`이미지 삭제 응답 오류: ${response.statusText}`)
       return false
     }
@@ -150,6 +193,7 @@ export const deleteImageFromCloudinary = async (publicId: string): Promise<boole
     const data = await response.json()
     return data.success === true
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(`이미지 삭제 실패 (${publicId}):`, error)
     return false
   }
@@ -197,7 +241,7 @@ export const setProductRecommendation = async ({
   isRecommended,
   recommendationOrder,
 }: SetProductRecommendationParams) => {
-  let updates: Partial<ProductUpdate> = {}
+  let updates: Partial<TablesUpdate<'products'>> = {}
 
   if (isRecommended) {
     updates = { is_recommended: true, recommendation_order: recommendationOrder }
@@ -208,7 +252,7 @@ export const setProductRecommendation = async ({
   const { data, error } = await supabase.from('products').update(updates).eq('id', id).select()
 
   if (error) throw error
-  return data
+  return data.map((row) => normalizeProduct(row))
 }
 
 export const updateProductRecommendationOrder = async (

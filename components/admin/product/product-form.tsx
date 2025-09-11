@@ -8,13 +8,14 @@ import { ko } from 'react-day-picker/locale'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { useCategoriesQuery } from '@/hooks/use-category'
-import { toast } from '@/hooks/use-toast'
-import { cn } from '@/lib/utils'
-import { uploadImageArray } from '@/services/product.service'
-import { Product } from '@/types/database.models'
+import { Product, ProductAttribute } from '@/types/database.models'
 import { showErrorToast } from '@/utils/show-error-toast'
+import AttributeDialog from '@components/admin/product/attribute-dialog'
 import MultiImageUpload, { ClientImage } from '@components/admin/product/multi-image-upload'
+import { useCategoriesQuery } from '@hooks/use-category'
+import { toast } from '@hooks/use-toast'
+import { cn } from '@lib/utils'
+import { uploadImageArray } from '@services/product.service'
 import { Button } from '@ui/button'
 import { Calendar } from '@ui/calendar'
 import { Checkbox } from '@ui/checkbox'
@@ -23,6 +24,12 @@ import { Input } from '@ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select'
 import { Textarea } from '@ui/textarea'
+
+const attributeSchema = z.object({
+  key: z.string().min(1, '항목을 입력하세요.'),
+  value: z.string().min(1, '값을 입력하세요.'),
+  order: z.number().int().nonnegative(),
+})
 
 const productSchema = z.object({
   category_id: z.string({ required_error: '카테고리를 선택해주세요.' }).min(1, { message: '카테고리를 선택해주세요.' }),
@@ -40,6 +47,10 @@ const productSchema = z.object({
   is_recommended: z.boolean(),
   featured_images: z.array(z.string()).nullable().optional(),
   detail_images: z.array(z.string()).nullable().optional(),
+  attributes: z
+    .array(attributeSchema)
+    .transform((arr) => (arr ? arr.filter((a) => a.key.trim() && a.value.trim()) : []))
+    .refine((arr) => arr.length > 0, { message: '상세 속성을 최소 1개 이상 입력해주세요.' }),
   published_at: z.date({ required_error: '상품 등록 일자를 선택해주세요.' }),
 })
 
@@ -86,6 +97,8 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
   const [tempHour, setTempHour] = React.useState<number>(0)
   const [tempMinute, setTempMinute] = React.useState<number>(0)
   const [datePickerOpen, setDatePickerOpen] = React.useState(false)
+  const [attrDialogOpen, setAttrDialogOpen] = React.useState(false)
+  const [editableAttributes, setEditableAttributes] = React.useState<ProductAttribute[]>([])
 
   const defaultValues: FormValues = product
     ? {
@@ -100,6 +113,7 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
         is_recommended: product.is_recommended,
         featured_images: product.featured_images || [],
         detail_images: product.detail_images || [],
+        attributes: product.attributes || [],
         published_at: product.published_at ? new Date(product.published_at) : new Date(),
       }
     : {
@@ -114,6 +128,7 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
         is_recommended: false,
         featured_images: [],
         detail_images: [],
+        attributes: [],
         published_at: new Date(),
       }
 
@@ -121,6 +136,10 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
     resolver: zodResolver(productSchema),
     defaultValues,
   })
+
+  React.useEffect(() => {
+    form.setValue('attributes', editableAttributes)
+  }, [editableAttributes, form])
 
   const handleStockQuantityChange = (value: number) => {
     if (value === 0) {
@@ -178,6 +197,7 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
         published_at: publishedAt.toISOString(),
         featured_images: featuredImages.length > 0 ? featuredImages : null,
         detail_images: detailImages.length > 0 ? detailImages : null,
+        attributes: data.attributes,
         is_available: data.stock_quantity === 0 ? false : data.is_available,
       }
 
@@ -285,14 +305,20 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
               <FormField
                 control={form.control}
-                name="name_en"
+                name="price_krw"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      상품명 (영어) <span className="text-red-600">*</span>
+                      가격 (KRW) <span className="text-red-600">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Product Name" {...field} />
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder="가격"
+                        {...field}
+                        onChange={(event) => field.onChange(parseFloat(event.target.value) || 0)}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -301,13 +327,24 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
               <FormField
                 control={form.control}
-                name="name_ko"
+                name="stock_quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>상품명 (한국어)</FormLabel>
+                    <FormLabel>
+                      재고 수량 <span className="text-red-600">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="상품명" {...field} />
+                      <Input
+                        type="number"
+                        min={0}
+                        placeholder="재고 수량"
+                        {...field}
+                        onChange={(event) =>
+                          field.onChange(handleStockQuantityChange(parseInt(event.target.value, 10) || 0))
+                        }
+                      />
                     </FormControl>
+                    <FormDescription>재고가 0이면 판매 불가능 상태로 자동 설정됩니다.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -315,13 +352,36 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
               <FormField
                 control={form.control}
-                name="name_si"
-                render={({ field }) => (
+                name="attributes"
+                render={() => (
                   <FormItem>
-                    <FormLabel>상품명 (싱할라어)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Product Name in Sinhala" {...field} />
-                    </FormControl>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <FormLabel>
+                          상세 속성 <span className="text-red-600">*</span>
+                        </FormLabel>
+                      </div>
+                      <Button type="button" variant="outline" size="sm" onClick={() => setAttrDialogOpen(true)}>
+                        설정
+                      </Button>
+                    </div>
+
+                    {(form.watch('attributes') || []).length > 0 ? (
+                      <div className="rounded-md border p-3 text-sm space-y-1">
+                        {form
+                          .watch('attributes')
+                          .slice()
+                          .sort((a, b) => a.order - b.order)
+                          .map((row) => (
+                            <div key={`${row.key}-${row.value}-${row.order}`} className="flex items-center gap-2">
+                              <span className="text-muted-foreground w-28 truncate">{row.key}</span>
+                              <span className="truncate">{row.value}</span>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground">등록된 상세 속성이 없습니다.</div>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -439,20 +499,14 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
               <FormField
                 control={form.control}
-                name="price_krw"
+                name="name_en"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      가격 (KRW) <span className="text-red-600">*</span>
+                      상품명 (영어) <span className="text-red-600">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="text"
-                        inputMode="numeric"
-                        placeholder="가격"
-                        {...field}
-                        onChange={(event) => field.onChange(parseFloat(event.target.value) || 0)}
-                      />
+                      <Input placeholder="Product Name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -461,24 +515,27 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
 
               <FormField
                 control={form.control}
-                name="stock_quantity"
+                name="name_ko"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      재고 수량 <span className="text-red-600">*</span>
-                    </FormLabel>
+                    <FormLabel>상품명 (한국어)</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        placeholder="재고 수량"
-                        {...field}
-                        onChange={(event) =>
-                          field.onChange(handleStockQuantityChange(parseInt(event.target.value, 10) || 0))
-                        }
-                      />
+                      <Input placeholder="상품명" {...field} />
                     </FormControl>
-                    <FormDescription>재고가 0이면 판매 불가능 상태로 자동 설정됩니다.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="name_si"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>상품명 (싱할라어)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Product Name in Sinhala" {...field} />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -578,6 +635,12 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
           </div>
         </form>
       </Form>
+      <AttributeDialog
+        open={attrDialogOpen}
+        onOpenChange={setAttrDialogOpen}
+        value={form.watch('attributes')}
+        onConfirm={(rows) => setEditableAttributes(rows)}
+      />
     </React.Suspense>
   )
 }
