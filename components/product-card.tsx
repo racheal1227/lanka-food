@@ -6,10 +6,10 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { CldImage } from 'next-cloudinary'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import WishlistButton from '@/components/wishlist/wishlist-button'
-import { cn } from '@/lib/utils'
 import { Product } from '@/types/database.models'
+import { Card, CardContent } from '@components/ui/card'
+import WishlistButton from '@components/wishlist/wishlist-button'
+import { cn } from '@lib/utils'
 
 interface ProductCardProps {
   product: Product
@@ -28,11 +28,14 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
   )
 
   React.useEffect(() => {
+    const node = cardRef.current
+    if (!node) return undefined
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          if (cardRef.current) observer.unobserve(cardRef.current)
+          observer.unobserve(node)
         }
       },
       {
@@ -42,14 +45,11 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
       },
     )
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current)
-    }
+    observer.observe(node)
 
     return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current)
-      }
+      observer.unobserve(node)
+      observer.disconnect()
     }
   }, [])
 

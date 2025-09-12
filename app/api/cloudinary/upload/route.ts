@@ -1,4 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary'
+import { v2 as cloudinary, UploadApiErrorResponse, UploadApiResponse } from 'cloudinary'
 
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -26,16 +26,16 @@ export async function POST(request: NextRequest) {
     const base64Data = `data:${file.type};base64,${buffer.toString('base64')}`
 
     // Cloudinary SDK를 사용하여 이미지 업로드
-    const uploadResult = await new Promise<any>((resolve, reject) => {
+    const uploadResult = await new Promise<UploadApiResponse>((resolve, reject) => {
       cloudinary.uploader.upload(
         base64Data,
         {
           upload_preset: 'lanka-food',
           resource_type: 'auto',
         },
-        (error: any, result: any) => {
+        (error?: UploadApiErrorResponse, callResult?: UploadApiResponse) => {
           if (error) reject(error)
-          else resolve(result)
+          else resolve(callResult as UploadApiResponse)
         },
       )
     })

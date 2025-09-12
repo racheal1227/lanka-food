@@ -34,7 +34,6 @@ interface WishlistFormProps {
 export default function WishlistForm({ onClose, onSubmit }: WishlistFormProps) {
   const { items, selectedItems } = useWishlistStore()
   const selectedProducts = items.filter((item) => selectedItems.has(item.id))
-  const totalQuantity = selectedProducts.reduce((sum, product) => sum + product.quantity, 0)
 
   // 전화번호 포맷팅 함수
   const formatPhoneNumber = (value: string): string => {

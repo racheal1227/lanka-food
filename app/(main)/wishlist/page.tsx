@@ -6,9 +6,9 @@ import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { CldImage } from 'next-cloudinary'
 
-import EmptyWishlist from '@/components/wishlist/empty-wishlist'
-import WishlistForm from '@/components/wishlist/wishlist-form'
-import { useIsMobile } from '@/hooks/use-mobile'
+import EmptyWishlist from '@components/wishlist/empty-wishlist'
+import WishlistForm from '@components/wishlist/wishlist-form'
+import { useIsMobile } from '@hooks/use-mobile'
 import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
 import { Card, CardContent } from '@ui/card'
@@ -23,13 +23,11 @@ export default function WishlistPage() {
     loadItems,
     removeItem,
     removeSelectedItems,
-    clearItems,
     toggleSelection,
     selectAll,
     clearSelection,
     getSelectedCount,
     getItemCount,
-    updateQuantity,
     incrementQuantity,
     decrementQuantity,
   } = useWishlistStore()

@@ -29,9 +29,9 @@ const normalizeAttributes = (input: Json | null | undefined): ProductAttribute[]
   return parsed.data.sort((a, b) => a.order - b.order)
 }
 
-const toJsonAttributes = (attrs: ProductAttribute[] | null | undefined): Json | null => {
-  if (!attrs || attrs.length === 0) return null
-  const plain = attrs.map((a) => ({ key: a.key, value: a.value, order: a.order }))
+const toJsonAttributes = (attributes: ProductAttribute[] | null | undefined): Json | null => {
+  if (!attributes || attributes.length === 0) return null
+  const plain = attributes.map((a) => ({ key: a.key, value: a.value, order: a.order }))
   return plain as unknown as Json
 }
 

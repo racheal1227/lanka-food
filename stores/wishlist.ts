@@ -1,15 +1,9 @@
 import React from 'react'
 import { create } from 'zustand'
 
-import {
-  getWishlistFromStorage,
-  addItemToStorage,
-  removeItemFromStorage,
-  clearWishlistStorage,
-  cleanExpiredItems,
-} from '@/lib/wishlist-storage'
 import { Product } from '@/types/database.models'
-import { WishlistStore, WishlistItem } from '@/types/wishlist.type'
+import { WishlistItem, WishlistStore } from '@/types/wishlist.type'
+import { addItemToStorage, cleanExpiredItems, clearWishlistStorage, removeItemFromStorage } from '@lib/wishlist-storage'
 
 export const useWishlistStore = create<WishlistStore>((set, get) => ({
   // 초기 상태
@@ -96,7 +90,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
 
   incrementQuantity: (productId: string) => {
     const { updateQuantity, items } = get()
-    const item = items.find((item) => item.id === productId)
+    const item = items.find(({ id }) => id === productId)
     if (item) {
       updateQuantity(productId, item.quantity + 1)
     }
@@ -104,7 +98,7 @@ export const useWishlistStore = create<WishlistStore>((set, get) => ({
 
   decrementQuantity: (productId: string) => {
     const { updateQuantity, items } = get()
-    const item = items.find((item) => item.id === productId)
+    const item = items.find(({ id }) => id === productId)
     if (item && item.quantity > 1) {
       updateQuantity(productId, item.quantity - 1)
     }

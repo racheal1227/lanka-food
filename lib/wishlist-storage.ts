@@ -23,16 +23,8 @@ export function getWishlistFromStorage(): WishlistItem[] {
   try {
     const stored = localStorage.getItem(WISHLIST_STORAGE_KEY)
     if (!stored) return []
-
-    const items: any[] = JSON.parse(stored)
-
-    // 기존 데이터에 quantity 필드가 없을 수 있으므로 기본값 설정
-    const itemsWithQuantity: WishlistItem[] = items.map((item) => ({
-      ...item,
-      quantity: item.quantity || 1, // 기존 아이템에 quantity가 없으면 1로 설정
-    }))
-
-    return itemsWithQuantity.filter(isNotExpired)
+    const items: WishlistItem[] = JSON.parse(stored)
+    return items.filter(isNotExpired)
   } catch (error) {
     console.error('위시리스트 로딩 중 오류:', error)
     return []
