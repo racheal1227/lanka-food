@@ -8,13 +8,13 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import Loading from '@/app/loading'
 import { Product } from '@/types/database.models'
-import { parseSearchTerms } from '@/utils/query.utils'
 import ProductCard from '@components/product-card'
 import { useIsMobile } from '@hooks/use-mobile'
 import { useProductsByCategory } from '@hooks/use-product'
 import { Badge } from '@ui/badge'
 import { Button } from '@ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@ui/dropdown-menu'
+import { parseSearchTerms } from '@utils/query.utils'
 
 export default function ProductList() {
   const searchParams = useSearchParams()

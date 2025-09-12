@@ -5,10 +5,10 @@ import { useEffect } from 'react'
 
 import { useRouter } from 'next/navigation'
 
-import { toast } from '@/hooks/use-toast'
-import supabase from '@/lib/supabase'
-import { useAuthStore } from '@/stores/auth'
 import { User } from '@/types/database.models'
+import { toast } from '@hooks/use-toast'
+import supabase from '@lib/supabase'
+import { useAuthStore } from '@stores/auth'
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()

@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
 
     // Cloudinary SDK를 사용하여 이미지 삭제
     const deleteResult = await new Promise<{ result: string }>((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       cloudinary.uploader.destroy(publicId, (error: any, callbackResult: any) => {
         if (error) reject(error)
         else resolve(callbackResult)

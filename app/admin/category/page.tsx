@@ -3,8 +3,16 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
-import { CategoryForm } from '@/components/admin/category/category-form'
-import { SortableCategoryList } from '@/components/admin/category/sortable-category-list'
+import { Category } from '@/types/database.models'
+import { CategoryForm } from '@components/admin/category/category-form'
+import { SortableCategoryList } from '@components/admin/category/sortable-category-list'
+import {
+  useCategoriesQuery,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+  useUpdateCategoryOrder,
+} from '@hooks/use-category'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,24 +22,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import {
-  useCategoriesQuery,
-  useCreateCategory,
-  useUpdateCategory,
-  useDeleteCategory,
-  useUpdateCategoryOrder,
-} from '@/hooks/use-category'
-import { Category } from '@/types/database.models'
+} from '@ui/alert-dialog'
+import { Button } from '@ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@ui/dialog'
 
 export default function CategoriesPage() {
   const { data: categories } = useCategoriesQuery(true)

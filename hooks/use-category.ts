@@ -2,10 +2,10 @@
 
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 
-import { toast } from '@/hooks/use-toast'
-import * as categoryService from '@/services/category.service'
 import { CategoryInsert, CategoryUpdate } from '@/types/database.models'
-import { showErrorToast } from '@/utils/show-error-toast'
+import { toast } from '@hooks/use-toast'
+import * as categoryService from '@services/category.service'
+import { showErrorToast } from '@utils/show-error-toast'
 
 // Read
 export const useCategoriesQuery = (isAdmin?: boolean) =>

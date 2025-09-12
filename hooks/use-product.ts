@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 
 import { Product, ProductInsert, ProductUpdate } from '@/types/database.models'
 import { QueryParams } from '@/types/query.type'
-import { showErrorToast } from '@/utils/show-error-toast'
+import { showErrorToast } from '@utils/show-error-toast'
 import { toast } from '@hooks/use-toast'
 import * as productService from '@services/product.service'
 

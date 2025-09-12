@@ -3,12 +3,13 @@
 import { ImageOff } from 'lucide-react'
 import * as React from 'react'
 
+import { useRouter } from 'next/navigation'
 import { CldImage } from 'next-cloudinary'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import WishlistButton from '@/components/wishlist/wishlist-button'
-import { cn } from '@/lib/utils'
 import { Product } from '@/types/database.models'
+import WishlistButton from '@components/wishlist/wishlist-button'
+import { cn } from '@lib/utils'
+import { Card, CardContent } from '@ui/card'
 
 interface ProductCardProps {
   product: Product
@@ -18,6 +19,7 @@ interface ProductCardProps {
 export default function ProductCard({ product, size = 'large' }: ProductCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = React.useState(false)
+  const router = useRouter()
 
   const placeholder = (
     <div className="bg-gray-200 h-full w-full flex items-center justify-center">
@@ -26,11 +28,14 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
   )
 
   React.useEffect(() => {
+    const node = cardRef.current
+    if (!node) return undefined
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true)
-          if (cardRef.current) observer.unobserve(cardRef.current)
+          observer.unobserve(node)
         }
       },
       {
@@ -40,14 +45,11 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
       },
     )
 
-    if (cardRef.current) {
-      observer.observe(cardRef.current)
-    }
+    observer.observe(node)
 
     return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current)
-      }
+      observer.unobserve(node)
+      observer.disconnect()
     }
   }, [])
 
@@ -58,7 +60,15 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
       ref={cardRef}
       className={cn('overflow-hidden hover:shadow-md transition-shadow', size === 'small' ? 'max-w-[150px]' : '')}
     >
-      <div className={cn('relative w-full', size === 'small' ? 'aspect-[4/3]' : 'aspect-square')}>
+      <div
+        className={cn('relative w-full', size === 'small' ? 'aspect-[4/3]' : 'aspect-square')}
+        role="button"
+        tabIndex={0}
+        onClick={() => router.push(`/products/${product.id}`)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') router.push(`/products/${product.id}`)
+        }}
+      >
         {mainImage ? (
           isVisible ? (
             <CldImage

@@ -1,13 +1,13 @@
 'use client'
 
-import { MessageCircle, Send, ShoppingBag } from 'lucide-react'
+import { MessageCircle, ShoppingBag } from 'lucide-react'
 import { useEffect } from 'react'
 
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
-import { useWishlistStore } from '@/stores/wishlist'
 import { useCategoriesQuery } from '@hooks/use-category'
+import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
 import {
   NavigationMenu,
@@ -91,7 +91,7 @@ export default function DesktopNavigation() {
             </NavigationMenu>
           </div>
 
-          {/* <div className="w-2 flex justify-end flex-shrink-0">
+          <div className="w-2 flex justify-end flex-shrink-0">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -109,7 +109,7 @@ export default function DesktopNavigation() {
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { toast } from '@/hooks/use-toast'
+import { toast } from '@hooks/use-toast'
 
 export const showErrorToast = <E extends Error>(error: E, message?: string) => {
   toast({
