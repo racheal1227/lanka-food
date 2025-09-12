@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getCldImageUrl } from 'next-cloudinary'
 
-import InfoTable, { ProductDetailViewModel } from '@/components/product-detail/info-table'
+import AttributesTable from '@components/product-detail/attributes-table'
 import Gallery from '@components/product-detail/gallery'
 import { getProduct } from '@services/product.service'
 
@@ -62,18 +62,6 @@ export default async function ProductDetailPage({ params }: PageProps) {
     images.push(...product.detail_images.filter(Boolean))
   }
 
-  const viewModel: ProductDetailViewModel = {
-    origin: '정보 없음',
-    weightGrams: 0,
-    brand: '정보 없음',
-    grade: '정보 없음',
-    packageUnit: '정보 없음',
-    ingredients: '정보 없음',
-    shelfLife: '정보 없음',
-    storage: '정보 없음',
-    certifications: '정보 없음',
-  }
-
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -97,7 +85,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
               </h1>
             )}
           </div>
-          <InfoTable viewModel={viewModel} />
+          <AttributesTable attributes={product.attributes || []} />
         </div>
       </div>
     </div>
