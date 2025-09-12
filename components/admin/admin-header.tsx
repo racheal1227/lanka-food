@@ -2,9 +2,9 @@
 
 import { LogOut, User as UserIcon } from 'lucide-react'
 
-import LogoutButton from '@/components/auth/logout-button'
-import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/stores/auth'
+import LogoutButton from '@components/auth/logout-button'
+import { useAuthStore } from '@stores/auth'
+import { Button } from '@ui/button'
 
 export default function AdminHeader() {
   const { user } = useAuthStore()

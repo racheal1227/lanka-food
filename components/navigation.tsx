@@ -2,9 +2,9 @@
 
 import * as React from 'react'
 
-import DesktopNavigation from '@/components/desktop-navigation'
-import MobileHeader from '@/components/mobile-header'
-import MobileNavigation from '@/components/mobile-navigation'
+import DesktopNavigation from '@components/desktop-navigation'
+import MobileHeader from '@components/mobile-header'
+import MobileNavigation from '@components/mobile-navigation'
 import { useIsMobile } from '@hooks/use-mobile'
 
 export default function MainNavigation() {

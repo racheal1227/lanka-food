@@ -20,9 +20,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Edit, Trash2 } from 'lucide-react'
 import { useEffect, useState, useCallback } from 'react'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Category } from '@/types/database.models'
+import { Badge } from '@ui/badge'
+import { Button } from '@ui/button'
 
 interface SortableCategoryItemProps {
   category: Category

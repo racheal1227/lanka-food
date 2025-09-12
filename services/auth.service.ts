@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@utils/supabase/server'
 
 export const login = async ({ email, password }: { email: string; password: string }) => {
   const supabase = await createClient()

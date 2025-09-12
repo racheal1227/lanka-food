@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
-import AdminHeader from '@/components/admin/admin-header'
-import AdminSidebar from '@/components/admin/admin-sidebar'
+import AdminHeader from '@components/admin/admin-header'
+import AdminSidebar from '@components/admin/admin-sidebar'
 
 export const metadata: Metadata = {
   title: '관리자 대시보드 | Lanka Food',

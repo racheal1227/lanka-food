@@ -1,4 +1,4 @@
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@ui/skeleton'
 
 const THUMB_SKELETON_KEYS = ['thumb-a', 'thumb-b', 'thumb-c', 'thumb-d', 'thumb-e']
 const ROW_SKELETON_KEYS = [

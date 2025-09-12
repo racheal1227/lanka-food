@@ -6,7 +6,7 @@ import {
   createPageResponse,
   formatToSupabaseSort,
   parseSearchTerms,
-} from '@/utils/query.utils'
+} from '@utils/query.utils'
 import supabase from '@lib/supabase'
 
 import type { Product, ProductInsert, ProductUpdate, ProductAttribute, Category } from '@/types/database.models'

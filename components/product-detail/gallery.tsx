@@ -5,15 +5,8 @@ import * as React from 'react'
 
 import { CldImage, getCldImageUrl } from 'next-cloudinary'
 
-import {
-  Carousel,
-  CarouselApi,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel'
-import { cn } from '@/lib/utils'
+import { cn } from '@lib/utils'
+import { Carousel, CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@ui/carousel'
 
 interface GalleryProps {
   images: string[]

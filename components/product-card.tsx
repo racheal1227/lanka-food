@@ -7,9 +7,9 @@ import { useRouter } from 'next/navigation'
 import { CldImage } from 'next-cloudinary'
 
 import { Product } from '@/types/database.models'
-import { Card, CardContent } from '@components/ui/card'
 import WishlistButton from '@components/wishlist/wishlist-button'
 import { cn } from '@lib/utils'
+import { Card, CardContent } from '@ui/card'
 
 interface ProductCardProps {
   product: Product

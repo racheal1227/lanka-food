@@ -3,9 +3,9 @@
 import * as React from 'react'
 import 'photoswipe/dist/photoswipe.css'
 
-import MainNavigation from '@/components/navigation'
-import { Separator } from '@/components/ui/separator'
-import { useIsMobile } from '@/hooks/use-mobile'
+import MainNavigation from '@components/navigation'
+import { useIsMobile } from '@hooks/use-mobile'
+import { Separator } from '@ui/separator'
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   // 초기 렌더링은 모바일 레이아웃으로 고정 (서버와 클라이언트 일치)

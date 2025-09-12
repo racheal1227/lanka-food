@@ -20,10 +20,10 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Plus, Trash2 } from 'lucide-react'
 import * as React from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { ProductAttribute } from '@/types/database.models'
+import { Button } from '@ui/button'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@ui/dialog'
+import { Input } from '@ui/input'
 
 interface AttributeWithId extends ProductAttribute {
   id: string

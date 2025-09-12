@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { Product, ProductAttribute } from '@/types/database.models'
-import { showErrorToast } from '@/utils/show-error-toast'
 import AttributeDialog from '@components/admin/product/attribute-dialog'
 import MultiImageUpload, { ClientImage } from '@components/admin/product/multi-image-upload'
 import { useCategoriesQuery } from '@hooks/use-category'
@@ -24,6 +23,7 @@ import { Input } from '@ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/popover'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/select'
 import { Textarea } from '@ui/textarea'
+import { showErrorToast } from '@utils/show-error-toast'
 
 const attributeSchema = z.object({
   key: z.string().min(1, '항목을 입력하세요.'),

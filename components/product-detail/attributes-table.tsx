@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableRow } from '@ui/table'
 
 import type { ProductAttribute } from '@/types/database.models'
 

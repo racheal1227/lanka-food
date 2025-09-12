@@ -6,8 +6,8 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 
-import { useWishlistStore } from '@/stores/wishlist'
 import { useCategoriesQuery } from '@hooks/use-category'
+import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
 import {
   NavigationMenu,

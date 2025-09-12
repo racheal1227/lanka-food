@@ -8,14 +8,14 @@ import * as z from 'zod'
 
 import { CldImage } from 'next-cloudinary'
 
-import { toast } from '@/hooks/use-toast'
-import { showErrorToast } from '@/utils/show-error-toast'
+import { toast } from '@hooks/use-toast'
 import { useWishlistStore } from '@stores/wishlist'
 import { Button } from '@ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/card'
 import { Input } from '@ui/input'
 import { Label } from '@ui/label'
 import { Textarea } from '@ui/textarea'
+import { showErrorToast } from '@utils/show-error-toast'
 
 const orderFormSchema = z.object({
   name: z.string().min(1, '이름 또는 회사명을 입력해주세요'),

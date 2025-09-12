@@ -1,8 +1,8 @@
 import { format } from 'date-fns'
 import { ko } from 'date-fns/locale'
 
-import supabase from '@/lib/supabase'
-import supabaseServer from '@/lib/supabase-server'
+import supabase from '@lib/supabase'
+import supabaseServer from '@lib/supabase-server'
 
 import type { EmailLog, EmailLogInsert, EmailLogUpdate, EmailLogProduct } from '@/types/database.models'
 

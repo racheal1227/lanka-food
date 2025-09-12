@@ -2,8 +2,8 @@ import { z } from 'zod'
 
 import { NextRequest, NextResponse } from 'next/server'
 
-import { createEmailLog, updateEmailLogSuccess, updateEmailLogFailure } from '@/services/email-log.service'
-import { sendContactEmail, sendOrderCopyToUser } from '@/services/email.service'
+import { createEmailLog, updateEmailLogSuccess, updateEmailLogFailure } from '@services/email-log.service'
+import { sendContactEmail, sendOrderCopyToUser } from '@services/email.service'
 
 // 주문 데이터 유효성 검사 스키마
 const contactSchema = z.object({
