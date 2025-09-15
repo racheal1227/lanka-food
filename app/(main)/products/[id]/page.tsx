@@ -4,6 +4,7 @@ import { getCldImageUrl } from 'next-cloudinary'
 
 import AttributesTable from '@components/product-detail/attributes-table'
 import Gallery from '@components/product-detail/gallery'
+import WishlistButton from '@components/wishlist/wishlist-button'
 import { getProduct } from '@services/product.service'
 
 interface PageProps {
@@ -69,22 +70,49 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <Gallery images={images} nameKo={product.name_ko || product.name_en} />
         </div>
         <div>
-          <div className="mb-4">
-            {product.name_ko ? (
-              <>
-                <h1 className="text-2xl md:text-3xl font-semibold text-foreground" lang="ko">
-                  {product.name_ko}
-                </h1>
-                <p className="text-sm md:text-base text-muted-foreground" lang="en">
-                  {product.name_en}
-                </p>
-              </>
-            ) : (
-              <h1 className="text-2xl md:text-3xl font-semibold text-foreground" lang="en">
-                {product.name_en}
-              </h1>
-            )}
+          <div className="mb-6">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div className="flex-1">
+                {product.name_ko ? (
+                  <>
+                    <h1 className="text-2xl md:text-3xl font-semibold text-foreground" lang="ko">
+                      {product.name_ko}
+                    </h1>
+                    <p className="text-sm md:text-base text-muted-foreground" lang="en">
+                      {product.name_en}
+                    </p>
+                  </>
+                ) : (
+                  <h1 className="text-2xl md:text-3xl font-semibold text-foreground" lang="en">
+                    {product.name_en}
+                  </h1>
+                )}
+                {product.name_si && (
+                  <p className="text-sm text-muted-foreground mt-1" lang="si">
+                    {product.name_si}
+                  </p>
+                )}
+              </div>
+
+              {/* 상품 상태에 따른 버튼 표시 */}
+              <div className="flex-shrink-0">
+                {product.is_available ? (
+                  <WishlistButton
+                    product={product}
+                    variant="outline"
+                    size="default"
+                    className="min-w-[140px] h-10"
+                    showText={true}
+                  />
+                ) : (
+                  <div className="px-4 py-2 bg-gray-100 text-gray-500 rounded-md border text-sm font-medium min-w-[120px] text-center">
+                    품절
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+
           <AttributesTable attributes={product.attributes || []} />
         </div>
       </div>

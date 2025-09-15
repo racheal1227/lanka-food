@@ -13,9 +13,16 @@ interface WishlistButtonProps {
   variant?: 'default' | 'ghost' | 'destructive' | 'outline' | 'secondary' | 'link'
   size?: 'default' | 'sm' | 'lg' | 'icon'
   className?: string
+  showText?: boolean
 }
 
-export default function WishlistButton({ product, variant = 'ghost', size = 'icon', className }: WishlistButtonProps) {
+export default function WishlistButton({
+  product,
+  variant = 'ghost',
+  size = 'icon',
+  className,
+  showText = false,
+}: WishlistButtonProps) {
   const { addItem, removeItem, isItemInWishlist, loadItems } = useWishlistStore()
   const [isInWishlist, setIsInWishlist] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -48,24 +55,23 @@ export default function WishlistButton({ product, variant = 'ghost', size = 'ico
 
   return (
     <Button
-      variant={variant}
+      variant={isInWishlist ? variant : 'default'}
       size={size}
       onClick={(event) => {
         event.stopPropagation()
         handleToggleWishlist()
       }}
       disabled={isLoading}
-      className={cn(
-        'relative',
-        isInWishlist ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-300' : 'hover:bg-gray-100',
-        className,
-      )}
+      className={className}
       aria-label={isInWishlist ? '장바구니에서 제거' : '장바구니에 추가'}
     >
-      <div className="relative">
-        <ShoppingBag className={cn('h-4 w-4', isInWishlist ? 'text-green-700' : '')} />
-        {isInWishlist && (
+      <div className={cn('relative', showText && 'flex items-center gap-2')}>
+        <ShoppingBag className="h-4 w-4" />
+        {isInWishlist && !showText && (
           <Check className="absolute -top-1.5 -right-2 h-3 w-3 text-white bg-green-600 rounded-full p-0.5" />
+        )}
+        {showText && (
+          <span className="text-sm font-medium">{isInWishlist ? '장바구니에서 제거' : '장바구니에 담기'}</span>
         )}
       </div>
     </Button>
