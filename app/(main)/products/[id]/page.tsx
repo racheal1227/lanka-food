@@ -102,7 +102,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
                     variant="outline"
                     size="default"
                     className="min-w-[140px] h-10"
-                    showText={true}
+                    showText
                   />
                 ) : (
                   <div className="px-4 py-2 bg-gray-100 text-gray-500 rounded-md border text-sm font-medium min-w-[120px] text-center">
