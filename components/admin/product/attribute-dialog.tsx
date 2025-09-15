@@ -53,7 +53,7 @@ function SortableRow({ row, onChange, onRemove, errors }: SortableRowProps) {
           <div className="w-36">
             <Input
               value={row.key}
-              placeholder="항목 이름"
+              placeholder="예: 원산지, 중량"
               onChange={(e) => onChange({ ...row, key: e.target.value })}
               className={errors?.key ? 'border-red-500' : ''}
             />
@@ -62,7 +62,7 @@ function SortableRow({ row, onChange, onRemove, errors }: SortableRowProps) {
           <div className="flex-1">
             <Input
               value={row.value}
-              placeholder="항목 값"
+              placeholder="예: 스리랑카, 250g"
               onChange={(e) => onChange({ ...row, value: e.target.value })}
               className={errors?.value ? 'border-red-500' : ''}
             />
