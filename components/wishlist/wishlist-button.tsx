@@ -50,7 +50,10 @@ export default function WishlistButton({ product, variant = 'ghost', size = 'ico
     <Button
       variant={variant}
       size={size}
-      onClick={handleToggleWishlist}
+      onClick={(event) => {
+        event.stopPropagation()
+        handleToggleWishlist()
+      }}
       disabled={isLoading}
       className={cn(
         'relative',

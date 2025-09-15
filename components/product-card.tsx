@@ -59,16 +59,14 @@ export default function ProductCard({ product, size = 'large' }: ProductCardProp
     <Card
       ref={cardRef}
       className={cn('overflow-hidden hover:shadow-md transition-shadow', size === 'small' ? 'max-w-[150px]' : '')}
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push(`/products/${product.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') router.push(`/products/${product.id}`)
+      }}
     >
-      <div
-        className={cn('relative w-full', size === 'small' ? 'aspect-[4/3]' : 'aspect-square')}
-        role="button"
-        tabIndex={0}
-        onClick={() => router.push(`/products/${product.id}`)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') router.push(`/products/${product.id}`)
-        }}
-      >
+      <div className={cn('relative w-full', size === 'small' ? 'aspect-[4/3]' : 'aspect-square')}>
         {mainImage ? (
           isVisible ? (
             <CldImage
